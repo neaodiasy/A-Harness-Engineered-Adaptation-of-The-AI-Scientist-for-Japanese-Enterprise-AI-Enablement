@@ -1,0 +1,35 @@
+[
+  {
+    "case_id": "case_family_quiet_school",
+    "customer_name": "佐藤様",
+    "household": "夫婦と小学生の子ども1名。静かな住環境と学校環境を重視。",
+    "budget": "55-70",
+    "commute_target": "新宿",
+    "max_commute_minutes": 40,
+    "preferences": "学校、静かな住宅街、駅アクセス、災害リスク確認、ファミリー向け。",
+    "must_have": "3LDK以上、駅徒歩15分以内、耐震性とハザードマップ確認。",
+    "approval_owner": "宅建士 / シニアコンサルタント"
+  },
+  {
+    "case_id": "case_commute_budget",
+    "customer_name": "田中様",
+    "household": "共働き夫婦。都心アクセスと予算バランスを重視。",
+    "budget": "50-60",
+    "commute_target": "新宿",
+    "max_commute_minutes": 35,
+    "preferences": "通勤、駅近、価格、将来の子育て可能性。",
+    "must_have": "駅徒歩12分以内、3LDK、月々支払いを抑えたい。",
+    "approval_owner": "営業マネージャー"
+  },
+  {
+    "case_id": "case_space_family",
+    "customer_name": "鈴木様",
+    "household": "子ども2名のファミリー。広さと生活利便性を重視。",
+    "budget": "45-58",
+    "commute_target": "新宿",
+    "max_commute_minutes": 50,
+    "preferences": "4LDK、広さ、学校、買い物利便性、静かさ。",
+    "must_have": "80平米前後、ファミリー向け、災害リスク確認。",
+    "approval_owner": "宅建士 / シニアコンサルタント"
+  }
+]

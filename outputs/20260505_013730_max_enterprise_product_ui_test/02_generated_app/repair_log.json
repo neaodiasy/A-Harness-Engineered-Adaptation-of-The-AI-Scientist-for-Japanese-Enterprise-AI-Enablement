@@ -1,0 +1,19 @@
+{
+  "status": "repair_required",
+  "failed_checks": [
+    "api_cli_runs",
+    "api_evaluation_runs",
+    "evaluation_results_indicate_success"
+  ],
+  "repairs": [
+    {
+      "trigger": "sandbox_evaluation_failed",
+      "failed_checks": [
+        "api_cli_runs",
+        "api_evaluation_runs",
+        "evaluation_results_indicate_success"
+      ],
+      "action": "Patch generated source files, rerun deterministic tests, then rerun API-backed evaluation."
+    }
+  ]
+}

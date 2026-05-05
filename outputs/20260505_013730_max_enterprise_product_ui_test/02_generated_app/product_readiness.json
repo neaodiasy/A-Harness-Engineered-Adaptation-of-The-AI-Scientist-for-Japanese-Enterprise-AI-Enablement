@@ -1,0 +1,112 @@
+{
+  "readiness_version": "production_readiness_v1",
+  "product_name": "AI Property Recommendation Platform",
+  "overall_level": "local_product_mvp_runtime_ready",
+  "implemented_capabilities": [
+    {
+      "capability": "multi_file_project_package",
+      "status": "implemented",
+      "evidence": [
+        "backend/",
+        "frontend/",
+        "data/",
+        "tests/",
+        "app.py",
+        "evaluation.py"
+      ]
+    },
+    {
+      "capability": "api_backed_agent_runtime",
+      "status": "implemented",
+      "evidence": [
+        "backend/llm_client.py",
+        "backend/agent.py"
+      ]
+    },
+    {
+      "capability": "runtime_live_web_evidence_search",
+      "status": "implemented",
+      "evidence": [
+        "backend/web_search.py",
+        "backend/agent.py:evidence"
+      ]
+    },
+    {
+      "capability": "local_domain_tools",
+      "status": "implemented",
+      "evidence": [
+        "backend/tools.py",
+        "backend/recommendation_engine.py"
+      ]
+    },
+    {
+      "capability": "human_approval_gate",
+      "status": "implemented",
+      "evidence": [
+        "backend/guardrails.py",
+        "output_policy.send_allowed=false"
+      ]
+    },
+    {
+      "capability": "sandbox_evaluation",
+      "status": "implemented",
+      "evidence": [
+        "evaluation.py",
+        "tests/test_recommendations.py",
+        "sandbox_report.json"
+      ]
+    },
+    {
+      "capability": "secret_leakage_check",
+      "status": "implemented",
+      "evidence": [
+        "src/sandbox_eval.py:no_api_key_or_secret_leakage"
+      ]
+    }
+  ],
+  "production_gaps": [
+    {
+      "capability": "authentication_and_roles",
+      "status": "not_implemented",
+      "production_requirement": "Add login, role-based access, approval-owner identity, and session audit trails."
+    },
+    {
+      "capability": "persistent_database",
+      "status": "not_implemented",
+      "production_requirement": "Replace local JSON files with a real database, migrations, and backup/restore policy."
+    },
+    {
+      "capability": "enterprise_data_connectors",
+      "status": "not_implemented",
+      "production_requirement": "Connect to approved internal document stores, CRM/SFA, ticketing, property systems, or maintenance logs."
+    },
+    {
+      "capability": "observability",
+      "status": "partial",
+      "production_requirement": "Add structured logs, latency metrics, model cost metrics, tracing, alerts, and redaction."
+    },
+    {
+      "capability": "security_review",
+      "status": "partial",
+      "production_requirement": "Add threat model, rate limiting, prompt-injection tests, dependency scanning, and data-retention controls."
+    },
+    {
+      "capability": "human_workflow_integration",
+      "status": "partial",
+      "production_requirement": "Add approval queue, edit history, reviewer comments, and final approval records."
+    }
+  ],
+  "recommended_next_milestones": [
+    "Pilot with sanitized enterprise data and named reviewers.",
+    "Add authentication, persistent storage, and approval workflow.",
+    "Connect to real enterprise data sources behind read-only permissions.",
+    "Add monitoring, cost controls, security tests, and prompt-injection evaluation.",
+    "Run 50-100 human-reviewed cases before production rollout."
+  ],
+  "architecture_entrypoints": {
+    "cli": "python3 app.py --cli",
+    "server": "python3 app.py",
+    "evaluation": "python3 evaluation.py",
+    "deterministic_tests": "python3 -m unittest discover -s tests"
+  }
+}

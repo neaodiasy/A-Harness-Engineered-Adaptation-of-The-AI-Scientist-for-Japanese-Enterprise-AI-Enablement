@@ -1,0 +1,240 @@
+{
+  "product_spec_version": "software_builder_loop_v1",
+  "product_name": "AI Property Recommendation Platform",
+  "product_slug": "ai_property_recommendation_platform",
+  "subtitle": "Customer preference intake, deterministic area/property ranking, DeepSeek recommendation drafting, and human approval workflow.",
+  "app_kind": "real_estate_recommendation",
+  "maturity_target": "enterprise_software_mvp",
+  "product_archetype": {
+    "id": "recommendation_workbench",
+    "name": "Recommendation Workbench",
+    "primary_job": "Compare candidates, explain trade-offs, and prepare an approval-ready recommendation.",
+    "workspace_regions": [
+      "case_queue",
+      "intake_form",
+      "candidate_comparison",
+      "evidence_panel",
+      "draft_editor",
+      "approval_packet"
+    ],
+    "selection_score": 8
+  },
+  "selected_opportunity": "Neighborhood Scoring & Ranking Engine",
+  "target_workflow": "Area comparison and recommendation based on customer preferences (budget, commute, lifestyle, family structure).",
+  "business_value": "Reduces consultant time per case by 40-50%, ensures consistent recommendations across staff, speeds up onboarding for new consultants.",
+  "key_risk": "Bias in scoring due to incomplete or outdated area data; overfitting to historical patterns.",
+  "target_user": "Business consultant and human reviewer",
+  "primary_action": "Generate Recommendation Packet",
+  "fields": [
+    {
+      "key": "customer_name",
+      "label": "Customer name",
+      "type": "text",
+      "required": true,
+      "default": "佐藤様"
+    },
+    {
+      "key": "household",
+      "label": "Household profile",
+      "type": "textarea",
+      "required": true,
+      "default": "夫婦と子ども1名。静かな住環境と通学環境を重視。"
+    },
+    {
+      "key": "budget",
+      "label": "Budget",
+      "type": "text",
+      "required": true,
+      "default": "55-70"
+    },
+    {
+      "key": "commute_target",
+      "label": "Commute target",
+      "type": "text",
+      "required": true,
+      "default": "新宿"
+    },
+    {
+      "key": "max_commute_minutes",
+      "label": "Max commute minutes",
+      "type": "number",
+      "required": true,
+      "default": "40"
+    },
+    {
+      "key": "preferences",
+      "label": "Preferences",
+      "type": "textarea",
+      "required": true,
+      "default": "駅アクセス、学校、静かな住宅街、災害リスク確認、ファミリー向け。"
+    },
+    {
+      "key": "must_have",
+      "label": "Must-have conditions",
+      "type": "textarea",
+      "required": true,
+      "default": "3LDK以上、駅徒歩15分以内、耐震性とハザードマップ確認。"
+    },
+    {
+      "key": "approval_owner",
+      "label": "Approval owner",
+      "type": "text",
+      "required": true,
+      "default": "宅建士 / シニアコンサルタント"
+    }
+  ],
+  "selected_primitives": [
+    "intake",
+    "retrieval",
+    "classification",
+    "extraction",
+    "checklist",
+    "drafting",
+    "risk_check",
+    "human_approval",
+    "audit_log",
+    "evaluation"
+  ],
+  "navigation_sections": [
+    "Work queue",
+    "Case intake",
+    "AI analysis",
+    "Evidence",
+    "Approval",
+    "Audit",
+    "System readiness"
+  ],
+  "workspace_regions": [
+    "case_queue",
+    "intake_form",
+    "candidate_comparison",
+    "evidence_panel",
+    "draft_editor",
+    "approval_packet"
+  ],
+  "enterprise_capabilities": [
+    "case_queue",
+    "structured_intake_form",
+    "runtime_live_web_evidence_search",
+    "domain_tool_panel",
+    "candidate_or_result_comparison",
+    "editable_business_draft",
+    "human_approval_packet",
+    "activity_log",
+    "audit_trace",
+    "error_and_loading_states"
+  ],
+  "role_model": [
+    {
+      "role": "operator",
+      "permissions": [
+        "create_case",
+        "run_agent",
+        "edit_draft"
+      ]
+    },
+    {
+      "role": "reviewer",
+      "permissions": [
+        "review_evidence",
+        "approve",
+        "request_edits",
+        "escalate"
+      ]
+    },
+    {
+      "role": "manager",
+      "permissions": [
+        "view_queue",
+        "inspect_audit",
+        "manage_policy"
+      ]
+    }
+  ],
+  "state_model": [
+    "new",
+    "ready_for_agent",
+    "running",
+    "draft_ready",
+    "review_required",
+    "approved_locally",
+    "edit_requested",
+    "escalated"
+  ],
+  "visual_quality_contract": {
+    "layout": "enterprise_workbench",
+    "must_have": [
+      "sidebar navigation",
+      "case queue",
+      "workbench panels",
+      "candidate or result table",
+      "evidence source list with live-search markers",
+      "approval actions",
+      "activity log",
+      "debug JSON secondary only",
+      "responsive KPI cards using auto-fit minmax grid",
+      "tablet and mobile breakpoints",
+      "safe wrapping for long labels and model outputs",
+      "no horizontal page overflow"
+    ],
+    "avoid": [
+      "landing page",
+      "chat-only UI",
+      "single raw JSON output",
+      "marketing hero",
+      "decorative-only visuals",
+      "fixed six-column KPI layout",
+      "desktop-only three-column workbench without tablet fallback"
+    ]
+  },
+  "enterprise_context": {
+    "industry": "real_estate",
+    "main_business": "The company helps users find suitable rental apartments and homes to buy in Tokyo and nearby areas. Staff members answer customer questions, compare neighborhoods, explain area characteristics, and recommend candidate areas and properties based on budget, commute, lifestyle, family structure, and preferences.",
+    "ai_objective": "",
+    "available_data": [
+      "area profiles",
+      "sample property listings",
+      "customer preference forms",
+      "commute information",
+      "school and lifestyle area notes"
+    ],
+    "constraints": [
+      "the system must not guarantee property price appreciation",
+      "the system must not make legal or financial decisions",
+      "final recommendation should be reviewed by a human real estate consultant",
+      "the system should explain reasoning and uncertainty clearly"
+    ]
+  },
+  "runtime": {
+    "api_key_env": "DEEPSEEK_API_KEY",
+    "base_url_env": "DEEPSEEK_BASE_URL",
+    "model_env": "AGENT_MODEL",
+    "default_model": "deepseek-v4-pro",
+    "thinking_env": "DEEPSEEK_THINKING",
+    "reasoning_effort_env": "DEEPSEEK_REASONING_EFFORT",
+    "default_reasoning_effort": "high"
+  },
+  "risk_terms": [
+    "customer",
+    "external",
+    "approval",
+    "legal",
+    "financial",
+    "investment",
+    "safety",
+    "hazard",
+    "earthquake",
+    "契約",
+    "金融",
+    "投資",
+    "災害",
+    "耐震",
+    "承認"
+  ],
+  "output_policy": {
+    "human_approval_required": true,
+    "send_allowed": false,
+    "no_guarantees": true,
+    "decision_support_only": true
+  }
+}

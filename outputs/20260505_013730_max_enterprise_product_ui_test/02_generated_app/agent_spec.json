@@ -1,0 +1,112 @@
+{
+  "agent_name": "AI Property Recommendation Platform",
+  "model": "deepseek-v4-pro",
+  "selected_opportunity": {
+    "name": "Neighborhood Scoring & Ranking Engine",
+    "score": 95,
+    "target_workflow": "Area comparison and recommendation based on customer preferences (budget, commute, lifestyle, family structure).",
+    "proposed_ai_capability": "LLM-powered multi-criteria decision engine that scores and ranks neighborhoods using structured area profiles, commute data, school ratings, and safety metrics.",
+    "expected_business_value": "Reduces consultant time per case by 40-50%, ensures consistent recommendations across staff, speeds up onboarding for new consultants.",
+    "key_risk": "Bias in scoring due to incomplete or outdated area data; overfitting to historical patterns.",
+    "human_approval_requirement": "Consultant must review and optionally adjust rankings before presenting to customer.",
+    "required_data": "Area profiles (safety, cost, schools, amenities, transport), commute time matrices, historical customer preference-resolution pairs.",
+    "japan_enterprise_fit": "High – directly addresses labor productivity and consistency, aligns with DX and kaizen improvement culture.",
+    "evidence_support": "OECD labour shortage report, METI GENIAC workflow efficiency case, FSA governance framework.",
+    "why_now": "Scattered area info is a critical pain point; AI can unify data and reduce manual comparison as labor shortages intensify.",
+    "refinement_action": "strengthen_human_approval",
+    "refinement_notes": [
+      "Make approval packet mandatory for all external, regulated, or irreversible outputs."
+    ],
+    "search_selection_reason": "Selected after LATS-lite expansion because it has the strongest combination of feasibility, risk controllability, evidence grounding, and PoC buildability."
+  },
+  "business_goal": "LLM-powered multi-criteria decision engine that scores and ranks neighborhoods using structured area profiles, commute data, school ratings, and safety metrics.",
+  "target_workflow": "Area comparison and recommendation based on customer preferences (budget, commute, lifestyle, family structure).",
+  "app_kind": "real_estate_recommendation",
+  "selected_primitives": [
+    "intake",
+    "retrieval",
+    "classification",
+    "extraction",
+    "checklist",
+    "drafting",
+    "risk_check",
+    "human_approval",
+    "audit_log",
+    "evaluation"
+  ],
+  "system_prompt": "You are the AI reasoning layer inside a generated enterprise software product. You receive deterministic local tool results and evidence. Return valid JSON only. Do not invent area names, property facts, legal claims, financial guarantees, investment advice, or disaster safety guarantees. Keep all customer-facing language in Japanese. Human approval is mandatory and send_allowed must be false.",
+  "output_contract": {
+    "case_id": "string",
+    "classification": {
+      "label": "string",
+      "confidence": "number",
+      "rationale": "string"
+    },
+    "ranked_area_candidates": [
+      {
+        "area_id": "string",
+        "name_ja": "string",
+        "score": "number"
+      }
+    ],
+    "ranked_property_candidates": [
+      {
+        "property_id": "string",
+        "title_ja": "string",
+        "score": "number"
+      }
+    ],
+    "local_tool_results": {
+      "tool_name": "string",
+      "top_candidates": [
+        "object"
+      ]
+    },
+    "evidence": [
+      {
+        "id": "string",
+        "title": "string",
+        "summary": "string"
+      }
+    ],
+    "missing_information": [
+      "string"
+    ],
+    "recommendation_ja": "string",
+    "customer_or_business_draft_ja": "string",
+    "internal_review_note": "string",
+    "risk": {
+      "risk_flag": "boolean",
+      "risk_level": "low|medium|high",
+      "risk_reasons": [
+        "string"
+      ]
+    },
+    "human_approval_required": "boolean",
+    "send_allowed": "boolean",
+    "approval_packet": {
+      "approval_required": "boolean",
+      "decision_options": [
+        "approve",
+        "edit",
+        "reject",
+        "escalate"
+      ]
+    },
+    "audit_trace": {
+      "evidence_ids": [
+        "string"
+      ],
+      "tool_names": [
+        "string"
+      ],
+      "model": "string"
+    }
+  },
+  "reviewer_guidance": [
+    "Confirm the recommended areas and properties exist in local tool results.",
+    "Verify hazard maps, earthquake resilience, school zones, and listing freshness before customer-facing use.",
+    "Edit customer-facing Japanese before sending.",
+    "Keep the system as decision support; never treat it as legal, financial, or safety advice."
+  ]
+}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="320" viewBox="0 0 1040 320">
+<rect width="1040" height="320" fill="#f8fafc"/>
+<text x="28" y="38" font-size="22" font-weight="800" fill="#172026">Opportunity Scores for Tokyo Home Finder</text>
+<text x="28" y="64" font-size="12" fill="#53606b">Selected: Neighborhood Scoring &amp; Ranking Engine | Business value, feasibility, Japan fit, and product buildability.</text>
+<text x="28" y="110" font-size="12" font-weight="700" fill="#172026">Neighborhood Scoring &amp; Ranking Engine</text>
+<rect x="430" y="94" width="500" height="18" rx="5" fill="#e5eaf0"/>
+<rect x="430" y="94" width="820" height="18" rx="5" fill="#b45309"/>
+<text x="948" y="109" font-size="12" font-weight="700" fill="#172026">10.0</text>
+<text x="28" y="152" font-size="12" font-weight="700" fill="#172026">Multilingual Consultation Assistant</text>
+<rect x="430" y="136" width="500" height="18" rx="5" fill="#e5eaf0"/>
+<rect x="430" y="136" width="820" height="18" rx="5" fill="#136f63"/>
+<text x="948" y="151" font-size="12" font-weight="700" fill="#172026">10.0</text>
+<text x="28" y="194" font-size="12" font-weight="700" fill="#172026">Automated Area Knowledge Aggregator</text>
+<rect x="430" y="178" width="500" height="18" rx="5" fill="#e5eaf0"/>
+<rect x="430" y="178" width="820" height="18" rx="5" fill="#136f63"/>
+<text x="948" y="193" font-size="12" font-weight="700" fill="#172026">10.0</text>
+<text x="28" y="236" font-size="12" font-weight="700" fill="#172026">AI-Enhanced Preference Elicitation Chatbot</text>
+<rect x="430" y="220" width="500" height="18" rx="5" fill="#e5eaf0"/>
+<rect x="430" y="220" width="820" height="18" rx="5" fill="#136f63"/>
+<text x="948" y="235" font-size="12" font-weight="700" fill="#172026">10.0</text>
+<text x="28" y="278" font-size="12" font-weight="700" fill="#172026">Property Search Strategy Advisor</text>
+<rect x="430" y="262" width="500" height="18" rx="5" fill="#e5eaf0"/>
+<rect x="430" y="262" width="820" height="18" rx="5" fill="#136f63"/>
+<text x="948" y="277" font-size="12" font-weight="700" fill="#172026">10.0</text>
+</svg>

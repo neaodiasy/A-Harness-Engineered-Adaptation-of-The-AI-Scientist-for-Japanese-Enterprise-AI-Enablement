@@ -1,0 +1,52 @@
+[
+  {
+    "primitive": "intake",
+    "score": 4.0,
+    "selected": true
+  },
+  {
+    "primitive": "retrieval",
+    "score": 1.0,
+    "selected": true
+  },
+  {
+    "primitive": "classification",
+    "score": 2.0,
+    "selected": true
+  },
+  {
+    "primitive": "extraction",
+    "score": 1.0,
+    "selected": true
+  },
+  {
+    "primitive": "checklist",
+    "score": 1.0,
+    "selected": true
+  },
+  {
+    "primitive": "drafting",
+    "score": 2.0,
+    "selected": true
+  },
+  {
+    "primitive": "risk_check",
+    "score": 4.0,
+    "selected": true
+  },
+  {
+    "primitive": "human_approval",
+    "score": 6.0,
+    "selected": true
+  },
+  {
+    "primitive": "audit_log",
+    "score": 3.0,
+    "selected": true
+  },
+  {
+    "primitive": "evaluation",
+    "score": 2.0,
+    "selected": true
+  }
+]

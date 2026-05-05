@@ -1,0 +1,40 @@
+{
+  "company_name": "Kanto Precision Machinery",
+  "country": "Japan",
+  "industry": "manufacturing",
+  "main_business": "The company manufactures precision components for industrial equipment and operates several production lines in the Kanto region. Field engineers and factory maintenance staff handle equipment troubleshooting, preventive maintenance, parts replacement, quality incidents, and escalation to senior engineers.",
+  "target_users": [
+    "factory maintenance technicians",
+    "field service engineers",
+    "production line supervisors",
+    "quality assurance staff",
+    "senior maintenance managers"
+  ],
+  "current_workflow": "When equipment issues occur, technicians check paper manuals, past maintenance logs, spare-parts records, sensor readings, and senior engineer notes. Troubleshooting knowledge is scattered across PDFs, spreadsheets, handwritten reports, and experienced staff. New technicians often need support to identify likely causes, prepare inspection checklists, and decide when to escalate.",
+  "pain_points": [
+    "maintenance knowledge is fragmented across manuals, logs, and expert memory",
+    "new technicians take too long to identify likely failure causes",
+    "similar equipment issues are investigated repeatedly from scratch",
+    "inspection and escalation quality varies by staff experience",
+    "production downtime increases when troubleshooting is slow",
+    "safety-critical repair decisions must remain under human engineer approval"
+  ],
+  "available_data": [
+    "equipment manuals",
+    "maintenance logs",
+    "sensor alerts",
+    "spare parts inventory",
+    "past failure reports",
+    "quality incident records",
+    "standard operating procedures"
+  ],
+  "constraints": [
+    "the system must not authorize continued machine operation",
+    "the system must not make final safety or repair decisions",
+    "senior engineer approval is required before repair execution",
+    "outputs must include evidence, uncertainty, missing checks, and escalation reasons",
+    "the system must not expose confidential customer or factory data"
+  ],
+  "business_goal": "Build an AI-enabled maintenance support agent that helps technicians retrieve relevant evidence, rank likely causes, prepare inspection checklists, draft maintenance notes, and escalate risky cases to senior engineers.",
+  "preferred_enablement_direction": "equipment troubleshooting and maintenance approval support agent"
+}

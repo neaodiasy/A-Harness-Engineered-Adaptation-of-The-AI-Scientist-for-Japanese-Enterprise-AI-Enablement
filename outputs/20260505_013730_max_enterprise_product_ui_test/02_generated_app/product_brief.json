@@ -1,0 +1,8 @@
+{
+  "product_name": "AI Property Recommendation Platform",
+  "selected_opportunity": "Neighborhood Scoring & Ranking Engine",
+  "problem": "Area comparison and recommendation based on customer preferences (budget, commute, lifestyle, family structure).",
+  "solution": "Customer preference intake, deterministic area/property ranking, DeepSeek recommendation drafting, and human approval workflow.",
+  "demo_value": "Shows consulting-agent to software-builder workflow through a runnable multi-file generated app.",
+  "human_approval": true
+}

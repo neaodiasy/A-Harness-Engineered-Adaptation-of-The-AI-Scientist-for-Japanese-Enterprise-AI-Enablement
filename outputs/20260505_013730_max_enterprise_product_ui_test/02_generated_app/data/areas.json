@@ -1,0 +1,54 @@
+[
+  {
+    "area_id": "musashi_kosugi",
+    "name_ja": "武蔵小杉",
+    "prefecture": "神奈川県",
+    "typical_budget_jpy_m": 65,
+    "commute_minutes_to_shinjuku": 28,
+    "station_access": 9,
+    "school_score": 8,
+    "quiet_score": 5,
+    "family_score": 8,
+    "summary_ja": "都心アクセスと生活利便性が高く、共働きファミリーにも検討しやすいエリアです。",
+    "risk_note_ja": "河川近接や再開発エリアの物件では、ハザードマップ、浸水想定、建物ごとの耐震性確認が必要です。"
+  },
+  {
+    "area_id": "kunitachi",
+    "name_ja": "国立",
+    "prefecture": "東京都",
+    "typical_budget_jpy_m": 62,
+    "commute_minutes_to_shinjuku": 35,
+    "station_access": 7,
+    "school_score": 9,
+    "quiet_score": 9,
+    "family_score": 9,
+    "summary_ja": "落ち着いた文教地区として知られ、学校環境や静かな住環境を重視する家庭に向きます。",
+    "risk_note_ja": "駅距離、学区、物件価格のばらつきがあるため、候補物件単位で最新情報の確認が必要です。"
+  },
+  {
+    "area_id": "wakoshi",
+    "name_ja": "和光市",
+    "prefecture": "埼玉県",
+    "typical_budget_jpy_m": 55,
+    "commute_minutes_to_shinjuku": 30,
+    "station_access": 8,
+    "school_score": 7,
+    "quiet_score": 7,
+    "family_score": 7,
+    "summary_ja": "都心アクセスと予算のバランスが良く、コストを抑えながら通勤利便性を確保しやすいエリアです。",
+    "risk_note_ja": "学校区、保育園、周辺道路、災害リスクは丁目・物件ごとに差があるため追加確認が必要です。"
+  },
+  {
+    "area_id": "machida",
+    "name_ja": "町田",
+    "prefecture": "東京都",
+    "typical_budget_jpy_m": 50,
+    "commute_minutes_to_shinjuku": 45,
+    "station_access": 7,
+    "school_score": 7,
+    "quiet_score": 7,
+    "family_score": 8,
+    "summary_ja": "価格と広さを重視するファミリー層に向き、生活利便施設も多い一方で通勤時間は長めです。",
+    "risk_note_ja": "エリアが広いため、駅距離、学校区、坂道、ハザード、通勤経路を個別に確認する必要があります。"
+  }
+]

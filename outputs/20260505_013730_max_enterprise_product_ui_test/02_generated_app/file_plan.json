@@ -1,0 +1,221 @@
+{
+  "manifest_version": "software_builder_loop_v1",
+  "product_name": "AI Property Recommendation Platform",
+  "files": [
+    {
+      "path": "README.md",
+      "role": "Human-readable usage and inspection guide.",
+      "required": true
+    },
+    {
+      "path": "requirements.txt",
+      "role": "Runtime dependency note; stdlib-first local product MVP.",
+      "required": true
+    },
+    {
+      "path": "app.py",
+      "role": "CLI/server entrypoint.",
+      "required": true
+    },
+    {
+      "path": "tools.py",
+      "role": "Compatibility wrapper for local domain tools.",
+      "required": true
+    },
+    {
+      "path": "evaluation.py",
+      "role": "API-backed product evaluator.",
+      "required": true
+    },
+    {
+      "path": "product_spec.json",
+      "role": "Generated product specification.",
+      "required": true
+    },
+    {
+      "path": "software_blueprint.json",
+      "role": "Backward-compatible copy of the product specification.",
+      "required": true
+    },
+    {
+      "path": "product_requirements.json",
+      "role": "Generated PRD.",
+      "required": true
+    },
+    {
+      "path": "productization_blueprint.json",
+      "role": "Enterprise software productization blueprint.",
+      "required": true
+    },
+    {
+      "path": "productization_blueprint.md",
+      "role": "Human-readable productization blueprint.",
+      "required": true
+    },
+    {
+      "path": "product_readiness.json",
+      "role": "Production-readiness checklist and gap analysis.",
+      "required": true
+    },
+    {
+      "path": "production_readiness.md",
+      "role": "Human-readable production-readiness report.",
+      "required": true
+    },
+    {
+      "path": "project_architecture.json",
+      "role": "Generated project architecture.",
+      "required": true
+    },
+    {
+      "path": "architecture.json",
+      "role": "Primitive architecture selected by the consulting/search layer.",
+      "required": true
+    },
+    {
+      "path": "architecture.md",
+      "role": "Readable generated project architecture.",
+      "required": true
+    },
+    {
+      "path": "implementation_plan.json",
+      "role": "Software Builder Loop implementation plan.",
+      "required": true
+    },
+    {
+      "path": "file_manifest.json",
+      "role": "Authoritative file manifest.",
+      "required": true
+    },
+    {
+      "path": "file_plan.json",
+      "role": "Backward-compatible copy of the file manifest.",
+      "required": true
+    },
+    {
+      "path": "generation_trace.json",
+      "role": "Generation trace for reviewer inspection.",
+      "required": true
+    },
+    {
+      "path": "builder_loop_trace.json",
+      "role": "Software Builder Loop trace.",
+      "required": true
+    },
+    {
+      "path": "repair_log.json",
+      "role": "Repair-loop status and planned actions.",
+      "required": true
+    },
+    {
+      "path": "agent_spec.json",
+      "role": "Agent runtime contract and prompts.",
+      "required": true
+    },
+    {
+      "path": "domain_data.json",
+      "role": "Compatibility aggregate of generated domain data.",
+      "required": true
+    },
+    {
+      "path": "sample_cases.json",
+      "role": "Compatibility copy of generated sample cases.",
+      "required": true
+    },
+    {
+      "path": "knowledge_base.md",
+      "role": "Generated product knowledge base.",
+      "required": true
+    },
+    {
+      "path": "pipeline_diagram.svg",
+      "role": "Generated agent flow diagram.",
+      "required": true
+    },
+    {
+      "path": "analysis_charts.svg",
+      "role": "Generated local data chart.",
+      "required": true
+    },
+    {
+      "path": "backend/__init__.py",
+      "role": "Backend package marker.",
+      "required": true
+    },
+    {
+      "path": "backend/agent.py",
+      "role": "Agent orchestration.",
+      "required": true
+    },
+    {
+      "path": "backend/api.py",
+      "role": "Local API and frontend server.",
+      "required": true
+    },
+    {
+      "path": "backend/data_store.py",
+      "role": "Data loading helpers.",
+      "required": true
+    },
+    {
+      "path": "backend/guardrails.py",
+      "role": "Safety and output contract enforcement.",
+      "required": true
+    },
+    {
+      "path": "backend/llm_client.py",
+      "role": "DeepSeek JSON client.",
+      "required": true
+    },
+    {
+      "path": "backend/web_search.py",
+      "role": "Runtime trusted-domain live web evidence search.",
+      "required": true
+    },
+    {
+      "path": "backend/recommendation_engine.py",
+      "role": "Deterministic ranking engine.",
+      "required": true
+    },
+    {
+      "path": "backend/tools.py",
+      "role": "Domain tool interface.",
+      "required": true
+    },
+    {
+      "path": "frontend/index.html",
+      "role": "Generated product UI.",
+      "required": true
+    },
+    {
+      "path": "frontend/styles.css",
+      "role": "Generated product styling.",
+      "required": true
+    },
+    {
+      "path": "frontend/app.js",
+      "role": "Generated product UI behavior.",
+      "required": true
+    },
+    {
+      "path": "data/areas.json",
+      "role": "Area profiles.",
+      "required": true
+    },
+    {
+      "path": "data/properties.json",
+      "role": "Property listings.",
+      "required": true
+    },
+    {
+      "path": "data/sample_customers.json",
+      "role": "Sample customer cases.",
+      "required": true
+    },
+    {
+      "path": "tests/test_recommendations.py",
+      "role": "Deterministic ranking tests.",
+      "required": true
+    }
+  ]
+}

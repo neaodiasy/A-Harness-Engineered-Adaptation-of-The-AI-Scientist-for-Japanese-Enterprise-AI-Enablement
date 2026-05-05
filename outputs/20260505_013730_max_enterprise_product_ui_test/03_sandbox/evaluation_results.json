@@ -1,0 +1,510 @@
+{
+  "success": true,
+  "summary": {
+    "success": true,
+    "passed": 1,
+    "total": 1,
+    "pass_rate": 1.0
+  },
+  "cases": [
+    {
+      "case_id": "case_family_quiet_school",
+      "passed": true,
+      "checks": {
+        "has_case_id": true,
+        "classification_label": true,
+        "confidence_not_fixed_half": true,
+        "classification_rationale": true,
+        "local_tool_results_exists": true,
+        "ranked_area_candidates_exists": true,
+        "ranked_property_candidates_exists": true,
+        "uses_actual_area_names": true,
+        "no_placeholder_area_names": true,
+        "has_evidence": true,
+        "has_missing_information": true,
+        "human_approval_required": true,
+        "send_allowed_false": true,
+        "customer_draft_is_japanese": true,
+        "approval_packet": true,
+        "audit_trace": true,
+        "no_final_guarantee": true
+      },
+      "output": {
+        "case_id": "case_family_quiet_school",
+        "classification": {
+          "label": "preference_based_property_recommendation",
+          "confidence": 0.78,
+          "rationale": "顧客の予算、通勤、学校、静かな住環境、災害確認ニーズに基づく不動産推薦ケースです。"
+        },
+        "ranked_area_candidates": [
+          {
+            "area_id": "kunitachi",
+            "name_ja": "国立",
+            "prefecture": "東京都",
+            "typical_budget_jpy_m": 62,
+            "commute_minutes_to_shinjuku": 35,
+            "station_access": 7,
+            "school_score": 9,
+            "quiet_score": 9,
+            "family_score": 9,
+            "summary_ja": "落ち着いた文教地区として知られ、学校環境や静かな住環境を重視する家庭に向きます。",
+            "risk_note_ja": "駅距離、学区、物件価格のばらつきがあるため、候補物件単位で最新情報の確認が必要です。",
+            "score": 101.3,
+            "reason_ja": "予算上限70百万円に対してエリア目安は62百万円。新宿まで約35分、駅アクセス7/10。学校評価9/10、ファミリー適性9/10。静かな住環境評価9/10。災害・耐震は物件単位の追加確認が必要。"
+          },
+          {
+            "area_id": "musashi_kosugi",
+            "name_ja": "武蔵小杉",
+            "prefecture": "神奈川県",
+            "typical_budget_jpy_m": 65,
+            "commute_minutes_to_shinjuku": 28,
+            "station_access": 9,
+            "school_score": 8,
+            "quiet_score": 5,
+            "family_score": 8,
+            "summary_ja": "都心アクセスと生活利便性が高く、共働きファミリーにも検討しやすいエリアです。",
+            "risk_note_ja": "河川近接や再開発エリアの物件では、ハザードマップ、浸水想定、建物ごとの耐震性確認が必要です。",
+            "score": 94.9,
+            "reason_ja": "予算上限70百万円に対してエリア目安は65百万円。新宿まで約28分、駅アクセス9/10。学校評価8/10、ファミリー適性8/10。静かな住環境評価5/10。災害・耐震は物件単位の追加確認が必要。"
+          },
+          {
+            "area_id": "wakoshi",
+            "name_ja": "和光市",
+            "prefecture": "埼玉県",
+            "typical_budget_jpy_m": 55,
+            "commute_minutes_to_shinjuku": 30,
+            "station_access": 8,
+            "school_score": 7,
+            "quiet_score": 7,
+            "family_score": 7,
+            "summary_ja": "都心アクセスと予算のバランスが良く、コストを抑えながら通勤利便性を確保しやすいエリアです。",
+            "risk_note_ja": "学校区、保育園、周辺道路、災害リスクは丁目・物件ごとに差があるため追加確認が必要です。",
+            "score": 82.9,
+            "reason_ja": "予算上限70百万円に対してエリア目安は55百万円。新宿まで約30分、駅アクセス8/10。学校評価7/10、ファミリー適性7/10。静かな住環境評価7/10。災害・耐震は物件単位の追加確認が必要。"
+          },
+          {
+            "area_id": "machida",
+            "name_ja": "町田",
+            "prefecture": "東京都",
+            "typical_budget_jpy_m": 50,
+            "commute_minutes_to_shinjuku": 45,
+            "station_access": 7,
+            "school_score": 7,
+            "quiet_score": 7,
+            "family_score": 8,
+            "summary_ja": "価格と広さを重視するファミリー層に向き、生活利便施設も多い一方で通勤時間は長めです。",
+            "risk_note_ja": "エリアが広いため、駅距離、学校区、坂道、ハザード、通勤経路を個別に確認する必要があります。",
+            "score": 69.0,
+            "reason_ja": "予算上限70百万円に対してエリア目安は50百万円。新宿まで約45分、駅アクセス7/10。学校評価7/10、ファミリー適性8/10。静かな住環境評価7/10。災害・耐震は物件単位の追加確認が必要。"
+          }
+        ],
+        "ranked_property_candidates": [
+          {
+            "property_id": "p_kunitachi_001",
+            "title_ja": "国立文教エリア 3LDK",
+            "area_id": "kunitachi",
+            "price_jpy_m": 63,
+            "layout": "3LDK",
+            "size_sqm": 70,
+            "station_walk_minutes": 12,
+            "built_year": 2015,
+            "earthquake_score": 8,
+            "school_score": 9,
+            "quiet_score": 9,
+            "family_score": 9,
+            "summary_ja": "学校環境と静かな住環境を重視する家庭に合いやすい候補。",
+            "risk_note_ja": "学区境界と通学距離を最新資料で確認してください。",
+            "area_name_ja": "国立",
+            "score": 127.69,
+            "reason_ja": "エリア評価を反映: 国立。価格63百万円。駅徒歩12分。学校・ファミリー評価 9/9。静かさ評価9/10。耐震関連評価8/10。"
+          },
+          {
+            "property_id": "p_musashi_001",
+            "title_ja": "武蔵小杉リバーサイド 3LDK",
+            "area_id": "musashi_kosugi",
+            "price_jpy_m": 68,
+            "layout": "3LDK",
+            "size_sqm": 72,
+            "station_walk_minutes": 8,
+            "built_year": 2018,
+            "earthquake_score": 7,
+            "school_score": 8,
+            "quiet_score": 5,
+            "family_score": 8,
+            "summary_ja": "駅アクセスと生活利便性が高いファミリー向け候補。",
+            "risk_note_ja": "河川近接のため浸水想定と管理組合資料の確認が必要です。",
+            "area_name_ja": "武蔵小杉",
+            "score": 117.61,
+            "reason_ja": "エリア評価を反映: 武蔵小杉。価格68百万円。駅徒歩8分。学校・ファミリー評価 8/8。静かさ評価5/10。耐震関連評価7/10。"
+          },
+          {
+            "property_id": "p_wakoshi_001",
+            "title_ja": "和光市駅徒歩圏 3LDK",
+            "area_id": "wakoshi",
+            "price_jpy_m": 56,
+            "layout": "3LDK",
+            "size_sqm": 68,
+            "station_walk_minutes": 10,
+            "built_year": 2012,
+            "earthquake_score": 7,
+            "school_score": 7,
+            "quiet_score": 7,
+            "family_score": 7,
+            "summary_ja": "予算と通勤利便性のバランスが良い候補。",
+            "risk_note_ja": "周辺道路、保育園、災害リスクを物件単位で確認してください。",
+            "area_name_ja": "和光市",
+            "score": 110.61,
+            "reason_ja": "エリア評価を反映: 和光市。価格56百万円。駅徒歩10分。学校・ファミリー評価 7/7。静かさ評価7/10。耐震関連評価7/10。"
+          },
+          {
+            "property_id": "p_machida_001",
+            "title_ja": "町田ゆとり住戸 4LDK",
+            "area_id": "machida",
+            "price_jpy_m": 49,
+            "layout": "4LDK",
+            "size_sqm": 84,
+            "station_walk_minutes": 15,
+            "built_year": 2010,
+            "earthquake_score": 7,
+            "school_score": 7,
+            "quiet_score": 8,
+            "family_score": 8,
+            "summary_ja": "広さと価格を重視する家庭に検討しやすい候補。",
+            "risk_note_ja": "通勤時間、坂道、駅距離、ハザードを現地確認してください。",
+            "area_name_ja": "町田",
+            "score": 103.35,
+            "reason_ja": "エリア評価を反映: 町田。価格49百万円。駅徒歩15分。学校・ファミリー評価 7/8。静かさ評価8/10。耐震関連評価7/10。"
+          }
+        ],
+        "local_tool_results": {
+          "tool_name": "real_estate_recommendation_toolkit",
+          "app_kind": "real_estate_recommendation",
+          "ranked_area_candidates": [
+            {
+              "area_id": "kunitachi",
+              "name_ja": "国立",
+              "prefecture": "東京都",
+              "typical_budget_jpy_m": 62,
+              "commute_minutes_to_shinjuku": 35,
+              "station_access": 7,
+              "school_score": 9,
+              "quiet_score": 9,
+              "family_score": 9,
+              "summary_ja": "落ち着いた文教地区として知られ、学校環境や静かな住環境を重視する家庭に向きます。",
+              "risk_note_ja": "駅距離、学区、物件価格のばらつきがあるため、候補物件単位で最新情報の確認が必要です。",
+              "score": 101.3,
+              "reason_ja": "予算上限70百万円に対してエリア目安は62百万円。新宿まで約35分、駅アクセス7/10。学校評価9/10、ファミリー適性9/10。静かな住環境評価9/10。災害・耐震は物件単位の追加確認が必要。"
+            },
+            {
+              "area_id": "musashi_kosugi",
+              "name_ja": "武蔵小杉",
+              "prefecture": "神奈川県",
+              "typical_budget_jpy_m": 65,
+              "commute_minutes_to_shinjuku": 28,
+              "station_access": 9,
+              "school_score": 8,
+              "quiet_score": 5,
+              "family_score": 8,
+              "summary_ja": "都心アクセスと生活利便性が高く、共働きファミリーにも検討しやすいエリアです。",
+              "risk_note_ja": "河川近接や再開発エリアの物件では、ハザードマップ、浸水想定、建物ごとの耐震性確認が必要です。",
+              "score": 94.9,
+              "reason_ja": "予算上限70百万円に対してエリア目安は65百万円。新宿まで約28分、駅アクセス9/10。学校評価8/10、ファミリー適性8/10。静かな住環境評価5/10。災害・耐震は物件単位の追加確認が必要。"
+            },
+            {
+              "area_id": "wakoshi",
+              "name_ja": "和光市",
+              "prefecture": "埼玉県",
+              "typical_budget_jpy_m": 55,
+              "commute_minutes_to_shinjuku": 30,
+              "station_access": 8,
+              "school_score": 7,
+              "quiet_score": 7,
+              "family_score": 7,
+              "summary_ja": "都心アクセスと予算のバランスが良く、コストを抑えながら通勤利便性を確保しやすいエリアです。",
+              "risk_note_ja": "学校区、保育園、周辺道路、災害リスクは丁目・物件ごとに差があるため追加確認が必要です。",
+              "score": 82.9,
+              "reason_ja": "予算上限70百万円に対してエリア目安は55百万円。新宿まで約30分、駅アクセス8/10。学校評価7/10、ファミリー適性7/10。静かな住環境評価7/10。災害・耐震は物件単位の追加確認が必要。"
+            },
+            {
+              "area_id": "machida",
+              "name_ja": "町田",
+              "prefecture": "東京都",
+              "typical_budget_jpy_m": 50,
+              "commute_minutes_to_shinjuku": 45,
+              "station_access": 7,
+              "school_score": 7,
+              "quiet_score": 7,
+              "family_score": 8,
+              "summary_ja": "価格と広さを重視するファミリー層に向き、生活利便施設も多い一方で通勤時間は長めです。",
+              "risk_note_ja": "エリアが広いため、駅距離、学校区、坂道、ハザード、通勤経路を個別に確認する必要があります。",
+              "score": 69.0,
+              "reason_ja": "予算上限70百万円に対してエリア目安は50百万円。新宿まで約45分、駅アクセス7/10。学校評価7/10、ファミリー適性8/10。静かな住環境評価7/10。災害・耐震は物件単位の追加確認が必要。"
+            }
+          ],
+          "ranked_property_candidates": [
+            {
+              "property_id": "p_kunitachi_001",
+              "title_ja": "国立文教エリア 3LDK",
+              "area_id": "kunitachi",
+              "price_jpy_m": 63,
+              "layout": "3LDK",
+              "size_sqm": 70,
+              "station_walk_minutes": 12,
+              "built_year": 2015,
+              "earthquake_score": 8,
+              "school_score": 9,
+              "quiet_score": 9,
+              "family_score": 9,
+              "summary_ja": "学校環境と静かな住環境を重視する家庭に合いやすい候補。",
+              "risk_note_ja": "学区境界と通学距離を最新資料で確認してください。",
+              "area_name_ja": "国立",
+              "score": 127.69,
+              "reason_ja": "エリア評価を反映: 国立。価格63百万円。駅徒歩12分。学校・ファミリー評価 9/9。静かさ評価9/10。耐震関連評価8/10。"
+            },
+            {
+              "property_id": "p_musashi_001",
+              "title_ja": "武蔵小杉リバーサイド 3LDK",
+              "area_id": "musashi_kosugi",
+              "price_jpy_m": 68,
+              "layout": "3LDK",
+              "size_sqm": 72,
+              "station_walk_minutes": 8,
+              "built_year": 2018,
+              "earthquake_score": 7,
+              "school_score": 8,
+              "quiet_score": 5,
+              "family_score": 8,
+              "summary_ja": "駅アクセスと生活利便性が高いファミリー向け候補。",
+              "risk_note_ja": "河川近接のため浸水想定と管理組合資料の確認が必要です。",
+              "area_name_ja": "武蔵小杉",
+              "score": 117.61,
+              "reason_ja": "エリア評価を反映: 武蔵小杉。価格68百万円。駅徒歩8分。学校・ファミリー評価 8/8。静かさ評価5/10。耐震関連評価7/10。"
+            },
+            {
+              "property_id": "p_wakoshi_001",
+              "title_ja": "和光市駅徒歩圏 3LDK",
+              "area_id": "wakoshi",
+              "price_jpy_m": 56,
+              "layout": "3LDK",
+              "size_sqm": 68,
+              "station_walk_minutes": 10,
+              "built_year": 2012,
+              "earthquake_score": 7,
+              "school_score": 7,
+              "quiet_score": 7,
+              "family_score": 7,
+              "summary_ja": "予算と通勤利便性のバランスが良い候補。",
+              "risk_note_ja": "周辺道路、保育園、災害リスクを物件単位で確認してください。",
+              "area_name_ja": "和光市",
+              "score": 110.61,
+              "reason_ja": "エリア評価を反映: 和光市。価格56百万円。駅徒歩10分。学校・ファミリー評価 7/7。静かさ評価7/10。耐震関連評価7/10。"
+            },
+            {
+              "property_id": "p_machida_001",
+              "title_ja": "町田ゆとり住戸 4LDK",
+              "area_id": "machida",
+              "price_jpy_m": 49,
+              "layout": "4LDK",
+              "size_sqm": 84,
+              "station_walk_minutes": 15,
+              "built_year": 2010,
+              "earthquake_score": 7,
+              "school_score": 7,
+              "quiet_score": 8,
+              "family_score": 8,
+              "summary_ja": "広さと価格を重視する家庭に検討しやすい候補。",
+              "risk_note_ja": "通勤時間、坂道、駅距離、ハザードを現地確認してください。",
+              "area_name_ja": "町田",
+              "score": 103.35,
+              "reason_ja": "エリア評価を反映: 町田。価格49百万円。駅徒歩15分。学校・ファミリー評価 7/8。静かさ評価8/10。耐震関連評価7/10。"
+            }
+          ],
+          "top_candidates": [
+            {
+              "area_id": "kunitachi",
+              "name_ja": "国立",
+              "prefecture": "東京都",
+              "typical_budget_jpy_m": 62,
+              "commute_minutes_to_shinjuku": 35,
+              "station_access": 7,
+              "school_score": 9,
+              "quiet_score": 9,
+              "family_score": 9,
+              "summary_ja": "落ち着いた文教地区として知られ、学校環境や静かな住環境を重視する家庭に向きます。",
+              "risk_note_ja": "駅距離、学区、物件価格のばらつきがあるため、候補物件単位で最新情報の確認が必要です。",
+              "score": 101.3,
+              "reason_ja": "予算上限70百万円に対してエリア目安は62百万円。新宿まで約35分、駅アクセス7/10。学校評価9/10、ファミリー適性9/10。静かな住環境評価9/10。災害・耐震は物件単位の追加確認が必要。"
+            },
+            {
+              "area_id": "musashi_kosugi",
+              "name_ja": "武蔵小杉",
+              "prefecture": "神奈川県",
+              "typical_budget_jpy_m": 65,
+              "commute_minutes_to_shinjuku": 28,
+              "station_access": 9,
+              "school_score": 8,
+              "quiet_score": 5,
+              "family_score": 8,
+              "summary_ja": "都心アクセスと生活利便性が高く、共働きファミリーにも検討しやすいエリアです。",
+              "risk_note_ja": "河川近接や再開発エリアの物件では、ハザードマップ、浸水想定、建物ごとの耐震性確認が必要です。",
+              "score": 94.9,
+              "reason_ja": "予算上限70百万円に対してエリア目安は65百万円。新宿まで約28分、駅アクセス9/10。学校評価8/10、ファミリー適性8/10。静かな住環境評価5/10。災害・耐震は物件単位の追加確認が必要。"
+            },
+            {
+              "area_id": "wakoshi",
+              "name_ja": "和光市",
+              "prefecture": "埼玉県",
+              "typical_budget_jpy_m": 55,
+              "commute_minutes_to_shinjuku": 30,
+              "station_access": 8,
+              "school_score": 7,
+              "quiet_score": 7,
+              "family_score": 7,
+              "summary_ja": "都心アクセスと予算のバランスが良く、コストを抑えながら通勤利便性を確保しやすいエリアです。",
+              "risk_note_ja": "学校区、保育園、周辺道路、災害リスクは丁目・物件ごとに差があるため追加確認が必要です。",
+              "score": 82.9,
+              "reason_ja": "予算上限70百万円に対してエリア目安は55百万円。新宿まで約30分、駅アクセス8/10。学校評価7/10、ファミリー適性7/10。静かな住環境評価7/10。災害・耐震は物件単位の追加確認が必要。"
+            },
+            {
+              "area_id": "machida",
+              "name_ja": "町田",
+              "prefecture": "東京都",
+              "typical_budget_jpy_m": 50,
+              "commute_minutes_to_shinjuku": 45,
+              "station_access": 7,
+              "school_score": 7,
+              "quiet_score": 7,
+              "family_score": 8,
+              "summary_ja": "価格と広さを重視するファミリー層に向き、生活利便施設も多い一方で通勤時間は長めです。",
+              "risk_note_ja": "エリアが広いため、駅距離、学校区、坂道、ハザード、通勤経路を個別に確認する必要があります。",
+              "score": 69.0,
+              "reason_ja": "予算上限70百万円に対してエリア目安は50百万円。新宿まで約45分、駅アクセス7/10。学校評価7/10、ファミリー適性8/10。静かな住環境評価7/10。災害・耐震は物件単位の追加確認が必要。"
+            }
+          ],
+          "missing_information": [
+            "実際の通勤時間帯での混雑、乗換、終電情報",
+            "掲載価格、販売状況、重要事項説明、現地確認結果",
+            "最新の学校区、通学距離、保育園・学童の空き状況",
+            "物件ごとのハザードマップ、浸水想定、耐震等級、管理状況"
+          ],
+          "scoring_summary_ja": "予算、通勤、駅アクセス、学校・ファミリー適性、静かな住環境、耐震・災害確認の必要性をローカルデータでスコアリングしました。"
+        },
+        "evidence": [
+          {
+            "id": "local_area_profiles",
+            "title": "Generated local area profiles",
+            "summary": "Area candidates and scoring inputs loaded from data/areas.json."
+          },
+          {
+            "id": "local_property_listings",
+            "title": "Generated local property listings",
+            "summary": "Property candidates and scoring inputs loaded from data/properties.json."
+          },
+          {
+            "id": "knowledge_base",
+            "title": "Generated knowledge base",
+            "summary": "# AI Property Recommendation Platform Knowledge Base\n\n## Enterprise Context\n\n- Industry: real_estate\n- Main business: The company helps users find suitable rental apartments and homes to buy in Tokyo and nearby areas. Staff members answer customer questions, compare neighborhoods, explain area characteristics, and recommend candidate areas and properties based on budget, commute, lifestyle, family structure, and preferences.\n- AI objective: \n- Constraints: ['the system must not guarantee property price appreciation', 'the system must not make legal or financial decisions', 'final recommendation should be reviewed by a human real estate consultant', 'the system should explain reasoning and un"
+          },
+          {
+            "id": "area_kunitachi",
+            "title": "国立",
+            "summary": "落ち着いた文教地区として知られ、学校環境や静かな住環境を重視する家庭に向きます。 駅距離、学区、物件価格のばらつきがあるため、候補物件単位で最新情報の確認が必要です。"
+          },
+          {
+            "id": "area_musashi_kosugi",
+            "title": "武蔵小杉",
+            "summary": "都心アクセスと生活利便性が高く、共働きファミリーにも検討しやすいエリアです。 河川近接や再開発エリアの物件では、ハザードマップ、浸水想定、建物ごとの耐震性確認が必要です。"
+          },
+          {
+            "id": "area_wakoshi",
+            "title": "和光市",
+            "summary": "都心アクセスと予算のバランスが良く、コストを抑えながら通勤利便性を確保しやすいエリアです。 学校区、保育園、周辺道路、災害リスクは丁目・物件ごとに差があるため追加確認が必要です。"
+          },
+          {
+            "id": "runtime_live_search_metadata",
+            "title": "Runtime live web search metadata",
+            "summary": "{\"enabled\": true, \"provider\": \"duckduckgo_html_with_bing_rss_fallback\", \"trusted_domains\": [\"digital.go.jp\", \"meti.go.jp\", \"ipa.go.jp\", \"fsa.go.jp\", \"mlit.go.jp\", \"gsi.go.jp\", \"mhlw.go.jp\", \"cao.go.jp\", \"boj.or.jp\", \"jpc-net.jp\", \"oecd.org\"], \"queries\": [\"不動産 AI 活用 住宅 国土交通省 site:mlit.go.jp\"], \"errors\": [], \"result_count\": 0}",
+            "retrieval_method": "runtime_live_web_search_metadata"
+          }
+        ],
+        "missing_information": [
+          "お客様の最終的なフィードバック",
+          "宅建士による重要事項説明の実施",
+          "実際の通勤時間帯での混雑、乗換、終電情報",
+          "掲載価格、販売状況、重要事項説明、現地確認結果",
+          "最新の学校区、通学距離、保育園・学童の空き状況",
+          "物件ごとのハザードマップ、浸水想定、耐震等級、管理状況"
+        ],
+        "recommendation_ja": "お客様のご希望（静かな住環境、学校環境、ファミリー向け、予算55〜70百万円、新宿まで40分以内、3LDK以上、駅徒歩15分以内、耐震性・災害リスク確認）に基づき、以下のエリアと物件を推奨します。\n\n最有力候補：国立エリア「国立文教エリア 3LDK」（63百万円、駅徒歩12分、学校評価9/10、静かさ9/10、ファミリー適性9/10）。落ち着いた文教地区で、お子様の通学環境として優れています。新宿まで約35分。\n\n次点候補：武蔵小杉エリア「武蔵小杉リバーサイド 3LDK」（68百万円、駅徒歩8分、学校評価8/10、静かさ5/10）。都心アクセスと生活利便性が高い一方、静かな住環境を重視される場合には注意が必要です。河川近接のためハザードマップ確認が必須です。\n\n第三候補：和光市エリア「和光市駅徒歩圏 3LDK」（56百万円、駅徒歩10分、総合評価7）。予算に余裕があり、通勤時間も30分と良好ですが、学校・静かさ評価は国立に劣ります。\n\n町田エリアは価格と広さで優れますが、通勤時間が45分とご希望を超過するため、条件に合致しません。\n\nいずれの候補も、最新の物件状況、ハザードマップ、学区、通勤実態を現地確認の上、宅建士の審査が必要です。",
+        "customer_or_business_draft_ja": "佐藤様\n\nこの度はお問い合わせいただきありがとうございます。ご希望条件をもとに、最適なエリアと物件を検討いたしました。\n\n【推奨エリア：国立】\n国立は都内有数の文教地区として知られ、静かな住宅街と充実した学校環境が特徴です。新宿まで約35分、ご予算内で3LDKの物件がございます。お子様の成長に適した落ち着いた環境です。\n\n【物件候補】\n「国立文教エリア 3LDK」\n・価格：63百万円（税込）\n・間取り：3LDK（70㎡）\n・築年：2015年\n・駅徒歩：12分\n・学校評価：9/10\n・静かさ：9/10\n\n【ご確認事項】\n物件の最新状況、学区、ハザードマップ、通勤経路の混雑等は別途ご案内いたします。ご内見や詳細なご説明を希望される場合は、担当コンサルタントまでお知らせください。\n\n※ 本内容は情報提供を目的としており、価格や空き状況等を保証するものではございません。",
+        "internal_review_note": "担当コンサルタント向け内部レビューノート：\n\n1. スコアリング概要：お客様の静かな住環境・学校重視の意向を強く反映し、国立エリア・物件がトップスコア（地区101.3、物件127.69）。武蔵小杉は静かさスコア5/10のため、お客様の優先事項との乖離に注意。\n2. 町田エリアは通勤時間オーバーのため推奨対象外（max40分に対し45分）。\n3. 確認必須項目：全物件でハザードマップ・耐震等級の実査、学区と通学路、最新販売価格・状況、通勤ラッシュ時の実時間。特に武蔵小杉は浸水リスクの重要事項説明要。\n4. 追加考慮：和光市は予算に優しいが、学校評価が7とやや低いため、お客様の学校重視度合いにより優先順位要調整。\n5. 本ドラフトはシステム生成です。最終アウトプットは宅建士のレビュー・修正後に承認ください。送信許可は付与されていません。",
+        "risk": {
+          "risk_flag": true,
+          "risk_level": "medium",
+          "risk_reasons": [
+            "実際の通勤時間帯での混雑、乗換、終電情報",
+            "掲載価格、販売状況、重要事項説明、現地確認結果",
+            "最新の学校区、通学距離、保育園・学童の空き状況",
+            "物件ごとのハザードマップ、浸水想定、耐震等級、管理状況"
+          ]
+        },
+        "human_approval_required": true,
+        "send_allowed": false,
+        "approval_packet": {
+          "approval_owner": "宅建士 / シニアコンサルタント",
+          "status": "draft_ready",
+          "human_approval_required": true,
+          "send_allowed": false,
+          "review_workflow": "case_family_quiet_school -> review_required -> approved_locally or edit_requested",
+          "summary": "ファミリー向け静かな住環境重視の案件。トップ候補は国立エリア。要ハザードマップ・学区・現地確認。",
+          "approval_required": true,
+          "decision_options": [
+            "approve",
+            "edit",
+            "reject",
+            "request_more_information"
+          ],
+          "reviewer_guidance": [
+            "Confirm the recommended areas and properties exist in local tool results.",
+            "Verify hazard maps, earthquake resilience, school zones, and listing freshness before customer-facing use.",
+            "Edit customer-facing Japanese before sending.",
+            "Keep the system as decision support; never treat it as legal, financial, or safety advice."
+          ],
+          "items_to_verify": [
+            "実際の通勤時間帯での混雑、乗換、終電情報",
+            "掲載価格、販売状況、重要事項説明、現地確認結果",
+            "最新の学校区、通学距離、保育園・学童の空き状況",
+            "物件ごとのハザードマップ、浸水想定、耐震等級、管理状況"
+          ],
+          "top_area_names": [
+            "国立",
+            "武蔵小杉",
+            "和光市"
+          ],
+          "top_property_titles": [
+            "国立文教エリア 3LDK",
+            "武蔵小杉リバーサイド 3LDK",
+            "和光市駅徒歩圏 3LDK"
+          ]
+        },
+        "audit_trace": {
+          "tool_names": [
+            "real_estate_recommendation_toolkit"
+          ],
+          "evidence_ids": [
+            "local_area_profiles",
+            "local_property_listings",
+            "knowledge_base",
+            "area_kunitachi",
+            "area_musashi_kosugi",
+            "area_wakoshi",
+            "runtime_live_search_metadata"
+          ],
+          "model": "deepseek-v4-pro",
+          "output_contract_enforced": true,
+          "deterministic_candidates_attached": true
+        }
+      }
+    }
+  ]
+}

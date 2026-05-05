@@ -1,0 +1,27 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.pyo
+
+.env
+.venv/
+venv/
+env/
+
+*.log
+*.tmp
+*.zip
+
+# Local/generated report assets should stay outside the repo.
+report_assets*/
+report_figures*/
+submission_ready_figures*/
+
+# Keep only the curated successful example run.
+outputs/*
+!outputs/20260505_013730_max_enterprise_product_ui_test/
+!outputs/20260505_013730_max_enterprise_product_ui_test/**
+
+# Generated scratch folders from older iterations.
+generated_apps/
+_backup_runs/

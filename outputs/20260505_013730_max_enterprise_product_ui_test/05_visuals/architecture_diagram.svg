@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="420" viewBox="0 0 1180 420">
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+<path d="M0,0 L0,6 L9,3 z" fill="#607080"/>
+</marker>
+</defs>
+<rect width="1180" height="420" fill="#f8fafc"/>
+<text x="34" y="42" font-size="24" font-weight="800" fill="#172026">AI Property Recommendation Platform Architecture</text>
+<text x="34" y="70" font-size="13" fill="#53606b">Selected opportunity: Neighborhood Scoring &amp; Ranking Engine</text>
+<text x="34" y="92" font-size="12" fill="#53606b">Business value: Reduces consultant time per case by 40-50%, ensures consistent recommendations across staff, speeds up onboarding for new consultants.</text>
+
+  <rect x="34" y="118" width="200" height="96" rx="10" fill="#e8f4f1" stroke="#264653" stroke-width="1.4"/>
+  <text x="50" y="146" font-size="15" font-weight="700" fill="#172026">Company Profile</text>
+  <text x="50" y="170" font-size="11" fill="#46515c">Tokyo Home Finder</text>
+
+
+  <line x1="234" y1="166" x2="272" y2="166" stroke="#607080" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+
+  <rect x="272" y="118" width="200" height="96" rx="10" fill="#eef2ff" stroke="#264653" stroke-width="1.4"/>
+  <text x="288" y="146" font-size="15" font-weight="700" fill="#172026">Consulting Evidence</text>
+  <text x="288" y="170" font-size="11" fill="#46515c">Company context + Japan AI/DX evidence</text>
+
+
+  <line x1="472" y1="166" x2="510" y2="166" stroke="#607080" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+
+  <rect x="510" y="118" width="200" height="96" rx="10" fill="#fff7ed" stroke="#264653" stroke-width="1.4"/>
+  <text x="526" y="146" font-size="15" font-weight="700" fill="#172026">Opportunity Search</text>
+  <text x="526" y="170" font-size="11" fill="#46515c">Neighborhood Scoring &amp; Ranking Engine</text>
+
+
+  <line x1="710" y1="166" x2="748" y2="166" stroke="#607080" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+
+  <rect x="748" y="118" width="200" height="96" rx="10" fill="#f0fdf4" stroke="#264653" stroke-width="1.4"/>
+  <text x="764" y="146" font-size="15" font-weight="700" fill="#172026">Primitive Composition</text>
+  <text x="764" y="170" font-size="11" fill="#46515c">intake -&gt; retrieval -&gt; classification -&gt; extraction -&gt; checklist -&gt; draf</text>
+
+
+  <line x1="948" y1="166" x2="986" y2="166" stroke="#607080" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+
+  <rect x="986" y="118" width="200" height="96" rx="10" fill="#fdf2f8" stroke="#264653" stroke-width="1.4"/>
+  <text x="1002" y="146" font-size="15" font-weight="700" fill="#172026">Generated Product</text>
+  <text x="1002" y="170" font-size="11" fill="#46515c">AI Property Recommendation Platform</text>
+
+
+  <rect x="154" y="282" width="260" height="76" rx="10" fill="#ecfeff" stroke="#264653" stroke-width="1.4"/>
+  <text x="170" y="310" font-size="15" font-weight="700" fill="#172026">Human Approval Gate</text>
+  <text x="170" y="334" font-size="11" fill="#46515c">Blocks external, regulated, or irreversible actions</text>
+
+
+  <rect x="460" y="282" width="260" height="76" rx="10" fill="#f7fee7" stroke="#264653" stroke-width="1.4"/>
+  <text x="476" y="310" font-size="15" font-weight="700" fill="#172026">Evaluation</text>
+  <text x="476" y="334" font-size="11" fill="#46515c">--/-- checks passed</text>
+
+
+  <rect x="766" y="282" width="260" height="76" rx="10" fill="#faf5ff" stroke="#264653" stroke-width="1.4"/>
+  <text x="782" y="310" font-size="15" font-weight="700" fill="#172026">Automated Reviewer</text>
+  <text x="782" y="334" font-size="11" fill="#46515c">Score: 8.56</text>
+
+
+  <line x1="560" y1="214" x2="560" y2="282" stroke="#607080" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+
+  <line x1="414" y1="320" x2="460" y2="320" stroke="#607080" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+
+  <line x1="720" y1="320" x2="766" y2="320" stroke="#607080" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+</svg>

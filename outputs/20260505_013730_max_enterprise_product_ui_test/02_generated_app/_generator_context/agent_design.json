@@ -1,0 +1,586 @@
+{
+  "name": "Neighborhood Scoring & Ranking Engine Composition",
+  "enterprise_context": {
+    "industry": "real_estate",
+    "main_business": "The company helps users find suitable rental apartments and homes to buy in Tokyo and nearby areas. Staff members answer customer questions, compare neighborhoods, explain area characteristics, and recommend candidate areas and properties based on budget, commute, lifestyle, family structure, and preferences.",
+    "ai_objective": "",
+    "available_data": [
+      "area profiles",
+      "sample property listings",
+      "customer preference forms",
+      "commute information",
+      "school and lifestyle area notes"
+    ],
+    "constraints": [
+      "the system must not guarantee property price appreciation",
+      "the system must not make legal or financial decisions",
+      "final recommendation should be reviewed by a human real estate consultant",
+      "the system should explain reasoning and uncertainty clearly"
+    ]
+  },
+  "selected_opportunity": {
+    "name": "Neighborhood Scoring & Ranking Engine",
+    "score": 95,
+    "target_workflow": "Area comparison and recommendation based on customer preferences (budget, commute, lifestyle, family structure).",
+    "proposed_ai_capability": "LLM-powered multi-criteria decision engine that scores and ranks neighborhoods using structured area profiles, commute data, school ratings, and safety metrics.",
+    "expected_business_value": "Reduces consultant time per case by 40-50%, ensures consistent recommendations across staff, speeds up onboarding for new consultants.",
+    "key_risk": "Bias in scoring due to incomplete or outdated area data; overfitting to historical patterns.",
+    "human_approval_requirement": "Consultant must review and optionally adjust rankings before presenting to customer.",
+    "required_data": "Area profiles (safety, cost, schools, amenities, transport), commute time matrices, historical customer preference-resolution pairs.",
+    "japan_enterprise_fit": "High – directly addresses labor productivity and consistency, aligns with DX and kaizen improvement culture.",
+    "evidence_support": "OECD labour shortage report, METI GENIAC workflow efficiency case, FSA governance framework.",
+    "why_now": "Scattered area info is a critical pain point; AI can unify data and reduce manual comparison as labor shortages intensify.",
+    "refinement_action": "strengthen_human_approval",
+    "refinement_notes": [
+      "Make approval packet mandatory for all external, regulated, or irreversible outputs."
+    ],
+    "search_selection_reason": "Selected after LATS-lite expansion because it has the strongest combination of feasibility, risk controllability, evidence grounding, and PoC buildability."
+  },
+  "input": [
+    "Enterprise user request or business case",
+    "Target workflow description",
+    "Available documents, tickets, policies, reports, or sample records",
+    "Human approval and compliance constraints"
+  ],
+  "output": [
+    "Recommended action or draft artifact",
+    "Evidence packet with source IDs",
+    "Risk level and risk reasons",
+    "Human approval requirement",
+    "Audit trace for review"
+  ],
+  "selected_primitives": [
+    "intake",
+    "retrieval",
+    "classification",
+    "extraction",
+    "checklist",
+    "drafting",
+    "risk_check",
+    "human_approval",
+    "audit_log",
+    "evaluation"
+  ],
+  "agent_steps": [
+    "Normalize the business request, user role, target workflow, available data, and constraints.",
+    "Classify the workflow case type, urgency, sensitivity, and routing destination.",
+    "Retrieve supporting evidence from approved documents, manuals, policies, or evidence pack sources.",
+    "Extract structured fields from documents, forms, emails, or screenshots and mark missing fields.",
+    "Run completeness and process checks against required fields, approval rules, and next actions.",
+    "Draft the recommended response, report, checklist, or internal note using only available evidence.",
+    "Detect regulated, customer-facing, legal, financial, HR, safety, or irreversible decisions.",
+    "Assemble an approval packet and block external or irreversible action until a human approves.",
+    "Record evidence IDs, model output, risk reasons, human edits, and final decision.",
+    "Evaluate the workflow on synthetic business cases and trigger repair if checks fail."
+  ],
+  "knowledge_sources": [
+    {
+      "id": "O",
+      "title": "O",
+      "url": ""
+    },
+    {
+      "id": "E",
+      "title": "E",
+      "url": ""
+    },
+    {
+      "id": "C",
+      "title": "C",
+      "url": ""
+    },
+    {
+      "id": "D",
+      "title": "D",
+      "url": ""
+    },
+    {
+      "id": " ",
+      "title": " ",
+      "url": ""
+    },
+    {
+      "id": "l",
+      "title": "l",
+      "url": ""
+    },
+    {
+      "id": "a",
+      "title": "a",
+      "url": ""
+    },
+    {
+      "id": "b",
+      "title": "b",
+      "url": ""
+    },
+    {
+      "id": "o",
+      "title": "o",
+      "url": ""
+    },
+    {
+      "id": "u",
+      "title": "u",
+      "url": ""
+    },
+    {
+      "id": "r",
+      "title": "r",
+      "url": ""
+    },
+    {
+      "id": " ",
+      "title": " ",
+      "url": ""
+    },
+    {
+      "id": "s",
+      "title": "s",
+      "url": ""
+    },
+    {
+      "id": "h",
+      "title": "h",
+      "url": ""
+    },
+    {
+      "id": "o",
+      "title": "o",
+      "url": ""
+    },
+    {
+      "id": "r",
+      "title": "r",
+      "url": ""
+    },
+    {
+      "id": "t",
+      "title": "t",
+      "url": ""
+    },
+    {
+      "id": "a",
+      "title": "a",
+      "url": ""
+    },
+    {
+      "id": "g",
+      "title": "g",
+      "url": ""
+    },
+    {
+      "id": "e",
+      "title": "e",
+      "url": ""
+    },
+    {
+      "id": " ",
+      "title": " ",
+      "url": ""
+    },
+    {
+      "id": "r",
+      "title": "r",
+      "url": ""
+    },
+    {
+      "id": "e",
+      "title": "e",
+      "url": ""
+    },
+    {
+      "id": "p",
+      "title": "p",
+      "url": ""
+    },
+    {
+      "id": "o",
+      "title": "o",
+      "url": ""
+    },
+    {
+      "id": "r",
+      "title": "r",
+      "url": ""
+    },
+    {
+      "id": "t",
+      "title": "t",
+      "url": ""
+    },
+    {
+      "id": ",",
+      "title": ",",
+      "url": ""
+    },
+    {
+      "id": " ",
+      "title": " ",
+      "url": ""
+    },
+    {
+      "id": "M",
+      "title": "M",
+      "url": ""
+    },
+    {
+      "id": "E",
+      "title": "E",
+      "url": ""
+    },
+    {
+      "id": "T",
+      "title": "T",
+      "url": ""
+    },
+    {
+      "id": "I",
+      "title": "I",
+      "url": ""
+    },
+    {
+      "id": " ",
+      "title": " ",
+      "url": ""
+    },
+    {
+      "id": "G",
+      "title": "G",
+      "url": ""
+    },
+    {
+      "id": "E",
+      "title": "E",
+      "url": ""
+    },
+    {
+      "id": "N",
+      "title": "N",
+      "url": ""
+    },
+    {
+      "id": "I",
+      "title": "I",
+      "url": ""
+    },
+    {
+      "id": "A",
+      "title": "A",
+      "url": ""
+    },
+    {
+      "id": "C",
+      "title": "C",
+      "url": ""
+    },
+    {
+      "id": " ",
+      "title": " ",
+      "url": ""
+    },
+    {
+      "id": "w",
+      "title": "w",
+      "url": ""
+    },
+    {
+      "id": "o",
+      "title": "o",
+      "url": ""
+    },
+    {
+      "id": "r",
+      "title": "r",
+      "url": ""
+    },
+    {
+      "id": "k",
+      "title": "k",
+      "url": ""
+    },
+    {
+      "id": "f",
+      "title": "f",
+      "url": ""
+    },
+    {
+      "id": "l",
+      "title": "l",
+      "url": ""
+    },
+    {
+      "id": "o",
+      "title": "o",
+      "url": ""
+    },
+    {
+      "id": "w",
+      "title": "w",
+      "url": ""
+    },
+    {
+      "id": " ",
+      "title": " ",
+      "url": ""
+    },
+    {
+      "id": "e",
+      "title": "e",
+      "url": ""
+    },
+    {
+      "id": "f",
+      "title": "f",
+      "url": ""
+    },
+    {
+      "id": "f",
+      "title": "f",
+      "url": ""
+    },
+    {
+      "id": "i",
+      "title": "i",
+      "url": ""
+    },
+    {
+      "id": "c",
+      "title": "c",
+      "url": ""
+    },
+    {
+      "id": "i",
+      "title": "i",
+      "url": ""
+    },
+    {
+      "id": "e",
+      "title": "e",
+      "url": ""
+    },
+    {
+      "id": "n",
+      "title": "n",
+      "url": ""
+    },
+    {
+      "id": "c",
+      "title": "c",
+      "url": ""
+    },
+    {
+      "id": "y",
+      "title": "y",
+      "url": ""
+    },
+    {
+      "id": " ",
+      "title": " ",
+      "url": ""
+    },
+    {
+      "id": "c",
+      "title": "c",
+      "url": ""
+    },
+    {
+      "id": "a",
+      "title": "a",
+      "url": ""
+    },
+    {
+      "id": "s",
+      "title": "s",
+      "url": ""
+    },
+    {
+      "id": "e",
+      "title": "e",
+      "url": ""
+    },
+    {
+      "id": ",",
+      "title": ",",
+      "url": ""
+    },
+    {
+      "id": " ",
+      "title": " ",
+      "url": ""
+    },
+    {
+      "id": "F",
+      "title": "F",
+      "url": ""
+    },
+    {
+      "id": "S",
+      "title": "S",
+      "url": ""
+    },
+    {
+      "id": "A",
+      "title": "A",
+      "url": ""
+    },
+    {
+      "id": " ",
+      "title": " ",
+      "url": ""
+    },
+    {
+      "id": "g",
+      "title": "g",
+      "url": ""
+    },
+    {
+      "id": "o",
+      "title": "o",
+      "url": ""
+    },
+    {
+      "id": "v",
+      "title": "v",
+      "url": ""
+    },
+    {
+      "id": "e",
+      "title": "e",
+      "url": ""
+    },
+    {
+      "id": "r",
+      "title": "r",
+      "url": ""
+    },
+    {
+      "id": "n",
+      "title": "n",
+      "url": ""
+    },
+    {
+      "id": "a",
+      "title": "a",
+      "url": ""
+    },
+    {
+      "id": "n",
+      "title": "n",
+      "url": ""
+    },
+    {
+      "id": "c",
+      "title": "c",
+      "url": ""
+    },
+    {
+      "id": "e",
+      "title": "e",
+      "url": ""
+    },
+    {
+      "id": " ",
+      "title": " ",
+      "url": ""
+    },
+    {
+      "id": "f",
+      "title": "f",
+      "url": ""
+    },
+    {
+      "id": "r",
+      "title": "r",
+      "url": ""
+    },
+    {
+      "id": "a",
+      "title": "a",
+      "url": ""
+    },
+    {
+      "id": "m",
+      "title": "m",
+      "url": ""
+    },
+    {
+      "id": "e",
+      "title": "e",
+      "url": ""
+    },
+    {
+      "id": "w",
+      "title": "w",
+      "url": ""
+    },
+    {
+      "id": "o",
+      "title": "o",
+      "url": ""
+    },
+    {
+      "id": "r",
+      "title": "r",
+      "url": ""
+    },
+    {
+      "id": "k",
+      "title": "k",
+      "url": ""
+    },
+    {
+      "id": ".",
+      "title": ".",
+      "url": ""
+    },
+    {
+      "id": "enterprise_available_data",
+      "title": "User-provided enterprise data assets",
+      "description": [
+        "area profiles",
+        "sample property listings",
+        "customer preference forms",
+        "commute information",
+        "school and lifestyle area notes"
+      ]
+    }
+  ],
+  "tools": [
+    "LLM with cheap/strong routing",
+    "Evidence pack retriever",
+    "Primitive composition registry",
+    "Schema validator",
+    "Sandbox evaluator",
+    "Human approval gate"
+  ],
+  "validation_checks": [
+    "Every recommendation cites evidence or declares evidence missing.",
+    "Customer-facing, regulated, HR, legal, financial, safety, or irreversible outputs require human approval.",
+    "Risk reasons are explicit and visible to the reviewer.",
+    "The workflow can run on local sample data before production integration.",
+    "Generated outputs preserve an audit trace."
+  ],
+  "human_approval_points": [
+    "Before sending external communication",
+    "Before making regulated or irreversible decisions",
+    "When confidence is low or evidence is missing",
+    "When the case affects customers, employees, finance, legal, safety, or compliance"
+  ],
+  "risk_mitigation": [
+    "Use evidence-gated generation.",
+    "Prefer bounded PoC scope over broad automation.",
+    "Keep human approval mandatory in pilot phase.",
+    "Log all model outputs and human edits.",
+    "Use synthetic and sanitized samples before real data integration."
+  ],
+  "evaluation_criteria": [
+    "Evidence relevance",
+    "Task classification or routing correctness",
+    "Completeness of required fields or checklist items",
+    "Risk flag correctness",
+    "Human approval enforcement",
+    "Clarity and usefulness of generated output",
+    "Traceability and auditability"
+  ]
+}

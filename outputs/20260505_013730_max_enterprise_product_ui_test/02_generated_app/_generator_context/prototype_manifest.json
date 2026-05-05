@@ -1,0 +1,1095 @@
+{
+  "app_dir": "<repo>/outputs/20260505_013730_max_enterprise_product_ui_test/02_generated_app",
+  "product_spec": {
+    "product_spec_version": "software_builder_loop_v1",
+    "product_name": "AI Property Recommendation Platform",
+    "product_slug": "ai_property_recommendation_platform",
+    "subtitle": "Customer preference intake, deterministic area/property ranking, DeepSeek recommendation drafting, and human approval workflow.",
+    "app_kind": "real_estate_recommendation",
+    "maturity_target": "enterprise_software_mvp",
+    "product_archetype": {
+      "id": "recommendation_workbench",
+      "name": "Recommendation Workbench",
+      "primary_job": "Compare candidates, explain trade-offs, and prepare an approval-ready recommendation.",
+      "workspace_regions": [
+        "case_queue",
+        "intake_form",
+        "candidate_comparison",
+        "evidence_panel",
+        "draft_editor",
+        "approval_packet"
+      ],
+      "selection_score": 8
+    },
+    "selected_opportunity": "Neighborhood Scoring & Ranking Engine",
+    "target_workflow": "Area comparison and recommendation based on customer preferences (budget, commute, lifestyle, family structure).",
+    "business_value": "Reduces consultant time per case by 40-50%, ensures consistent recommendations across staff, speeds up onboarding for new consultants.",
+    "key_risk": "Bias in scoring due to incomplete or outdated area data; overfitting to historical patterns.",
+    "target_user": "Business consultant and human reviewer",
+    "primary_action": "Generate Recommendation Packet",
+    "fields": [
+      {
+        "key": "customer_name",
+        "label": "Customer name",
+        "type": "text",
+        "required": true,
+        "default": "佐藤様"
+      },
+      {
+        "key": "household",
+        "label": "Household profile",
+        "type": "textarea",
+        "required": true,
+        "default": "夫婦と子ども1名。静かな住環境と通学環境を重視。"
+      },
+      {
+        "key": "budget",
+        "label": "Budget",
+        "type": "text",
+        "required": true,
+        "default": "55-70"
+      },
+      {
+        "key": "commute_target",
+        "label": "Commute target",
+        "type": "text",
+        "required": true,
+        "default": "新宿"
+      },
+      {
+        "key": "max_commute_minutes",
+        "label": "Max commute minutes",
+        "type": "number",
+        "required": true,
+        "default": "40"
+      },
+      {
+        "key": "preferences",
+        "label": "Preferences",
+        "type": "textarea",
+        "required": true,
+        "default": "駅アクセス、学校、静かな住宅街、災害リスク確認、ファミリー向け。"
+      },
+      {
+        "key": "must_have",
+        "label": "Must-have conditions",
+        "type": "textarea",
+        "required": true,
+        "default": "3LDK以上、駅徒歩15分以内、耐震性とハザードマップ確認。"
+      },
+      {
+        "key": "approval_owner",
+        "label": "Approval owner",
+        "type": "text",
+        "required": true,
+        "default": "宅建士 / シニアコンサルタント"
+      }
+    ],
+    "selected_primitives": [
+      "intake",
+      "retrieval",
+      "classification",
+      "extraction",
+      "checklist",
+      "drafting",
+      "risk_check",
+      "human_approval",
+      "audit_log",
+      "evaluation"
+    ],
+    "navigation_sections": [
+      "Work queue",
+      "Case intake",
+      "AI analysis",
+      "Evidence",
+      "Approval",
+      "Audit",
+      "System readiness"
+    ],
+    "workspace_regions": [
+      "case_queue",
+      "intake_form",
+      "candidate_comparison",
+      "evidence_panel",
+      "draft_editor",
+      "approval_packet"
+    ],
+    "enterprise_capabilities": [
+      "case_queue",
+      "structured_intake_form",
+      "runtime_live_web_evidence_search",
+      "domain_tool_panel",
+      "candidate_or_result_comparison",
+      "editable_business_draft",
+      "human_approval_packet",
+      "activity_log",
+      "audit_trace",
+      "error_and_loading_states"
+    ],
+    "role_model": [
+      {
+        "role": "operator",
+        "permissions": [
+          "create_case",
+          "run_agent",
+          "edit_draft"
+        ]
+      },
+      {
+        "role": "reviewer",
+        "permissions": [
+          "review_evidence",
+          "approve",
+          "request_edits",
+          "escalate"
+        ]
+      },
+      {
+        "role": "manager",
+        "permissions": [
+          "view_queue",
+          "inspect_audit",
+          "manage_policy"
+        ]
+      }
+    ],
+    "state_model": [
+      "new",
+      "ready_for_agent",
+      "running",
+      "draft_ready",
+      "review_required",
+      "approved_locally",
+      "edit_requested",
+      "escalated"
+    ],
+    "visual_quality_contract": {
+      "layout": "enterprise_workbench",
+      "must_have": [
+        "sidebar navigation",
+        "case queue",
+        "workbench panels",
+        "candidate or result table",
+        "evidence source list with live-search markers",
+        "approval actions",
+        "activity log",
+        "debug JSON secondary only",
+        "responsive KPI cards using auto-fit minmax grid",
+        "tablet and mobile breakpoints",
+        "safe wrapping for long labels and model outputs",
+        "no horizontal page overflow"
+      ],
+      "avoid": [
+        "landing page",
+        "chat-only UI",
+        "single raw JSON output",
+        "marketing hero",
+        "decorative-only visuals",
+        "fixed six-column KPI layout",
+        "desktop-only three-column workbench without tablet fallback"
+      ]
+    },
+    "enterprise_context": {
+      "industry": "real_estate",
+      "main_business": "The company helps users find suitable rental apartments and homes to buy in Tokyo and nearby areas. Staff members answer customer questions, compare neighborhoods, explain area characteristics, and recommend candidate areas and properties based on budget, commute, lifestyle, family structure, and preferences.",
+      "ai_objective": "",
+      "available_data": [
+        "area profiles",
+        "sample property listings",
+        "customer preference forms",
+        "commute information",
+        "school and lifestyle area notes"
+      ],
+      "constraints": [
+        "the system must not guarantee property price appreciation",
+        "the system must not make legal or financial decisions",
+        "final recommendation should be reviewed by a human real estate consultant",
+        "the system should explain reasoning and uncertainty clearly"
+      ]
+    },
+    "runtime": {
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "base_url_env": "DEEPSEEK_BASE_URL",
+      "model_env": "AGENT_MODEL",
+      "default_model": "deepseek-v4-pro",
+      "thinking_env": "DEEPSEEK_THINKING",
+      "reasoning_effort_env": "DEEPSEEK_REASONING_EFFORT",
+      "default_reasoning_effort": "high"
+    },
+    "risk_terms": [
+      "customer",
+      "external",
+      "approval",
+      "legal",
+      "financial",
+      "investment",
+      "safety",
+      "hazard",
+      "earthquake",
+      "契約",
+      "金融",
+      "投資",
+      "災害",
+      "耐震",
+      "承認"
+    ],
+    "output_policy": {
+      "human_approval_required": true,
+      "send_allowed": false,
+      "no_guarantees": true,
+      "decision_support_only": true
+    }
+  },
+  "product_brief": {
+    "product_name": "AI Property Recommendation Platform",
+    "selected_opportunity": "Neighborhood Scoring & Ranking Engine",
+    "problem": "Area comparison and recommendation based on customer preferences (budget, commute, lifestyle, family structure).",
+    "solution": "Customer preference intake, deterministic area/property ranking, DeepSeek recommendation drafting, and human approval workflow.",
+    "demo_value": "Shows consulting-agent to software-builder workflow through a runnable multi-file generated app.",
+    "human_approval": true
+  },
+  "product_requirements": {
+    "prd_version": "software_builder_loop_v1",
+    "product_name": "AI Property Recommendation Platform",
+    "app_kind": "real_estate_recommendation",
+    "source_opportunity": "Neighborhood Scoring & Ranking Engine",
+    "company_context": {
+      "industry": "real_estate",
+      "main_business": "The company helps users find suitable rental apartments and homes to buy in Tokyo and nearby areas. Staff members answer customer questions, compare neighborhoods, explain area characteristics, and recommend candidate areas and properties based on budget, commute, lifestyle, family structure, and preferences.",
+      "ai_objective": "",
+      "constraints": [
+        "the system must not guarantee property price appreciation",
+        "the system must not make legal or financial decisions",
+        "final recommendation should be reviewed by a human real estate consultant",
+        "the system should explain reasoning and uncertainty clearly"
+      ]
+    },
+    "problem_statement": "Area comparison and recommendation based on customer preferences (budget, commute, lifestyle, family structure).",
+    "proposed_capability": "LLM-powered multi-criteria decision engine that scores and ranks neighborhoods using structured area profiles, commute data, school ratings, and safety metrics.",
+    "primary_users": [
+      "Real-estate consultant",
+      "Sales manager / reviewer",
+      "Customer-facing advisor"
+    ],
+    "core_workflows": [
+      "Capture buyer preferences and constraints.",
+      "Rank local area candidates and property candidates with deterministic tools.",
+      "Ask DeepSeek to draft a Japanese recommendation using only local tool results and evidence.",
+      "Block external sending until a human reviewer approves the packet."
+    ],
+    "acceptance_criteria": [
+      "The app exposes a real CLI and local web UI.",
+      "The backend includes separate agent, tool, data, guardrail, and API modules.",
+      "Outputs include local_tool_results and ranked_area_candidates.",
+      "Area recommendations use concrete names such as 武蔵小杉, 国立, 和光市, and 町田.",
+      "The system never returns send_allowed=true in the local product runtime."
+    ],
+    "non_goals": [
+      "No production database or external CRM integration in the local product runtime.",
+      "No automatic customer sending or irreversible action.",
+      "No legal, financial, disaster-safety, or investment guarantee."
+    ],
+    "safety_policy": "Human approval is required before customer-facing, financial, legal, safety, or operationally consequential use."
+  },
+  "product_readiness": {
+    "readiness_version": "production_readiness_v1",
+    "product_name": "AI Property Recommendation Platform",
+    "overall_level": "local_product_mvp_runtime_ready",
+    "implemented_capabilities": [
+      {
+        "capability": "multi_file_project_package",
+        "status": "implemented",
+        "evidence": [
+          "backend/",
+          "frontend/",
+          "data/",
+          "tests/",
+          "app.py",
+          "evaluation.py"
+        ]
+      },
+      {
+        "capability": "api_backed_agent_runtime",
+        "status": "implemented",
+        "evidence": [
+          "backend/llm_client.py",
+          "backend/agent.py"
+        ]
+      },
+      {
+        "capability": "runtime_live_web_evidence_search",
+        "status": "implemented",
+        "evidence": [
+          "backend/web_search.py",
+          "backend/agent.py:evidence"
+        ]
+      },
+      {
+        "capability": "local_domain_tools",
+        "status": "implemented",
+        "evidence": [
+          "backend/tools.py",
+          "backend/recommendation_engine.py"
+        ]
+      },
+      {
+        "capability": "human_approval_gate",
+        "status": "implemented",
+        "evidence": [
+          "backend/guardrails.py",
+          "output_policy.send_allowed=false"
+        ]
+      },
+      {
+        "capability": "sandbox_evaluation",
+        "status": "implemented",
+        "evidence": [
+          "evaluation.py",
+          "tests/test_recommendations.py",
+          "sandbox_report.json"
+        ]
+      },
+      {
+        "capability": "secret_leakage_check",
+        "status": "implemented",
+        "evidence": [
+          "src/sandbox_eval.py:no_api_key_or_secret_leakage"
+        ]
+      }
+    ],
+    "production_gaps": [
+      {
+        "capability": "authentication_and_roles",
+        "status": "not_implemented",
+        "production_requirement": "Add login, role-based access, approval-owner identity, and session audit trails."
+      },
+      {
+        "capability": "persistent_database",
+        "status": "not_implemented",
+        "production_requirement": "Replace local JSON files with a real database, migrations, and backup/restore policy."
+      },
+      {
+        "capability": "enterprise_data_connectors",
+        "status": "not_implemented",
+        "production_requirement": "Connect to approved internal document stores, CRM/SFA, ticketing, property systems, or maintenance logs."
+      },
+      {
+        "capability": "observability",
+        "status": "partial",
+        "production_requirement": "Add structured logs, latency metrics, model cost metrics, tracing, alerts, and redaction."
+      },
+      {
+        "capability": "security_review",
+        "status": "partial",
+        "production_requirement": "Add threat model, rate limiting, prompt-injection tests, dependency scanning, and data-retention controls."
+      },
+      {
+        "capability": "human_workflow_integration",
+        "status": "partial",
+        "production_requirement": "Add approval queue, edit history, reviewer comments, and final approval records."
+      }
+    ],
+    "recommended_next_milestones": [
+      "Pilot with sanitized enterprise data and named reviewers.",
+      "Add authentication, persistent storage, and approval workflow.",
+      "Connect to real enterprise data sources behind read-only permissions.",
+      "Add monitoring, cost controls, security tests, and prompt-injection evaluation.",
+      "Run 50-100 human-reviewed cases before production rollout."
+    ],
+    "architecture_entrypoints": {
+      "cli": "python3 app.py --cli",
+      "server": "python3 app.py",
+      "evaluation": "python3 evaluation.py",
+      "deterministic_tests": "python3 -m unittest discover -s tests"
+    }
+  },
+  "productization_blueprint": {
+    "blueprint_version": "enterprise_productization_v1",
+    "maturity_target": "enterprise_software_mvp",
+    "selected_archetype": {
+      "id": "recommendation_workbench",
+      "name": "Recommendation Workbench",
+      "primary_job": "Compare candidates, explain trade-offs, and prepare an approval-ready recommendation.",
+      "workspace_regions": [
+        "case_queue",
+        "intake_form",
+        "candidate_comparison",
+        "evidence_panel",
+        "draft_editor",
+        "approval_packet"
+      ],
+      "selection_score": 8
+    },
+    "source_opportunity": "Neighborhood Scoring & Ranking Engine",
+    "product_positioning": {
+      "not_a_chatbot": true,
+      "not_a_json_console": true,
+      "primary_user_value": "Compare candidates, explain trade-offs, and prepare an approval-ready recommendation.",
+      "enterprise_context": {
+        "company_name": "Tokyo Home Finder",
+        "industry": "real_estate",
+        "main_business": "The company helps users find suitable rental apartments and homes to buy in Tokyo and nearby areas. Staff members answer customer questions, compare neighborhoods, explain area characteristics, and recommend candidate areas and properties based on budget, commute, lifestyle, family structure, and preferences.",
+        "ai_objective": "Build an AI-enabled agent system that helps consultants analyze customer preferences and recommend suitable areas or property search directions."
+      }
+    },
+    "role_model": [
+      {
+        "role": "operator",
+        "permissions": [
+          "create_case",
+          "run_agent",
+          "edit_draft"
+        ]
+      },
+      {
+        "role": "reviewer",
+        "permissions": [
+          "review_evidence",
+          "approve",
+          "request_edits",
+          "escalate"
+        ]
+      },
+      {
+        "role": "manager",
+        "permissions": [
+          "view_queue",
+          "inspect_audit",
+          "manage_policy"
+        ]
+      }
+    ],
+    "navigation_sections": [
+      "Work queue",
+      "Case intake",
+      "AI analysis",
+      "Evidence",
+      "Approval",
+      "Audit",
+      "System readiness"
+    ],
+    "workspace_regions": [
+      "case_queue",
+      "intake_form",
+      "candidate_comparison",
+      "evidence_panel",
+      "draft_editor",
+      "approval_packet"
+    ],
+    "enterprise_capabilities": [
+      "case_queue",
+      "structured_intake_form",
+      "runtime_live_web_evidence_search",
+      "domain_tool_panel",
+      "candidate_or_result_comparison",
+      "editable_business_draft",
+      "human_approval_packet",
+      "activity_log",
+      "audit_trace",
+      "error_and_loading_states"
+    ],
+    "data_model": [
+      {
+        "object": "Case",
+        "fields": [
+          "case_id",
+          "requester",
+          "workflow_type",
+          "status",
+          "created_at"
+        ]
+      },
+      {
+        "object": "EvidenceItem",
+        "fields": [
+          "id",
+          "title",
+          "url",
+          "retrieval_method",
+          "summary"
+        ]
+      },
+      {
+        "object": "AgentRun",
+        "fields": [
+          "run_id",
+          "case_id",
+          "model",
+          "tool_names",
+          "risk_level"
+        ]
+      },
+      {
+        "object": "ApprovalPacket",
+        "fields": [
+          "approval_owner",
+          "decision_options",
+          "risk_reasons",
+          "send_allowed"
+        ]
+      }
+    ],
+    "state_model": [
+      "new",
+      "ready_for_agent",
+      "running",
+      "draft_ready",
+      "review_required",
+      "approved_locally",
+      "edit_requested",
+      "escalated"
+    ],
+    "interaction_model": [
+      "Select a case from the work queue.",
+      "Edit structured input fields.",
+      "Run local tools, live web search, and LLM reasoning.",
+      "Compare ranked candidates or extracted findings.",
+      "Inspect evidence sources and risk reasons.",
+      "Edit the generated draft.",
+      "Record approve, edit, or escalate decision in the local review state."
+    ],
+    "visual_quality_contract": {
+      "layout": "enterprise_workbench",
+      "must_have": [
+        "sidebar navigation",
+        "case queue",
+        "workbench panels",
+        "candidate or result table",
+        "evidence source list with live-search markers",
+        "approval actions",
+        "activity log",
+        "debug JSON secondary only",
+        "responsive KPI cards using auto-fit minmax grid",
+        "tablet and mobile breakpoints",
+        "safe wrapping for long labels and model outputs",
+        "no horizontal page overflow"
+      ],
+      "avoid": [
+        "landing page",
+        "chat-only UI",
+        "single raw JSON output",
+        "marketing hero",
+        "decorative-only visuals",
+        "fixed six-column KPI layout",
+        "desktop-only three-column workbench without tablet fallback"
+      ]
+    },
+    "quality_gates": [
+      "Generated app has a local server and browser UI.",
+      "Generated app uses DeepSeek at runtime.",
+      "Generated app performs runtime trusted-domain evidence search.",
+      "Primary UI is an enterprise workbench; raw JSON is secondary.",
+      "Frontend passes the responsiveness harness.",
+      "Human approval is visible and enforced.",
+      "No API key or secret is written into generated files."
+    ],
+    "evidence_basis": [
+      "evidence_oecd_ai_labour_japan_2025",
+      "evidence_fsa_ai_discussion_2025",
+      "evidence_meti_geniac_multimodal_insurance_case",
+      "live_evidence_www_meti_go_jp_1",
+      "live_evidence_www_digital_go_jp_2",
+      "live_evidence_www_ipa_go_jp_3",
+      "live_evidence_www_meti_go_jp_4",
+      "live_evidence_www_ipa_go_jp_5"
+    ],
+    "selected_primitives": [
+      "intake",
+      "retrieval",
+      "classification",
+      "extraction",
+      "checklist",
+      "drafting",
+      "risk_check",
+      "human_approval",
+      "audit_log",
+      "evaluation"
+    ]
+  },
+  "project_architecture": {
+    "architecture_version": "software_builder_loop_v1",
+    "product_name": "AI Property Recommendation Platform",
+    "app_kind": "real_estate_recommendation",
+    "runtime": "Python standard library HTTP API + static frontend + DeepSeek chat completions",
+    "entrypoints": {
+      "cli": "python3 app.py --cli",
+      "server": "python3 app.py",
+      "evaluation": "python3 evaluation.py",
+      "deterministic_tests": "python3 -m unittest discover -s tests"
+    },
+    "backend_modules": [
+      {
+        "path": "backend/agent.py",
+        "responsibility": "Orchestrates case -> tools -> evidence -> DeepSeek -> guardrails."
+      },
+      {
+        "path": "backend/api.py",
+        "responsibility": "Local JSON API and static frontend server."
+      },
+      {
+        "path": "backend/data_store.py",
+        "responsibility": "Loads generated domain data and sample cases."
+      },
+      {
+        "path": "backend/llm_client.py",
+        "responsibility": "DeepSeek/OpenAI-compatible JSON client with retry."
+      },
+      {
+        "path": "backend/web_search.py",
+        "responsibility": "Runtime trusted-domain web evidence search."
+      },
+      {
+        "path": "backend/recommendation_engine.py",
+        "responsibility": "Deterministic ranking algorithms."
+      },
+      {
+        "path": "backend/tools.py",
+        "responsibility": "Local tool interface used before LLM drafting."
+      },
+      {
+        "path": "backend/guardrails.py",
+        "responsibility": "Schema normalization, placeholder prevention, approval enforcement."
+      }
+    ],
+    "frontend_modules": [
+      {
+        "path": "frontend/index.html",
+        "responsibility": "Usable product surface."
+      },
+      {
+        "path": "frontend/styles.css",
+        "responsibility": "Work-focused interface styling."
+      },
+      {
+        "path": "frontend/app.js",
+        "responsibility": "Calls local API and displays recommendation packets."
+      }
+    ],
+    "data_modules": [
+      {
+        "path": "data/areas.json",
+        "responsibility": "Generated local area profiles."
+      },
+      {
+        "path": "data/properties.json",
+        "responsibility": "Generated local property listings."
+      },
+      {
+        "path": "data/sample_customers.json",
+        "responsibility": "Generated evaluation cases."
+      }
+    ],
+    "quality_gates": [
+      "All Python files compile.",
+      "App imports successfully.",
+      "CLI produces structured JSON using the real DeepSeek API.",
+      "Deterministic unit tests pass.",
+      "API-backed evaluation passes.",
+      "Frontend responsiveness harness passes.",
+      "No API key or secret is written into generated files."
+    ],
+    "selected_primitives": [
+      "intake",
+      "retrieval",
+      "classification",
+      "extraction",
+      "checklist",
+      "drafting",
+      "risk_check",
+      "human_approval",
+      "audit_log",
+      "evaluation"
+    ]
+  },
+  "file_manifest": {
+    "manifest_version": "software_builder_loop_v1",
+    "product_name": "AI Property Recommendation Platform",
+    "files": [
+      {
+        "path": "README.md",
+        "role": "Human-readable usage and inspection guide.",
+        "required": true
+      },
+      {
+        "path": "requirements.txt",
+        "role": "Runtime dependency note; stdlib-first local product MVP.",
+        "required": true
+      },
+      {
+        "path": "app.py",
+        "role": "CLI/server entrypoint.",
+        "required": true
+      },
+      {
+        "path": "tools.py",
+        "role": "Compatibility wrapper for local domain tools.",
+        "required": true
+      },
+      {
+        "path": "evaluation.py",
+        "role": "API-backed product evaluator.",
+        "required": true
+      },
+      {
+        "path": "product_spec.json",
+        "role": "Generated product specification.",
+        "required": true
+      },
+      {
+        "path": "software_blueprint.json",
+        "role": "Backward-compatible copy of the product specification.",
+        "required": true
+      },
+      {
+        "path": "product_requirements.json",
+        "role": "Generated PRD.",
+        "required": true
+      },
+      {
+        "path": "productization_blueprint.json",
+        "role": "Enterprise software productization blueprint.",
+        "required": true
+      },
+      {
+        "path": "productization_blueprint.md",
+        "role": "Human-readable productization blueprint.",
+        "required": true
+      },
+      {
+        "path": "product_readiness.json",
+        "role": "Production-readiness checklist and gap analysis.",
+        "required": true
+      },
+      {
+        "path": "production_readiness.md",
+        "role": "Human-readable production-readiness report.",
+        "required": true
+      },
+      {
+        "path": "project_architecture.json",
+        "role": "Generated project architecture.",
+        "required": true
+      },
+      {
+        "path": "architecture.json",
+        "role": "Primitive architecture selected by the consulting/search layer.",
+        "required": true
+      },
+      {
+        "path": "architecture.md",
+        "role": "Readable generated project architecture.",
+        "required": true
+      },
+      {
+        "path": "implementation_plan.json",
+        "role": "Software Builder Loop implementation plan.",
+        "required": true
+      },
+      {
+        "path": "file_manifest.json",
+        "role": "Authoritative file manifest.",
+        "required": true
+      },
+      {
+        "path": "file_plan.json",
+        "role": "Backward-compatible copy of the file manifest.",
+        "required": true
+      },
+      {
+        "path": "generation_trace.json",
+        "role": "Generation trace for reviewer inspection.",
+        "required": true
+      },
+      {
+        "path": "builder_loop_trace.json",
+        "role": "Software Builder Loop trace.",
+        "required": true
+      },
+      {
+        "path": "repair_log.json",
+        "role": "Repair-loop status and planned actions.",
+        "required": true
+      },
+      {
+        "path": "agent_spec.json",
+        "role": "Agent runtime contract and prompts.",
+        "required": true
+      },
+      {
+        "path": "domain_data.json",
+        "role": "Compatibility aggregate of generated domain data.",
+        "required": true
+      },
+      {
+        "path": "sample_cases.json",
+        "role": "Compatibility copy of generated sample cases.",
+        "required": true
+      },
+      {
+        "path": "knowledge_base.md",
+        "role": "Generated product knowledge base.",
+        "required": true
+      },
+      {
+        "path": "pipeline_diagram.svg",
+        "role": "Generated agent flow diagram.",
+        "required": true
+      },
+      {
+        "path": "analysis_charts.svg",
+        "role": "Generated local data chart.",
+        "required": true
+      },
+      {
+        "path": "backend/__init__.py",
+        "role": "Backend package marker.",
+        "required": true
+      },
+      {
+        "path": "backend/agent.py",
+        "role": "Agent orchestration.",
+        "required": true
+      },
+      {
+        "path": "backend/api.py",
+        "role": "Local API and frontend server.",
+        "required": true
+      },
+      {
+        "path": "backend/data_store.py",
+        "role": "Data loading helpers.",
+        "required": true
+      },
+      {
+        "path": "backend/guardrails.py",
+        "role": "Safety and output contract enforcement.",
+        "required": true
+      },
+      {
+        "path": "backend/llm_client.py",
+        "role": "DeepSeek JSON client.",
+        "required": true
+      },
+      {
+        "path": "backend/web_search.py",
+        "role": "Runtime trusted-domain live web evidence search.",
+        "required": true
+      },
+      {
+        "path": "backend/recommendation_engine.py",
+        "role": "Deterministic ranking engine.",
+        "required": true
+      },
+      {
+        "path": "backend/tools.py",
+        "role": "Domain tool interface.",
+        "required": true
+      },
+      {
+        "path": "frontend/index.html",
+        "role": "Generated product UI.",
+        "required": true
+      },
+      {
+        "path": "frontend/styles.css",
+        "role": "Generated product styling.",
+        "required": true
+      },
+      {
+        "path": "frontend/app.js",
+        "role": "Generated product UI behavior.",
+        "required": true
+      },
+      {
+        "path": "data/areas.json",
+        "role": "Area profiles.",
+        "required": true
+      },
+      {
+        "path": "data/properties.json",
+        "role": "Property listings.",
+        "required": true
+      },
+      {
+        "path": "data/sample_customers.json",
+        "role": "Sample customer cases.",
+        "required": true
+      },
+      {
+        "path": "tests/test_recommendations.py",
+        "role": "Deterministic ranking tests.",
+        "required": true
+      }
+    ]
+  },
+  "builder_loop_trace": {
+    "trace_version": "software_builder_loop_v1",
+    "loop": [
+      {
+        "stage": "productization_blueprint",
+        "purpose": "Translate the selected opportunity into an enterprise software product archetype, role model, workbench layout, state model, and UI quality contract.",
+        "outputs": [
+          "productization_blueprint.json",
+          "productization_blueprint.md"
+        ],
+        "ai_scientist_analogy": "experiment environment design / template shaping"
+      },
+      {
+        "stage": "product_requirements",
+        "purpose": "Turn the selected enterprise opportunity into users, jobs-to-be-done, workflows, acceptance criteria, and safety boundaries.",
+        "outputs": [
+          "product_requirements.json",
+          "product_brief.json"
+        ],
+        "ai_scientist_analogy": "idea refinement / experiment objective"
+      },
+      {
+        "stage": "project_architecture",
+        "purpose": "Design a runnable product with backend modules, local tools, data files, frontend surface, tests, evaluation, and review artifacts.",
+        "outputs": [
+          "project_architecture.json",
+          "architecture.md"
+        ],
+        "ai_scientist_analogy": "experiment design / method architecture"
+      },
+      {
+        "stage": "file_manifest",
+        "purpose": "Define every generated source, data, test, evaluation, and documentation file before writing code.",
+        "outputs": [
+          "file_manifest.json",
+          "file_plan.json"
+        ],
+        "ai_scientist_analogy": "code generation plan"
+      },
+      {
+        "stage": "code_generation",
+        "purpose": "Generate the full project package, not a single demo script: API server, agent runtime, deterministic tools, data, UI, tests, and docs.",
+        "outputs": [
+          "app.py",
+          "backend/",
+          "frontend/",
+          "data/",
+          "tests/",
+          "evaluation.py"
+        ],
+        "ai_scientist_analogy": "LLM-written experiment code"
+      },
+      {
+        "stage": "sandbox_execution",
+        "purpose": "Compile, import, run CLI, run deterministic tests, run API-backed evaluation, and collect generated case outputs.",
+        "outputs": [
+          "sandbox_report.json",
+          "evaluation_results.json",
+          "case_outputs.json"
+        ],
+        "ai_scientist_analogy": "experiment execution"
+      },
+      {
+        "stage": "repair_loop",
+        "purpose": "Inspect failures and record the next patch/regeneration action until the generated project is runnable.",
+        "outputs": [
+          "repair_log.json",
+          "builder_loop_trace.json"
+        ],
+        "ai_scientist_analogy": "debug, refine, and iterate"
+      },
+      {
+        "stage": "product_review",
+        "purpose": "Score the generated product for business alignment, technical completeness, tool use, API behavior, Japan fit, and governance.",
+        "outputs": [
+          "review.json",
+          "review.md"
+        ],
+        "ai_scientist_analogy": "automated review"
+      }
+    ],
+    "product_requirements": {
+      "product_name": "AI Property Recommendation Platform",
+      "acceptance_criteria": [
+        "The app exposes a real CLI and local web UI.",
+        "The backend includes separate agent, tool, data, guardrail, and API modules.",
+        "Outputs include local_tool_results and ranked_area_candidates.",
+        "Area recommendations use concrete names such as 武蔵小杉, 国立, 和光市, and 町田.",
+        "The system never returns send_allowed=true in the local product runtime."
+      ]
+    },
+    "project_architecture": {
+      "runtime": "Python standard library HTTP API + static frontend + DeepSeek chat completions",
+      "entrypoints": {
+        "cli": "python3 app.py --cli",
+        "server": "python3 app.py",
+        "evaluation": "python3 evaluation.py",
+        "deterministic_tests": "python3 -m unittest discover -s tests"
+      },
+      "backend_modules": [
+        "backend/agent.py",
+        "backend/api.py",
+        "backend/data_store.py",
+        "backend/llm_client.py",
+        "backend/web_search.py",
+        "backend/recommendation_engine.py",
+        "backend/tools.py",
+        "backend/guardrails.py"
+      ],
+      "frontend_modules": [
+        "frontend/index.html",
+        "frontend/styles.css",
+        "frontend/app.js"
+      ]
+    },
+    "file_count": 43,
+    "quality_gates": [
+      "Generated app must be a project package, not a single demo script.",
+      "Generated app must have backend, frontend, data, tests, evaluation, and documentation.",
+      "Generated app must use deterministic local tools before DeepSeek drafting.",
+      "Generated app must call DeepSeek in real API mode.",
+      "Generated app must enforce human approval and send_allowed=false.",
+      "Sandbox evaluation must pass before the generated product is considered usable."
+    ]
+  },
+  "files": [
+    "README.md",
+    "agent_spec.json",
+    "analysis_charts.svg",
+    "app.py",
+    "architecture.json",
+    "architecture.md",
+    "backend/__init__.py",
+    "backend/agent.py",
+    "backend/api.py",
+    "backend/data_store.py",
+    "backend/guardrails.py",
+    "backend/llm_client.py",
+    "backend/recommendation_engine.py",
+    "backend/tools.py",
+    "backend/web_search.py",
+    "builder_loop_trace.json",
+    "data/areas.json",
+    "data/properties.json",
+    "data/sample_customers.json",
+    "domain_data.json",
+    "evaluation.py",
+    "file_manifest.json",
+    "file_plan.json",
+    "frontend/app.js",
+    "frontend/index.html",
+    "frontend/styles.css",
+    "generation_trace.json",
+    "implementation_plan.json",
+    "knowledge_base.md",
+    "pipeline_diagram.svg",
+    "product_readiness.json",
+    "product_requirements.json",
+    "product_spec.json",
+    "production_readiness.md",
+    "productization_blueprint.json",
+    "productization_blueprint.md",
+    "project_architecture.json",
+    "repair_log.json",
+    "requirements.txt",
+    "sample_cases.json",
+    "software_blueprint.json",
+    "tests/test_recommendations.py",
+    "tools.py"
+  ]
+}

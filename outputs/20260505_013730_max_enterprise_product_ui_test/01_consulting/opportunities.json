@@ -1,0 +1,67 @@
+[
+  {
+    "name": "Neighborhood Scoring & Ranking Engine",
+    "score": 95,
+    "target_workflow": "Area comparison and recommendation based on customer preferences (budget, commute, lifestyle, family structure).",
+    "proposed_ai_capability": "LLM-powered multi-criteria decision engine that scores and ranks neighborhoods using structured area profiles, commute data, school ratings, and safety metrics.",
+    "expected_business_value": "Reduces consultant time per case by 40-50%, ensures consistent recommendations across staff, speeds up onboarding for new consultants.",
+    "key_risk": "Bias in scoring due to incomplete or outdated area data; overfitting to historical patterns.",
+    "human_approval_requirement": "Consultant must review and optionally adjust rankings before presenting to customer.",
+    "required_data": "Area profiles (safety, cost, schools, amenities, transport), commute time matrices, historical customer preference-resolution pairs.",
+    "japan_enterprise_fit": "High – directly addresses labor productivity and consistency, aligns with DX and kaizen improvement culture.",
+    "evidence_support": "OECD labour shortage report, METI GENIAC workflow efficiency case, FSA governance framework.",
+    "why_now": "Scattered area info is a critical pain point; AI can unify data and reduce manual comparison as labor shortages intensify."
+  },
+  {
+    "name": "Multilingual Consultation Assistant",
+    "score": 88,
+    "target_workflow": "Handling inquiries from foreign customers who require clear explanations in English or Japanese.",
+    "proposed_ai_capability": "Multilingual LLM (fine-tuned on real estate domain) that translates and clarifies customer requirements, explains area trade-offs, and generates culturally appropriate recommendations.",
+    "expected_business_value": "Expands market to growing foreign resident segment, reduces dependency on bilingual staff, improves customer satisfaction and trust.",
+    "key_risk": "Mistranslation or cultural miscommunication leading to mismatched expectations.",
+    "human_approval_requirement": "Consultant reviews all AI-generated customer-facing text before sending; sensitive edges handled manually.",
+    "required_data": "Multilingual area glossary, sample past interactions in English/Japanese, area notes with cultural context.",
+    "japan_enterprise_fit": "High – addresses need to serve foreign residents, aligns with Digital Agency's push for inclusive digital services.",
+    "evidence_support": "OECD labour shortage / skills gap, FSA customer convenience theme, METI GENIAC multimodal document processing case.",
+    "why_now": "Increasing foreign resident population in Tokyo; existing Japanese-only workflow limits market reach and service quality."
+  },
+  {
+    "name": "Automated Area Knowledge Aggregator",
+    "score": 82,
+    "target_workflow": "Gathering and updating area information from multiple scattered sources into a unified profile.",
+    "proposed_ai_capability": "RAG-based information retrieval system that crawls trusted sources, extracts and summarizes area characteristics, and updates a centralized knowledge base with version control.",
+    "expected_business_value": "Eliminates hours of manual research per consultant per week; ensures all staff have access to latest, consistent area data.",
+    "key_risk": "Outdated or incorrect information from unauthoritative sources; potential for hallucination in summaries.",
+    "human_approval_requirement": "Curated list of approved sources; human review of new or flagged summaries before they go live.",
+    "required_data": "Access to Japanese real estate portals, municipal websites, transport APIs, school district databases, and internal area notes.",
+    "japan_enterprise_fit": "High – internal knowledge retrieval is a top AI use case in Japanese enterprises; fits kaizen philosophy of continuous data improvement.",
+    "evidence_support": "METI GENIAC document processing case, IPA DX trends report on AI for knowledge work, FSA governance emphasis on data quality.",
+    "why_now": "Scattered information is a direct pain point; manual aggregation is unsustainable given increasing volume and staff shortage."
+  },
+  {
+    "name": "AI-Enhanced Preference Elicitation Chatbot",
+    "score": 78,
+    "target_workflow": "Initial customer requirement gathering via web forms or chat.",
+    "proposed_ai_capability": "Conversational AI that asks dynamic, clarifying questions based on initial inputs to refine preferences (budget, commute tolerance, family needs) before handing off to consultant.",
+    "expected_business_value": "Cuts consultation prep time by 30%; reduces back-and-forth emails; captures nuanced requirements early.",
+    "key_risk": "Poorly designed dialog flow may frustrate users or fail to capture critical constraints.",
+    "human_approval_requirement": "Consultant reviews extracted preference summary and can manually adjust before proceeding.",
+    "required_data": "Customer preference forms, historical chat/email logs, decision trees used by experienced consultants.",
+    "japan_enterprise_fit": "Medium-high – fits service industry trend of AI-augmented customer interaction, but must handle Japanese politeness levels and indirect expressions carefully.",
+    "evidence_support": "FSA customer convenience theme, OECD workplace AI productivity, METI GENIAC insurance contract case (document-based Q&A).",
+    "why_now": "Diverse and time-consuming requirements are a top pain; early structuring of preferences reduces downstream inefficiencies."
+  },
+  {
+    "name": "Property Search Strategy Advisor",
+    "score": 85,
+    "target_workflow": "Translating area recommendations into actionable property search directions and trade-off explanations.",
+    "proposed_ai_capability": "LLM agent that suggests search filters (price range, size, age) based on area characteristics and user budget, explains trade-offs (e.g., distance vs. price), and outputs a brief to guide human consultant's property search.",
+    "expected_business_value": "Reduces trial-and-error property search by 35%; minimizes consultant time spent explaining basic trade-offs; ensures alignment with area-level insights.",
+    "key_risk": "Oversimplification or overpromising on property availability; reliance on potentially biased listing data.",
+    "human_approval_requirement": "Consultant finalizes search plan and approves any customer-facing explanations.",
+    "required_data": "Current property listing samples, price-range trends per area, commute cost data, typical property sizes/ages.",
+    "japan_enterprise_fit": "High – directly supports consultant workflow by bridging area advice and actual property search, with clear human-in-the-loop.",
+    "evidence_support": "METI GENIAC workflow efficiency, OECD productivity improvement, FSA risk management for regulated-like processes.",
+    "why_now": "Consultants spend too much time on repetitive search tasks; AI-guided strategy can standardize and accelerate the process."
+  }
+]

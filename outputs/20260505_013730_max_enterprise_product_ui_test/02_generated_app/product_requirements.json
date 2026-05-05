@@ -1,0 +1,43 @@
+{
+  "prd_version": "software_builder_loop_v1",
+  "product_name": "AI Property Recommendation Platform",
+  "app_kind": "real_estate_recommendation",
+  "source_opportunity": "Neighborhood Scoring & Ranking Engine",
+  "company_context": {
+    "industry": "real_estate",
+    "main_business": "The company helps users find suitable rental apartments and homes to buy in Tokyo and nearby areas. Staff members answer customer questions, compare neighborhoods, explain area characteristics, and recommend candidate areas and properties based on budget, commute, lifestyle, family structure, and preferences.",
+    "ai_objective": "",
+    "constraints": [
+      "the system must not guarantee property price appreciation",
+      "the system must not make legal or financial decisions",
+      "final recommendation should be reviewed by a human real estate consultant",
+      "the system should explain reasoning and uncertainty clearly"
+    ]
+  },
+  "problem_statement": "Area comparison and recommendation based on customer preferences (budget, commute, lifestyle, family structure).",
+  "proposed_capability": "LLM-powered multi-criteria decision engine that scores and ranks neighborhoods using structured area profiles, commute data, school ratings, and safety metrics.",
+  "primary_users": [
+    "Real-estate consultant",
+    "Sales manager / reviewer",
+    "Customer-facing advisor"
+  ],
+  "core_workflows": [
+    "Capture buyer preferences and constraints.",
+    "Rank local area candidates and property candidates with deterministic tools.",
+    "Ask DeepSeek to draft a Japanese recommendation using only local tool results and evidence.",
+    "Block external sending until a human reviewer approves the packet."
+  ],
+  "acceptance_criteria": [
+    "The app exposes a real CLI and local web UI.",
+    "The backend includes separate agent, tool, data, guardrail, and API modules.",
+    "Outputs include local_tool_results and ranked_area_candidates.",
+    "Area recommendations use concrete names such as 武蔵小杉, 国立, 和光市, and 町田.",
+    "The system never returns send_allowed=true in the local product runtime."
+  ],
+  "non_goals": [
+    "No production database or external CRM integration in the local product runtime.",
+    "No automatic customer sending or irreversible action.",
+    "No legal, financial, disaster-safety, or investment guarantee."
+  ],
+  "safety_policy": "Human approval is required before customer-facing, financial, legal, safety, or operationally consequential use."
+}

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>J-Enterprise Agent Scientist</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="mark">J</div>
+          <div>
+            <h1>J-Enterprise Agent Scientist</h1>
+            <p>Enterprise AI Enablement Console</p>
+          </div>
+        </div>
+
+        <section class="status-grid">
+          <div>
+            <span class="label">System</span>
+            <strong>Consult</strong>
+          </div>
+          <div>
+            <span class="label">Mode</span>
+            <strong id="keyState">--</strong>
+          </div>
+          <div>
+            <span class="label">Output</span>
+            <strong id="artifactState">--</strong>
+          </div>
+        </section>
+
+        <nav id="artifactList" class="artifact-list"></nav>
+      </aside>
+
+      <main class="workspace">
+        <section class="prototype-panel">
+          <div class="panel-header">
+            <div>
+              <h2>Enterprise AI Enablement Intake</h2>
+              <p>Describe any Japanese enterprise context. The system proposes AI enablement opportunities, not a fixed insurance chatbot.</p>
+            </div>
+            <button id="refreshButton" class="icon-button" title="Refresh artifacts">↻</button>
+          </div>
+
+          <div class="consult-grid">
+            <div class="input-pane">
+              <label for="companyDescription">Company Context</label>
+              <textarea id="companyDescription">We are a mid-sized Japanese manufacturing company. Our main business is producing precision components for automotive and industrial customers. We want to use AI to reduce engineering support workload and improve knowledge sharing across factories.</textarea>
+
+              <div class="field-grid">
+                <div>
+                  <label for="industry">Industry</label>
+                  <input id="industry" value="Manufacturing">
+                </div>
+                <div>
+                  <label for="aiObjective">AI Objective</label>
+                  <input id="aiObjective" value="Improve productivity and standardize expert knowledge">
+                </div>
+              </div>
+
+              <label for="mainBusiness">Main Business</label>
+              <input id="mainBusiness" value="Precision component manufacturing and technical customer support">
+
+              <label for="painPoints">Pain Points</label>
+              <textarea id="painPoints">Experienced engineers answer repetitive questions, manuals are scattered across shared folders, factory staff depend on tacit knowledge, and quality issue reports take too long to prepare.</textarea>
+
+              <label for="availableData">Available Data</label>
+              <textarea id="availableData">Technical manuals, quality reports, support emails, inspection checklists, product specifications, past proposal documents.</textarea>
+
+              <label for="constraints">Constraints</label>
+              <textarea id="constraints">No automatic customer-facing claims. Human approval required for technical advice, quality decisions, and external documents. Must be traceable and usable by non-technical staff.</textarea>
+
+              <button id="consultButton" class="primary-button">Generate AI Enablement Analysis</button>
+            </div>
+
+            <div class="output-pane">
+              <div class="pipeline-strip" id="pipelineStrip"></div>
+
+              <div class="result-cards">
+                <div>
+                  <span class="label">Recommended Agent</span>
+                  <strong id="recommendedAgent">--</strong>
+                </div>
+                <div>
+                  <span class="label">Score</span>
+                  <strong id="recommendationScore">--</strong>
+                </div>
+                <div>
+                  <span class="label">Risk</span>
+                  <strong id="consultRisk">--</strong>
+                </div>
+              </div>
+
+              <div class="reply-box">
+                <span class="label">Why This Fits</span>
+                <p id="consultSummary">--</p>
+              </div>
+
+              <div class="result-cards secondary">
+                <div>
+                  <span class="label">Evaluation</span>
+                  <strong id="evaluationScore">--</strong>
+                </div>
+                <div>
+                  <span class="label">Review</span>
+                  <strong id="reviewScore">--</strong>
+                </div>
+                <div>
+                  <span class="label">Generated App</span>
+                  <strong id="generatedApp">--</strong>
+                </div>
+              </div>
+
+              <div class="opportunity-list" id="opportunityList"></div>
+
+              <div class="evidence-box">
+                <span class="label">Roadmap</span>
+                <pre id="roadmapText">--</pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="artifact-panel">
+          <div class="panel-header tight">
+            <h2 id="artifactTitle">Artifact</h2>
+            <span id="artifactType" class="pill">--</span>
+          </div>
+          <pre id="artifactContent" class="artifact-content"></pre>
+        </section>
+      </main>
+    </div>
+    <script src="/app.js?v=20260503-visual-poc"></script>
+  </body>
+</html>

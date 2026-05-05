@@ -1,0 +1,37 @@
+{
+  "company_name": "Tokyo Home Finder",
+  "country": "Japan",
+  "industry": "real_estate",
+  "main_business": "The company helps users find suitable rental apartments and homes to buy in Tokyo and nearby areas. Staff members answer customer questions, compare neighborhoods, explain area characteristics, and recommend candidate areas and properties based on budget, commute, lifestyle, family structure, and preferences.",
+  "target_users": [
+    "first-time home buyers",
+    "renters moving to Tokyo",
+    "families with children",
+    "foreign residents living in Japan",
+    "working professionals who care about commuting time"
+  ],
+  "current_workflow": "Customers submit requirements through email or web forms. Real estate consultants manually read the requirements, search area information and property listings, compare neighborhoods, explain trade-offs, and recommend areas or properties. New staff often need time to learn neighborhood characteristics and property matching logic.",
+  "pain_points": [
+    "customer requirements are diverse and time-consuming to analyze",
+    "area information is scattered across different sources",
+    "consultants spend a lot of time comparing neighborhoods manually",
+    "recommendations may be inconsistent across staff members",
+    "foreign customers may need explanations in clear English or Japanese",
+    "users often do not know which area fits their budget and lifestyle"
+  ],
+  "available_data": [
+    "area profiles",
+    "sample property listings",
+    "customer preference forms",
+    "commute information",
+    "school and lifestyle area notes"
+  ],
+  "constraints": [
+    "the system must not guarantee property price appreciation",
+    "the system must not make legal or financial decisions",
+    "final recommendation should be reviewed by a human real estate consultant",
+    "the system should explain reasoning and uncertainty clearly"
+  ],
+  "business_goal": "Build an AI-enabled agent system that helps consultants analyze customer preferences and recommend suitable areas or property search directions.",
+  "preferred_enablement_direction": "area-based home recommendation agent"
+}
