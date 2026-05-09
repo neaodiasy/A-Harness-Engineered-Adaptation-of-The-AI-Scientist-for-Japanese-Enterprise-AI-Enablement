@@ -103,6 +103,7 @@ This keeps the framework flexible while avoiding a fixed single-file demo. Domai
 - `src/productization.py`: converts the selected opportunity into an enterprise software product blueprint before code generation.
 - `src/software_factory.py`: Software Builder Loop artifacts: PRD, architecture, file manifest, implementation plan, and repair trace.
 - `src/domain_templates.py`: loads and selects optional domain packs from `templates/*/domain_pack.json`.
+- `src/domain_pack_builder.py`: semi-automatically drafts new domain packs from enterprise profiles and source documents.
 - `src/prototype_builder.py`: writes generated multi-file product packages from the selected blueprint and domain template.
 - `src/ui_quality.py`: static frontend responsiveness harness for generated enterprise workbench UIs.
 - `src/sandbox_eval.py`: compiles and evaluates generated project packages in the local generated app folder.
@@ -127,6 +128,7 @@ j-enterprise-agent-scientist/
 │   ├── agent_design.py
 │   ├── architecture_composer.py
 │   ├── candidate_search.py
+│   ├── domain_pack_builder.py
 │   ├── domain_templates.py
 │   ├── evidence_search.py
 │   ├── feasibility.py
@@ -166,6 +168,16 @@ export DEEPSEEK_REASONING_EFFORT="high"
 export ENABLE_LIVE_SEARCH="1"
 python3 run.py --profile profiles/example_real_estate.json
 ```
+
+Draft a new domain pack from a different company profile:
+
+```bash
+python3 -m src.domain_pack_builder \
+  --profile profiles/example_real_estate.json \
+  --output outputs/domain_pack_drafts/domain_pack.json
+```
+
+The auto-builder writes both `domain_pack.json` and `validation_report.json`. By default it creates a draft under `outputs/`; to install a reviewed template into `templates/<template_id>/domain_pack.json`, rerun with `--install-template`.
 
 Each run writes everything into one timestamped folder:
 
@@ -235,6 +247,7 @@ The sandbox runs real-API smoke checks on one representative case so high-reason
 ## Future Work
 
 - Improve live search for company-specific competitive evidence, including better Japanese query expansion and source credibility scoring.
+- Extend the Domain Pack Auto-Builder so it can ingest public guidelines, industry reports, company documents, and structured schema sources, then run schema validation, generated-app smoke tests, and human review before a pack is accepted.
 - Add stronger multi-file code generation with generate-run-repair iterations.
 - Add a richer reviewer that scores both generated code quality and business usefulness.
 - Add optional visual input analysis for screenshots, forms, and documents.
