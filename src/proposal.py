@@ -101,6 +101,7 @@ def review_result(result: dict, evaluation: dict, app_dir: str | Path | None = N
         sandbox = _load_json(app_path / "sandbox_report.json", sandbox)
 
     app_kind = product_spec.get("app_kind", "")
+    uses_domain_template = bool(product_spec.get("domain_template_id"))
     evaluation_success = bool(app_evaluation.get("success", evaluation.get("success")))
     sandbox_success = bool(sandbox.get("success"))
     required_files = {check.get("name"): check for check in sandbox.get("checks", [])}
@@ -114,10 +115,10 @@ def review_result(result: dict, evaluation: dict, app_dir: str | Path | None = N
         "business_alignment": 9 if selected.get("name") and product_spec.get("selected_opportunity") else 7,
         "technical_completeness": 10 if has_project_shape and has_unit_tests and evaluation_success else 7 if has_project_shape else 5,
         "agentic_quality": 9 if architecture.get("selected_primitives") and has_evidence else 7,
-        "tool_use_quality": 9 if has_local_tools and app_kind == "real_estate_recommendation" else 7 if has_local_tools else 4,
+        "tool_use_quality": 9 if has_local_tools and uses_domain_template else 7 if has_local_tools else 4,
         "api_backed_functionality": 9 if has_api_runtime else 5,
         "sandbox_success": 10 if sandbox_success else 5,
-        "japan_specific_relevance": 9 if app_kind == "real_estate_recommendation" or "Japan" in str(result.get("company_profile", {})) else 7,
+        "japan_specific_relevance": 9 if uses_domain_template or "Japan" in str(result.get("company_profile", {})) else 7,
         "safety_and_human_approval": 10 if has_approval else 5,
         "faithfulness_to_ai_scientist_architecture": 10 if has_builder_loop and (result.get("search_trace") or result.get("tree_search_trace")) else 7,
     }

@@ -17,6 +17,7 @@ from src.software_factory import (
     build_project_architecture,
     build_repair_log,
 )
+from src.domain_templates import generic_domain_template, select_domain_template
 
 
 def _blob(*values: object) -> str:
@@ -29,22 +30,9 @@ def _slugify(value: str) -> str:
 
 
 def _infer_app_kind(agent_design: dict, product_spec: dict | None = None) -> str:
-    text = _blob(agent_design, product_spec or {})
-    if any(term in text for term in (
-        "real estate",
-        "property",
-        "housing",
-        "home",
-        "area",
-        "neighborhood",
-        "buyer",
-        "不動産",
-        "住宅",
-        "物件",
-        "地域",
-        "住まい",
-    )):
-        return "real_estate_recommendation"
+    domain_pack = select_domain_template(agent_design, product_spec or {})
+    if domain_pack:
+        return str(domain_pack.get("template_id", "domain_template_product"))
     return "enterprise_agent_product"
 
 
@@ -61,33 +49,15 @@ def build_software_blueprint(
     app_kind = _infer_app_kind(agent_design)
     opportunity_name = opportunity.get("name", "Enterprise Agent Product")
     selected_archetype = productization_blueprint.get("selected_archetype", {}) or {}
-
-    if app_kind == "real_estate_recommendation":
-        product_name = "AI Property Recommendation Platform"
-        subtitle = (
-            "Customer preference intake, deterministic area/property ranking, "
-            "DeepSeek recommendation drafting, and human approval workflow."
-        )
-        fields = [
-            {"key": "customer_name", "label": "Customer name", "type": "text", "required": True, "default": "佐藤様"},
-            {"key": "household", "label": "Household profile", "type": "textarea", "required": True, "default": "夫婦と子ども1名。静かな住環境と通学環境を重視。"},
-            {"key": "budget", "label": "Budget", "type": "text", "required": True, "default": "55-70"},
-            {"key": "commute_target", "label": "Commute target", "type": "text", "required": True, "default": "新宿"},
-            {"key": "max_commute_minutes", "label": "Max commute minutes", "type": "number", "required": True, "default": "40"},
-            {"key": "preferences", "label": "Preferences", "type": "textarea", "required": True, "default": "駅アクセス、学校、静かな住宅街、災害リスク確認、ファミリー向け。"},
-            {"key": "must_have", "label": "Must-have conditions", "type": "textarea", "required": True, "default": "3LDK以上、駅徒歩15分以内、耐震性とハザードマップ確認。"},
-            {"key": "approval_owner", "label": "Approval owner", "type": "text", "required": True, "default": "宅建士 / シニアコンサルタント"},
-        ]
-        primary_action = "Generate Recommendation Packet"
-    else:
-        product_name = f"{opportunity_name} Platform"
-        subtitle = opportunity.get("proposed_ai_capability", "Generated enterprise agent product.")
-        fields = [
-            {"key": "request", "label": "Business request", "type": "textarea", "required": True, "default": "Describe the workflow case to process."},
-            {"key": "evidence_summary", "label": "Evidence summary", "type": "textarea", "required": True, "default": "Paste relevant evidence, policy, ticket, or approved example notes."},
-            {"key": "approval_owner", "label": "Approval owner", "type": "text", "required": True, "default": "Business owner"},
-        ]
-        primary_action = "Generate Approval Packet"
+    domain_pack = select_domain_template(agent_design, productization_blueprint) or generic_domain_template(
+        opportunity_name,
+        opportunity.get("proposed_ai_capability", "Generated enterprise agent product."),
+    )
+    app_kind = str(domain_pack.get("template_id", app_kind))
+    product_name = str(domain_pack.get("product_name") or f"{opportunity_name} Platform")
+    subtitle = str(domain_pack.get("subtitle") or opportunity.get("proposed_ai_capability", "Generated enterprise agent product."))
+    fields = domain_pack.get("fields") or []
+    primary_action = str(domain_pack.get("primary_action") or "Generate Approval Packet")
 
     return {
         "product_spec_version": "software_builder_loop_v1",
@@ -95,6 +65,17 @@ def build_software_blueprint(
         "product_slug": _slugify(product_name),
         "subtitle": subtitle,
         "app_kind": app_kind,
+        "domain_template": domain_pack,
+        "domain_template_id": domain_pack.get("template_id", "generic_enterprise"),
+        "domain_template_source": domain_pack.get("source_path", ""),
+        "tool_name": domain_pack.get("tool_name", "generic_enterprise_toolkit"),
+        "candidate_collection_label": domain_pack.get("candidate_collection_label", "candidates"),
+        "item_collection_label": domain_pack.get("item_collection_label", "items"),
+        "default_classification_label": domain_pack.get("default_classification_label", "enterprise_workflow_case"),
+        "live_search_queries": domain_pack.get("live_search_queries", []),
+        "prompt_context": domain_pack.get("prompt_context", "AI-driven Japanese enterprise product"),
+        "specific_rules": domain_pack.get("specific_rules", []),
+        "candidate_examples": domain_pack.get("candidate_examples", []),
         "maturity_target": productization_blueprint.get("maturity_target", "enterprise_software_mvp"),
         "product_archetype": selected_archetype,
         "selected_opportunity": opportunity_name,
@@ -190,166 +171,8 @@ def build_agent_spec(agent_design: dict, architecture: dict, product_spec: dict)
     }
 
 
-REAL_ESTATE_AREAS = [
-    {
-        "area_id": "musashi_kosugi",
-        "name_ja": "武蔵小杉",
-        "prefecture": "神奈川県",
-        "typical_budget_jpy_m": 65,
-        "commute_minutes_to_shinjuku": 28,
-        "station_access": 9,
-        "school_score": 8,
-        "quiet_score": 5,
-        "family_score": 8,
-        "summary_ja": "都心アクセスと生活利便性が高く、共働きファミリーにも検討しやすいエリアです。",
-        "risk_note_ja": "河川近接や再開発エリアの物件では、ハザードマップ、浸水想定、建物ごとの耐震性確認が必要です。",
-    },
-    {
-        "area_id": "kunitachi",
-        "name_ja": "国立",
-        "prefecture": "東京都",
-        "typical_budget_jpy_m": 62,
-        "commute_minutes_to_shinjuku": 35,
-        "station_access": 7,
-        "school_score": 9,
-        "quiet_score": 9,
-        "family_score": 9,
-        "summary_ja": "落ち着いた文教地区として知られ、学校環境や静かな住環境を重視する家庭に向きます。",
-        "risk_note_ja": "駅距離、学区、物件価格のばらつきがあるため、候補物件単位で最新情報の確認が必要です。",
-    },
-    {
-        "area_id": "wakoshi",
-        "name_ja": "和光市",
-        "prefecture": "埼玉県",
-        "typical_budget_jpy_m": 55,
-        "commute_minutes_to_shinjuku": 30,
-        "station_access": 8,
-        "school_score": 7,
-        "quiet_score": 7,
-        "family_score": 7,
-        "summary_ja": "都心アクセスと予算のバランスが良く、コストを抑えながら通勤利便性を確保しやすいエリアです。",
-        "risk_note_ja": "学校区、保育園、周辺道路、災害リスクは丁目・物件ごとに差があるため追加確認が必要です。",
-    },
-    {
-        "area_id": "machida",
-        "name_ja": "町田",
-        "prefecture": "東京都",
-        "typical_budget_jpy_m": 50,
-        "commute_minutes_to_shinjuku": 45,
-        "station_access": 7,
-        "school_score": 7,
-        "quiet_score": 7,
-        "family_score": 8,
-        "summary_ja": "価格と広さを重視するファミリー層に向き、生活利便施設も多い一方で通勤時間は長めです。",
-        "risk_note_ja": "エリアが広いため、駅距離、学校区、坂道、ハザード、通勤経路を個別に確認する必要があります。",
-    },
-]
-
-
-REAL_ESTATE_PROPERTIES = [
-    {
-        "property_id": "p_musashi_001",
-        "title_ja": "武蔵小杉リバーサイド 3LDK",
-        "area_id": "musashi_kosugi",
-        "price_jpy_m": 68,
-        "layout": "3LDK",
-        "size_sqm": 72,
-        "station_walk_minutes": 8,
-        "built_year": 2018,
-        "earthquake_score": 7,
-        "school_score": 8,
-        "quiet_score": 5,
-        "family_score": 8,
-        "summary_ja": "駅アクセスと生活利便性が高いファミリー向け候補。",
-        "risk_note_ja": "河川近接のため浸水想定と管理組合資料の確認が必要です。",
-    },
-    {
-        "property_id": "p_kunitachi_001",
-        "title_ja": "国立文教エリア 3LDK",
-        "area_id": "kunitachi",
-        "price_jpy_m": 63,
-        "layout": "3LDK",
-        "size_sqm": 70,
-        "station_walk_minutes": 12,
-        "built_year": 2015,
-        "earthquake_score": 8,
-        "school_score": 9,
-        "quiet_score": 9,
-        "family_score": 9,
-        "summary_ja": "学校環境と静かな住環境を重視する家庭に合いやすい候補。",
-        "risk_note_ja": "学区境界と通学距離を最新資料で確認してください。",
-    },
-    {
-        "property_id": "p_wakoshi_001",
-        "title_ja": "和光市駅徒歩圏 3LDK",
-        "area_id": "wakoshi",
-        "price_jpy_m": 56,
-        "layout": "3LDK",
-        "size_sqm": 68,
-        "station_walk_minutes": 10,
-        "built_year": 2012,
-        "earthquake_score": 7,
-        "school_score": 7,
-        "quiet_score": 7,
-        "family_score": 7,
-        "summary_ja": "予算と通勤利便性のバランスが良い候補。",
-        "risk_note_ja": "周辺道路、保育園、災害リスクを物件単位で確認してください。",
-    },
-    {
-        "property_id": "p_machida_001",
-        "title_ja": "町田ゆとり住戸 4LDK",
-        "area_id": "machida",
-        "price_jpy_m": 49,
-        "layout": "4LDK",
-        "size_sqm": 84,
-        "station_walk_minutes": 15,
-        "built_year": 2010,
-        "earthquake_score": 7,
-        "school_score": 7,
-        "quiet_score": 8,
-        "family_score": 8,
-        "summary_ja": "広さと価格を重視する家庭に検討しやすい候補。",
-        "risk_note_ja": "通勤時間、坂道、駅距離、ハザードを現地確認してください。",
-    },
-]
-
-
-SAMPLE_CUSTOMERS = [
-    {
-        "case_id": "case_family_quiet_school",
-        "customer_name": "佐藤様",
-        "household": "夫婦と小学生の子ども1名。静かな住環境と学校環境を重視。",
-        "budget": "55-70",
-        "commute_target": "新宿",
-        "max_commute_minutes": 40,
-        "preferences": "学校、静かな住宅街、駅アクセス、災害リスク確認、ファミリー向け。",
-        "must_have": "3LDK以上、駅徒歩15分以内、耐震性とハザードマップ確認。",
-        "approval_owner": "宅建士 / シニアコンサルタント",
-    },
-    {
-        "case_id": "case_commute_budget",
-        "customer_name": "田中様",
-        "household": "共働き夫婦。都心アクセスと予算バランスを重視。",
-        "budget": "50-60",
-        "commute_target": "新宿",
-        "max_commute_minutes": 35,
-        "preferences": "通勤、駅近、価格、将来の子育て可能性。",
-        "must_have": "駅徒歩12分以内、3LDK、月々支払いを抑えたい。",
-        "approval_owner": "営業マネージャー",
-    },
-    {
-        "case_id": "case_space_family",
-        "customer_name": "鈴木様",
-        "household": "子ども2名のファミリー。広さと生活利便性を重視。",
-        "budget": "45-58",
-        "commute_target": "新宿",
-        "max_commute_minutes": 50,
-        "preferences": "4LDK、広さ、学校、買い物利便性、静かさ。",
-        "must_have": "80平米前後、ファミリー向け、災害リスク確認。",
-        "approval_owner": "宅建士 / シニアコンサルタント",
-    },
-]
-
+# Domain-specific candidate data is loaded from templates/*/domain_pack.json.
+# The generator core intentionally contains no company- or industry-specific data.
 
 APP_ENTRYPOINT = '''"""Entrypoint for the generated agent product."""
 
@@ -411,9 +234,9 @@ if __name__ == "__main__":
 
 ROOT_TOOLS = '''"""Compatibility exports for generated local domain tools."""
 
-from backend.tools import rank_real_estate_areas, run_domain_tools
+from backend.tools import run_domain_tools
 
-__all__ = ["rank_real_estate_areas", "run_domain_tools"]
+__all__ = ["run_domain_tools"]
 '''
 
 
@@ -463,7 +286,7 @@ def load_knowledge_base() -> str:
 '''
 
 
-RECOMMENDATION_ENGINE = '''"""Deterministic recommendation engine for local tool use."""
+RECOMMENDATION_ENGINE = '''"""Deterministic ranking engine for generated local tool use."""
 
 from __future__ import annotations
 
@@ -474,19 +297,17 @@ from backend.data_store import load_areas, load_properties
 
 
 def _numbers(value: Any) -> list[float]:
-    return [float(item) for item in re.findall(r"\\d+(?:\\.\\d+)?", str(value))]
+    return [float(item) for item in re.findall(r"\d+(?:\.\d+)?", str(value))]
 
 
-def budget_ceiling_m(value: Any, default: float = 65.0) -> float:
+def _first_number(value: Any, default: float) -> float:
     numbers = _numbers(value)
-    if not numbers:
-        return default
-    return max(numbers)
-
-
-def max_commute_minutes(case: dict[str, Any], default: float = 45.0) -> float:
-    numbers = _numbers(case.get("max_commute_minutes", ""))
     return numbers[0] if numbers else default
+
+
+def _budget_ceiling(value: Any, default: float = 65.0) -> float:
+    numbers = _numbers(value)
+    return max(numbers) if numbers else default
 
 
 def _case_text(case: dict[str, Any]) -> str:
@@ -498,96 +319,102 @@ def _wants(case: dict[str, Any], terms: list[str]) -> bool:
     return any(term.lower() in text for term in terms)
 
 
-def score_area(area: dict[str, Any], case: dict[str, Any]) -> tuple[float, list[str]]:
-    ceiling = budget_ceiling_m(case.get("budget"))
-    commute_limit = max_commute_minutes(case)
+def _numeric(item: dict[str, Any], keys: list[str], default: float = 0.0) -> float:
+    for key in keys:
+        if key in item:
+            return float(item.get(key) or default)
+    return default
+
+
+def _commute_minutes(candidate: dict[str, Any]) -> float:
+    for key, value in candidate.items():
+        if key.startswith("commute_minutes"):
+            return float(value or 0)
+    return float(candidate.get("commute_minutes", 0) or 0)
+
+
+def score_candidate(candidate: dict[str, Any], case: dict[str, Any]) -> tuple[float, list[str]]:
+    ceiling = _budget_ceiling(case.get("budget"))
+    commute_limit = _first_number(case.get("max_commute_minutes", ""), 45.0)
     score = 0.0
     reasons: list[str] = []
 
-    price_gap = abs(float(area["typical_budget_jpy_m"]) - ceiling)
-    budget_score = max(0.0, 25.0 - price_gap * 1.1)
+    cost = _numeric(candidate, ["typical_budget_jpy_m", "estimated_cost", "cost_score_base"], 50.0)
+    budget_score = max(0.0, 25.0 - abs(cost - ceiling) * 1.1)
     score += budget_score
-    reasons.append(f"予算上限{ceiling:.0f}百万円に対してエリア目安は{area['typical_budget_jpy_m']}百万円")
+    reasons.append(f"予算・コスト目安 {cost:g} に対して適合度を評価")
 
-    commute_gap = max(0.0, float(area["commute_minutes_to_shinjuku"]) - commute_limit)
-    commute_score = max(0.0, 22.0 - commute_gap * 1.8)
-    if _wants(case, ["commute", "通勤", "新宿", "access", "駅"]):
-        commute_score += float(area["station_access"]) * 1.3
-    score += commute_score
-    reasons.append(f"新宿まで約{area['commute_minutes_to_shinjuku']}分、駅アクセス{area['station_access']}/10")
+    commute_value = _commute_minutes(candidate)
+    if commute_value:
+        commute_gap = max(0.0, commute_value - commute_limit)
+        commute_score = max(0.0, 22.0 - commute_gap * 1.8)
+        score += commute_score
+        reasons.append(f"時間・アクセス指標 {commute_value:g} を条件と比較")
 
     if _wants(case, ["school", "学校", "学区", "子ども", "子供", "family", "ファミリー"]):
-        score += float(area["school_score"]) * 2.0 + float(area["family_score"]) * 1.5
-        reasons.append(f"学校評価{area['school_score']}/10、ファミリー適性{area['family_score']}/10")
+        score += _numeric(candidate, ["school_score"], 5.0) * 2.0 + _numeric(candidate, ["family_score"], 5.0) * 1.5
+        reasons.append("家族・教育・利用者適合に関する指標を加点")
 
-    if _wants(case, ["quiet", "静か", "閑静", "落ち着"]):
-        score += float(area["quiet_score"]) * 2.1
-        reasons.append(f"静かな住環境評価{area['quiet_score']}/10")
+    if _wants(case, ["quiet", "静か", "閑静", "落ち着", "stable", "安定"]):
+        score += _numeric(candidate, ["quiet_score", "stability_score"], 5.0) * 2.1
+        reasons.append("安定性・静穏性・運用品質に関する指標を加点")
 
-    if _wants(case, ["hazard", "earthquake", "resilience", "災害", "耐震", "ハザード"]):
-        score += float(area.get("family_score", 0)) * 0.4
-        reasons.append("災害・耐震は物件単位の追加確認が必要")
+    if _wants(case, ["risk", "safety", "resilience", "exception", "災害", "リスク", "例外"]):
+        score += _numeric(candidate, ["family_score", "risk_readiness_score"], 5.0) * 0.4
+        reasons.append("リスク確認は個別証拠と人間承認が必要")
 
     return round(score, 2), reasons
 
 
-def rank_real_estate_areas(case: dict[str, Any]) -> list[dict[str, Any]]:
+def rank_domain_candidates(case: dict[str, Any]) -> list[dict[str, Any]]:
     ranked: list[dict[str, Any]] = []
-    for area in load_areas():
-        score, reasons = score_area(area, case)
-        item = dict(area)
-        item.update({
-            "score": score,
-            "reason_ja": "。".join(reasons) + "。",
-        })
+    for candidate in load_areas():
+        score, reasons = score_candidate(candidate, case)
+        item = dict(candidate)
+        item.update({"score": score, "reason_ja": "。".join(reasons) + "。"})
         ranked.append(item)
     ranked.sort(key=lambda item: item["score"], reverse=True)
     return ranked
 
 
-def score_property(prop: dict[str, Any], area_rank: dict[str, dict[str, Any]], case: dict[str, Any]) -> tuple[float, list[str]]:
-    ceiling = budget_ceiling_m(case.get("budget"))
+def score_item(item: dict[str, Any], candidate_rank: dict[str, dict[str, Any]], case: dict[str, Any]) -> tuple[float, list[str]]:
+    ceiling = _budget_ceiling(case.get("budget"))
     score = 0.0
     reasons: list[str] = []
-    area = area_rank.get(prop["area_id"], {})
+    parent = candidate_rank.get(str(item.get("area_id", "")), {})
 
-    area_score = float(area.get("score", 0)) * 0.45
-    score += area_score
-    reasons.append(f"エリア評価を反映: {area.get('name_ja', prop['area_id'])}")
+    score += float(parent.get("score", 0)) * 0.45
+    reasons.append(f"上位候補評価を反映: {parent.get('name_ja', item.get('area_id', 'candidate'))}")
 
-    price_gap = max(0.0, float(prop["price_jpy_m"]) - ceiling)
-    price_score = 22.0 if price_gap == 0 else max(0.0, 22.0 - price_gap * 3.0)
-    score += price_score
-    reasons.append(f"価格{prop['price_jpy_m']}百万円")
+    price = _numeric(item, ["price_jpy_m", "estimated_cost", "cost"], ceiling)
+    price_gap = max(0.0, price - ceiling)
+    score += 22.0 if price_gap == 0 else max(0.0, 22.0 - price_gap * 3.0)
+    reasons.append(f"コスト・価格指標 {price:g}")
 
-    if _wants(case, ["station", "駅", "通勤", "commute"]):
-        walk_score = max(0.0, 18.0 - float(prop["station_walk_minutes"]) * 0.8)
-        score += walk_score
-        reasons.append(f"駅徒歩{prop['station_walk_minutes']}分")
+    if _wants(case, ["station", "駅", "通勤", "commute", "access"]):
+        score += max(0.0, 18.0 - _numeric(item, ["station_walk_minutes", "access_minutes"], 8.0) * 0.8)
+        reasons.append("アクセス条件を評価")
 
     if _wants(case, ["school", "学校", "family", "子ども", "ファミリー"]):
-        score += float(prop["school_score"]) * 1.5 + float(prop["family_score"]) * 1.5
-        reasons.append(f"学校・ファミリー評価 {prop['school_score']}/{prop['family_score']}")
+        score += _numeric(item, ["school_score"], 5.0) * 1.5 + _numeric(item, ["family_score"], 5.0) * 1.5
+        reasons.append("利用者適合・家族条件を評価")
 
-    if _wants(case, ["quiet", "静か", "閑静"]):
-        score += float(prop["quiet_score"]) * 1.5
-        reasons.append(f"静かさ評価{prop['quiet_score']}/10")
-
-    if _wants(case, ["earthquake", "耐震", "災害", "hazard"]):
-        score += float(prop["earthquake_score"]) * 1.4
-        reasons.append(f"耐震関連評価{prop['earthquake_score']}/10")
+    if _wants(case, ["risk", "safety", "resilience", "exception", "災害", "リスク", "例外"]):
+        score += _numeric(item, ["earthquake_score", "risk_readiness_score"], 5.0) * 1.4
+        reasons.append("リスク関連指標を評価")
 
     return round(score, 2), reasons
 
 
-def rank_properties(case: dict[str, Any], ranked_areas: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    area_rank = {area["area_id"]: area for area in ranked_areas}
+def rank_items(case: dict[str, Any], ranked_candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    candidate_rank = {str(candidate.get("area_id", candidate.get("id", ""))): candidate for candidate in ranked_candidates}
     ranked: list[dict[str, Any]] = []
-    for prop in load_properties():
-        score, reasons = score_property(prop, area_rank, case)
-        item = dict(prop)
+    for source_item in load_properties():
+        score, reasons = score_item(source_item, candidate_rank, case)
+        item = dict(source_item)
+        parent_id = str(item.get("area_id", ""))
         item.update({
-            "area_name_ja": area_rank.get(prop["area_id"], {}).get("name_ja", prop["area_id"]),
+            "area_name_ja": candidate_rank.get(parent_id, {}).get("name_ja", parent_id),
             "score": score,
             "reason_ja": "。".join(reasons) + "。",
         })
@@ -603,39 +430,37 @@ from __future__ import annotations
 
 from typing import Any
 
-from backend.recommendation_engine import rank_properties, rank_real_estate_areas
+from backend.recommendation_engine import rank_domain_candidates, rank_items
 
 
-def _missing_information(case: dict[str, Any]) -> list[str]:
+def _missing_information(product_spec: dict[str, Any], case: dict[str, Any]) -> list[str]:
     text = " ".join(str(value) for value in case.values()).lower()
+    domain_template = product_spec.get("domain_template", {}) if isinstance(product_spec.get("domain_template"), dict) else {}
     missing: list[str] = []
-    if any(term in text for term in ["hazard", "災害", "ハザード", "earthquake", "耐震"]):
-        missing.append("物件ごとのハザードマップ、浸水想定、耐震等級、管理状況")
-    if any(term in text for term in ["school", "学校", "学区", "子ども", "子供"]):
-        missing.append("最新の学校区、通学距離、保育園・学童の空き状況")
-    if any(term in text for term in ["commute", "通勤", "新宿"]):
-        missing.append("実際の通勤時間帯での混雑、乗換、終電情報")
-    missing.append("掲載価格、販売状況、重要事項説明、現地確認結果")
-    return sorted(set(missing))
+    for rule in domain_template.get("missing_information_rules", []):
+        terms = [str(term).lower() for term in rule.get("terms", [])]
+        if any(term and term in text for term in terms):
+            missing.append(str(rule.get("message", "Additional source evidence and human approval required.")))
+    missing.extend(str(item) for item in domain_template.get("always_missing_information", []))
+    return sorted(set(item for item in missing if item.strip()))
 
 
 def run_domain_tools(product_spec: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
-    ranked_areas = rank_real_estate_areas(case)
-    ranked_properties = rank_properties(case, ranked_areas)
+    ranked_candidates = rank_domain_candidates(case)
+    ranked_items = rank_items(case, ranked_candidates)
+    domain_template = product_spec.get("domain_template", {}) if isinstance(product_spec.get("domain_template"), dict) else {}
     return {
-        "tool_name": "real_estate_recommendation_toolkit",
+        "tool_name": product_spec.get("tool_name") or domain_template.get("tool_name") or "local_domain_toolkit",
         "app_kind": product_spec.get("app_kind"),
-        "ranked_area_candidates": ranked_areas[:4],
-        "ranked_property_candidates": ranked_properties[:4],
-        "top_candidates": ranked_areas[:4],
-        "missing_information": _missing_information(case),
-        "scoring_summary_ja": (
-            "予算、通勤、駅アクセス、学校・ファミリー適性、静かな住環境、耐震・災害確認の必要性を"
-            "ローカルデータでスコアリングしました。"
-        ),
+        "ranked_area_candidates": ranked_candidates[:4],
+        "ranked_property_candidates": ranked_items[:4],
+        "ranked_candidates": ranked_candidates[:4],
+        "ranked_items": ranked_items[:4],
+        "top_candidates": ranked_candidates[:4],
+        "missing_information": _missing_information(product_spec, case),
+        "scoring_summary_ja": domain_template.get("scoring_summary_ja") or "ローカル候補、証拠、リスク、人間承認条件をスコアリングしました。",
     }
 '''
-
 
 LLM_CLIENT = '''"""DeepSeek/OpenAI-compatible JSON client for the generated app."""
 
@@ -769,6 +594,11 @@ def live_search_enabled() -> bool:
 
 
 def build_queries(case: dict[str, Any], product_spec: dict[str, Any], local_tool_results: dict[str, Any]) -> list[str]:
+    domain_queries = [
+        str(query)
+        for query in product_spec.get("live_search_queries", [])
+        if str(query).strip()
+    ]
     terms = [
         str(product_spec.get("product_name", "")),
         str(product_spec.get("selected_opportunity", "")),
@@ -783,16 +613,13 @@ def build_queries(case: dict[str, Any], product_spec: dict[str, Any], local_tool
         if item.get("name_ja")
     ]
     base = " ".join(term for term in terms + area_names if term).strip()
-    app_kind = str(product_spec.get("app_kind", ""))
     queries = [
+        *domain_queries,
         f"{base} site:digital.go.jp",
         f"{base} AI governance Japan site:meti.go.jp",
         "生成AI ガイドライン 企業 活用 site:meti.go.jp",
         "AI governance DX Japan enterprise site:ipa.go.jp",
     ]
-    if app_kind == "real_estate_recommendation":
-        queries.insert(0, "不動産 AI 活用 住宅 国土交通省 site:mlit.go.jp")
-        queries.insert(1, "ハザードマップ 不動産 住宅 国土交通省 site:mlit.go.jp")
     return [query[:240] for query in queries if query.strip()]
 
 
@@ -951,11 +778,11 @@ def deterministic_recommendation(local_tool_results: dict[str, Any]) -> str:
         for index, prop in enumerate(properties, start=1)
     ]
     return (
-        "ローカルランキングでは、候補エリアは次の順で確認する価値があります。\\n"
+        "ローカルランキングでは、候補は次の順で確認する価値があります。\\n"
         + "\\n".join(area_lines)
-        + "\\n\\n候補物件は次の順で追加確認してください。\\n"
+        + "\\n\\n関連候補は次の順で追加確認してください。\\n"
         + "\\n".join(property_lines)
-        + "\\n\\n災害リスク、耐震性、学校区、販売状況、重要事項説明は人間の担当者が確認してください。"
+        + "\\n\\nリスク、証拠の鮮度、適用条件、承認境界は人間の担当者が確認してください。"
     )
 
 
@@ -963,8 +790,8 @@ def _classification(case: dict[str, Any], output: dict[str, Any]) -> dict[str, A
     classification = output.get("classification")
     if not isinstance(classification, dict):
         classification = {}
-    label = classification.get("label") or "preference_based_property_recommendation"
-    rationale = classification.get("rationale") or "顧客の予算、通勤、学校、静かな住環境、災害確認ニーズに基づく不動産推薦ケースです。"
+    label = classification.get("label") or "preference_based_recommendation"
+    rationale = classification.get("rationale") or "業務要件、候補スコア、証拠、人間承認条件に基づく推奨ケースです。"
     try:
         confidence = float(classification.get("confidence", 0.78))
     except (TypeError, ValueError):
@@ -995,7 +822,7 @@ def enforce_output_contract(
         draft = (
             "以下は担当者確認用のドラフトです。"
             + recommendation
-            + "\\n\\nこの内容は送信前に宅建士または担当コンサルタントが確認してください。"
+            + "\\n\\nこの内容は送信前に指定された承認者が確認してください。"
         )
 
     risk = output.get("risk") if isinstance(output.get("risk"), dict) else {}
@@ -1070,14 +897,14 @@ KNOWLEDGE_BASE = load_knowledge_base()
 def retrieve_evidence(case: dict[str, Any], local_tool_results: dict[str, Any]) -> list[dict[str, Any]]:
     evidence: list[dict[str, Any]] = [
         {
-            "id": "local_area_profiles",
-            "title": "Generated local area profiles",
-            "summary": "Area candidates and scoring inputs loaded from data/areas.json.",
+            "id": "local_candidate_profiles",
+            "title": "Generated local candidate profiles",
+            "summary": "Domain candidates and scoring inputs loaded from data/areas.json.",
         },
         {
-            "id": "local_property_listings",
-            "title": "Generated local property listings",
-            "summary": "Property candidates and scoring inputs loaded from data/properties.json.",
+            "id": "local_item_records",
+            "title": "Generated local item records",
+            "summary": "Related item candidates and scoring inputs loaded from data/properties.json.",
         },
         {
             "id": "knowledge_base",
@@ -1086,9 +913,10 @@ def retrieve_evidence(case: dict[str, Any], local_tool_results: dict[str, Any]) 
         },
     ]
     for area in local_tool_results.get("ranked_area_candidates", [])[:3]:
+        candidate_id = area.get("area_id") or area.get("id") or area.get("name_ja", "candidate")
         evidence.append({
-            "id": f"area_{area['area_id']}",
-            "title": area["name_ja"],
+            "id": f"candidate_{candidate_id}",
+            "title": area.get("name_ja", str(candidate_id)),
             "summary": f"{area.get('summary_ja', '')} {area.get('risk_note_ja', '')}",
         })
     live_pack = search_web_evidence(case, PRODUCT_SPEC, local_tool_results)
@@ -1104,7 +932,10 @@ def retrieve_evidence(case: dict[str, Any], local_tool_results: dict[str, Any]) 
 
 
 def build_prompt(case: dict[str, Any], local_tool_results: dict[str, Any], evidence: list[dict[str, Any]]) -> str:
-    return f"""You are drafting the reasoning layer for an AI-driven real-estate recommendation platform.
+    candidate_examples = PRODUCT_SPEC.get("candidate_examples", [])
+    specific_rules = PRODUCT_SPEC.get("specific_rules", [])
+    return f"""You are drafting the reasoning layer for this generated enterprise agent product:
+{PRODUCT_SPEC.get("prompt_context", PRODUCT_SPEC.get("product_name", "enterprise product"))}
 
 Product spec:
 {json.dumps(PRODUCT_SPEC, ensure_ascii=False, indent=2)}
@@ -1112,23 +943,29 @@ Product spec:
 Customer case:
 {json.dumps(case, ensure_ascii=False, indent=2)}
 
-Deterministic local tool results. You must use these concrete area and property names:
+Deterministic local tool results. You must use concrete candidate names from these results:
 {json.dumps(local_tool_results, ensure_ascii=False, indent=2)}
 
 Evidence:
 {json.dumps(evidence, ensure_ascii=False, indent=2)}
+
+Candidate examples from the selected domain template:
+{json.dumps(candidate_examples, ensure_ascii=False, indent=2)}
+
+Domain-specific rules from the selected template:
+{json.dumps(specific_rules, ensure_ascii=False, indent=2)}
 
 Return one JSON object with these keys:
 case_id, classification, evidence, missing_information, recommendation_ja,
 customer_or_business_draft_ja, internal_review_note, risk, approval_packet.
 
 Rules:
-- Use concrete local tool candidate names such as 武蔵小杉, 国立, 和光市, 町田 when relevant.
+- Use concrete local tool candidate names when relevant.
 - Use runtime_live_web_search evidence when available, but describe it as supporting context that requires human verification.
 - Do not say エリアA, エリアB, エリアC, Area A, Area B, or Area C.
 - Do not claim legal, financial, investment, disaster-safety, or earthquake-resilience guarantees.
 - Use Japanese for recommendation_ja, customer_or_business_draft_ja, and internal_review_note.
-- Mention missing hazard map, earthquake resilience, school zone, listing freshness, and human review needs.
+- Mention missing evidence, uncertainty, source freshness, risk checks, and human review needs.
 - The final app will force human_approval_required=true and send_allowed=false.
 """
 
@@ -1348,16 +1185,16 @@ from backend.tools import run_domain_tools
 
 
 class RecommendationToolTests(unittest.TestCase):
-    def test_area_ranking_uses_concrete_candidates(self) -> None:
+    def test_candidate_ranking_uses_concrete_candidates(self) -> None:
         case = {
             "budget": "55-70",
-            "preferences": "学校 静か 通勤 新宿 災害 耐震",
+            "preferences": "quality risk access family evidence",
             "max_commute_minutes": 40,
         }
         result = run_domain_tools(load_product_spec(), case)
         names = [item["name_ja"] for item in result["ranked_area_candidates"]]
-        self.assertIn("国立", names)
-        self.assertTrue({"武蔵小杉", "国立", "和光市", "町田"} & set(names))
+        self.assertTrue(names)
+        self.assertFalse(any(name in {"Area A", "Area B", "エリアA", "エリアB"} for name in names))
         self.assertGreater(result["ranked_area_candidates"][0]["score"], 0)
 
     def test_property_candidates_are_ranked(self) -> None:
@@ -2782,10 +2619,16 @@ def build_prototype(
     generation_trace = build_generation_trace(implementation_plan, product_spec)
     builder_loop_trace = build_builder_loop_trace(product_requirements, project_architecture, file_manifest, implementation_plan)
     knowledge_base = build_knowledge_base(agent_design, product_spec)
+    domain_template = product_spec.get("domain_template", {}) if isinstance(product_spec.get("domain_template"), dict) else {}
+    area_profiles = domain_template.get("area_profiles", [])
+    property_listings = domain_template.get("property_listings", [])
+    sample_cases = domain_template.get("sample_customers", [])
     domain_data = {
-        "area_profiles": REAL_ESTATE_AREAS,
-        "property_listings": REAL_ESTATE_PROPERTIES,
-        "sample_customers": SAMPLE_CUSTOMERS,
+        "template_id": product_spec.get("domain_template_id"),
+        "template_source": product_spec.get("domain_template_source"),
+        "area_profiles": area_profiles,
+        "property_listings": property_listings,
+        "sample_customers": sample_cases,
     }
 
     json_files = {
@@ -2805,10 +2648,10 @@ def build_prototype(
         "repair_log.json": build_repair_log(),
         "architecture.json": architecture,
         "domain_data.json": domain_data,
-        "sample_cases.json": SAMPLE_CUSTOMERS,
-        "data/areas.json": REAL_ESTATE_AREAS,
-        "data/properties.json": REAL_ESTATE_PROPERTIES,
-        "data/sample_customers.json": SAMPLE_CUSTOMERS,
+        "sample_cases.json": sample_cases,
+        "data/areas.json": area_profiles,
+        "data/properties.json": property_listings,
+        "data/sample_customers.json": sample_cases,
     }
     for relative_path, payload in json_files.items():
         _write_json(app_dir, relative_path, payload)
@@ -2839,7 +2682,7 @@ def build_prototype(
         _write(app_dir, relative_path, content)
 
     write_pipeline_diagram(app_dir, product_spec)
-    write_analysis_charts(app_dir, REAL_ESTATE_AREAS, product_spec)
+    write_analysis_charts(app_dir, area_profiles, product_spec)
     write_architecture_markdown(app_dir, project_architecture)
     _write(
         app_dir,

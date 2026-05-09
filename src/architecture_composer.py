@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from src.domain_templates import select_domain_template
 from src.primitive_registry import PRIMITIVES, get_primitive
 
 
@@ -37,7 +38,7 @@ def compose_architecture(profile: dict, recommended_opportunity: dict) -> dict:
         selected.add("retrieval")
     if any(term in blob for term in ("email", "reply", "customer", "proposal", "report", "顧客", "返信", "提案")):
         selected.add("drafting")
-    if any(term in blob for term in ("real_estate", "real estate", "property", "housing", "area", "recommend", "不動産", "住宅", "物件", "地域", "推薦")):
+    if "recommend" in blob or "推薦" in blob or select_domain_template(profile, selected_opportunity):
         selected.update({"retrieval", "checklist", "drafting"})
     if any(term in blob for term in ("invoice", "contract", "pdf", "form", "請求書", "契約", "申請")):
         selected.update({"extraction", "checklist"})

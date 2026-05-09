@@ -17,6 +17,8 @@ import urllib.request
 from datetime import datetime, timezone
 from urllib.error import URLError
 
+from src.domain_templates import select_domain_template
+
 
 EVIDENCE_LIBRARY: tuple[dict, ...] = (
     {
@@ -122,8 +124,9 @@ def _profile_terms(profile: dict) -> list[str]:
             terms.append(str(candidate)[:120])
     if any(term in blob.lower() for term in ("manufacturing", "factory", "maintenance", "engineer", "製造", "工場", "保守")):
         terms.append("Japan manufacturing AI maintenance knowledge retrieval")
-    if any(term in blob.lower() for term in ("real estate", "property", "housing", "不動産", "住宅", "物件")):
-        terms.append("Japan real estate AI customer recommendation governance")
+    domain_pack = select_domain_template(profile)
+    if domain_pack:
+        terms.extend(str(query) for query in domain_pack.get("live_search_queries", [])[:2])
     if any(term in blob.lower() for term in ("finance", "bank", "insurance", "金融", "銀行", "保険")):
         terms.append("Japan financial sector AI governance customer service")
     return terms[:4]

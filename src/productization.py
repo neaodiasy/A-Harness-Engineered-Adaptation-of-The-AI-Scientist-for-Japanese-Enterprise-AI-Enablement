@@ -10,11 +10,13 @@ from __future__ import annotations
 
 from typing import Any
 
+from src.domain_templates import select_domain_template
+
 
 PRODUCT_ARCHETYPES = {
     "recommendation_workbench": {
         "name": "Recommendation Workbench",
-        "fit_terms": ["recommend", "property", "area", "housing", "sales", "proposal", "推薦", "提案", "物件", "地域"],
+        "fit_terms": ["recommend", "compare", "rank", "match", "sales", "proposal", "推薦", "提案", "比較", "候補"],
         "primary_job": "Compare candidates, explain trade-offs, and prepare an approval-ready recommendation.",
         "workspace_regions": ["case_queue", "intake_form", "candidate_comparison", "evidence_panel", "draft_editor", "approval_packet"],
     },
@@ -56,20 +58,8 @@ def _score_archetype(archetype: dict[str, Any], text: str) -> int:
 def select_product_archetype(profile: dict, selected_opportunity: dict, architecture: dict) -> dict[str, Any]:
     """Select a product archetype from enterprise context and opportunity."""
     text = _blob(profile, selected_opportunity, architecture)
-    if any(term in text for term in (
-        "real_estate",
-        "real estate",
-        "property",
-        "housing",
-        "home",
-        "area recommendation",
-        "neighborhood",
-        "不動産",
-        "住宅",
-        "物件",
-        "地域",
-        "推薦",
-    )):
+    domain_pack = select_domain_template(profile, selected_opportunity, architecture)
+    if domain_pack and any(term in text for term in ("recommend", "rank", "compare", "推薦", "比較", "候補")):
         archetype_id = "recommendation_workbench"
         archetype = PRODUCT_ARCHETYPES[archetype_id]
         return {

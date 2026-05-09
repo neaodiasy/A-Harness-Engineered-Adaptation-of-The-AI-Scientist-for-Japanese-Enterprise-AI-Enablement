@@ -91,7 +91,7 @@ The Code Agent now builds the generated child app through a software engineering
 7. `repair_loop`: records failed checks and the next patch/regeneration action.
 8. `product_review`: scores the generated product.
 
-This keeps the framework flexible while avoiding a fixed single-file demo. The real-estate profile can generate an AI-driven property recommendation platform; another profile should generate a different product package with the same builder loop.
+This keeps the framework flexible while avoiding a fixed single-file demo. Domain-specific material is not embedded in the core generator: the framework loads optional `templates/*/domain_pack.json` files when a submitted enterprise profile matches them, and otherwise falls back to a generic enterprise product template. The included real-estate pack is a case-study template, not a hard-coded assumption inside the agent harness.
 
 ## Harness Engineering Components
 
@@ -102,7 +102,8 @@ This keeps the framework flexible while avoiding a fixed single-file demo. The r
 - `src/architecture_composer.py`: composes workflows from reusable primitives.
 - `src/productization.py`: converts the selected opportunity into an enterprise software product blueprint before code generation.
 - `src/software_factory.py`: Software Builder Loop artifacts: PRD, architecture, file manifest, implementation plan, and repair trace.
-- `src/prototype_builder.py`: writes generated multi-file product packages.
+- `src/domain_templates.py`: loads and selects optional domain packs from `templates/*/domain_pack.json`.
+- `src/prototype_builder.py`: writes generated multi-file product packages from the selected blueprint and domain template.
 - `src/ui_quality.py`: static frontend responsiveness harness for generated enterprise workbench UIs.
 - `src/sandbox_eval.py`: compiles and evaluates generated project packages in the local generated app folder.
 
@@ -119,10 +120,14 @@ j-enterprise-agent-scientist/
 │   ├── index.html
 │   ├── styles.css
 │   └── app.js
+├── templates/
+│   └── real_estate_recommendation/
+│       └── domain_pack.json
 ├── src/
 │   ├── agent_design.py
 │   ├── architecture_composer.py
 │   ├── candidate_search.py
+│   ├── domain_templates.py
 │   ├── evidence_search.py
 │   ├── feasibility.py
 │   ├── primitive_registry.py

@@ -96,25 +96,31 @@ def build_product_requirements(agent_design: dict, product_spec: dict) -> dict:
     opportunity = _opportunity(agent_design)
     context = _context(agent_design)
     app_kind = product_spec.get("app_kind", "enterprise_agent_product")
-    if app_kind == "real_estate_recommendation":
+    domain_template = product_spec.get("domain_template", {}) if isinstance(product_spec.get("domain_template"), dict) else {}
+    if product_spec.get("domain_template_id") and product_spec.get("domain_template_id") != "generic_enterprise":
+        candidate_label = product_spec.get("candidate_collection_label", "domain candidates")
+        item_label = product_spec.get("item_collection_label", "related items")
         user_roles = [
-            "Real-estate consultant",
-            "Sales manager / reviewer",
-            "Customer-facing advisor",
+            "Business consultant",
+            "Manager / reviewer",
+            "Customer-facing or operational advisor",
         ]
         core_workflows = [
-            "Capture buyer preferences and constraints.",
-            "Rank local area candidates and property candidates with deterministic tools.",
+            "Capture user preferences, constraints, and business context.",
+            f"Rank local {candidate_label} and {item_label} with deterministic tools.",
             "Ask DeepSeek to draft a Japanese recommendation using only local tool results and evidence.",
             "Block external sending until a human reviewer approves the packet.",
         ]
+        examples = [str(item) for item in domain_template.get("candidate_examples", [])[:4]]
         acceptance_criteria = [
             "The app exposes a real CLI and local web UI.",
             "The backend includes separate agent, tool, data, guardrail, and API modules.",
             "Outputs include local_tool_results and ranked_area_candidates.",
-            "Area recommendations use concrete names such as 武蔵小杉, 国立, 和光市, and 町田.",
+            "Recommendations use concrete candidate names from the selected domain template.",
             "The system never returns send_allowed=true in the local product runtime.",
         ]
+        if examples:
+            acceptance_criteria.append(f"Candidate examples are loaded from template data, e.g. {', '.join(examples)}.")
     else:
         user_roles = ["Business operator", "Reviewer / approver", "Workflow owner"]
         core_workflows = [
