@@ -18,6 +18,8 @@ from urllib.parse import parse_qs, urlparse
 from src.agent_design import design_agent_workflow, render_agent_design_markdown
 from src.architecture_composer import compose_architecture
 from src.candidate_search import run_candidate_search
+from src.domain_pack_builder import build_domain_pack, validate_domain_pack
+from src.domain_templates import select_domain_template
 from src.evidence_search import build_evidence_pack
 from src.feasibility import score_opportunities
 from src.harness.json_utils import dump_json, parse_jsonish
@@ -55,6 +57,8 @@ ARTIFACTS = {
     "search_trace": OUTPUT_DIR / "01_consulting" / "search_trace.json",
     "tree_search_trace": OUTPUT_DIR / "01_consulting" / "tree_search_trace.json",
     "selected_opportunity": OUTPUT_DIR / "01_consulting" / "selected_opportunity.json",
+    "domain_pack_candidate": OUTPUT_DIR / "01_consulting" / "domain_pack_candidate.json",
+    "domain_pack_validation": OUTPUT_DIR / "01_consulting" / "domain_pack_validation.json",
     "product_brief": OUTPUT_DIR / "02_generated_app" / "product_brief.json",
     "product_spec": OUTPUT_DIR / "02_generated_app" / "product_spec.json",
     "product_requirements": OUTPUT_DIR / "02_generated_app" / "product_requirements.json",
@@ -112,6 +116,8 @@ def _refresh_output_artifacts(output_dir: Path) -> None:
         "search_trace": output_dir / "01_consulting" / "search_trace.json",
         "tree_search_trace": output_dir / "01_consulting" / "tree_search_trace.json",
         "selected_opportunity": output_dir / "01_consulting" / "selected_opportunity.json",
+        "domain_pack_candidate": output_dir / "01_consulting" / "domain_pack_candidate.json",
+        "domain_pack_validation": output_dir / "01_consulting" / "domain_pack_validation.json",
         "product_brief": output_dir / "02_generated_app" / "product_brief.json",
         "product_spec": output_dir / "02_generated_app" / "product_spec.json",
         "product_requirements": output_dir / "02_generated_app" / "product_requirements.json",
@@ -178,6 +184,58 @@ def _write_case_outputs(app_dir: Path, sandbox_dir: Path) -> Path:
     output_path = sandbox_dir / "case_outputs.json"
     dump_json(output_path, case_outputs)
     return output_path
+
+
+def _evidence_source_documents(evidence_pack: dict) -> list[str]:
+    """Compress evidence items into source notes for runtime domain-pack drafting."""
+    docs: list[str] = []
+    for item in evidence_pack.get("evidence_items", [])[:8]:
+        docs.append(
+            "\n".join(
+                str(value)
+                for value in (
+                    item.get("title", ""),
+                    item.get("summary", ""),
+                    item.get("source", ""),
+                    item.get("url", ""),
+                )
+                if value
+            )
+        )
+    return docs
+
+
+def _prepare_runtime_domain_pack(
+    profile: dict,
+    agent_design: dict,
+    architecture: dict,
+    evidence_pack: dict,
+    consulting_dir: Path,
+) -> dict[str, object]:
+    """Select an existing pack or auto-build a runtime pack for this run."""
+    existing_pack = select_domain_template(profile, agent_design, architecture)
+    if existing_pack:
+        pack = dict(existing_pack)
+        pack["autobuilder"] = {
+            "status": "accepted_existing_template",
+            "human_review_required": False,
+            "runtime_selection": True,
+        }
+        result = {
+            "mode": "existing_domain_pack",
+            "domain_pack": pack,
+            "validation": {"valid": True, "errors": [], "warnings": [], "human_review_required": False},
+        }
+    else:
+        draft_pack = build_domain_pack(profile, _evidence_source_documents(evidence_pack))
+        result = {
+            "mode": "auto_built_runtime_domain_pack",
+            "domain_pack": draft_pack,
+            "validation": validate_domain_pack(draft_pack),
+        }
+    dump_json(consulting_dir / "domain_pack_candidate.json", result["domain_pack"])
+    dump_json(consulting_dir / "domain_pack_validation.json", result["validation"])
+    return result
 
 
 def _write_run_index(
@@ -285,7 +343,11 @@ def run_pipeline(profile: dict, run_id: str = "") -> tuple[dict, dict]:
     (generator_context_dir / "agent_design.md").write_text(render_agent_design_markdown(agent_design), encoding="utf-8")
     (generator_context_dir / "agent_architecture.md").write_text(render_agent_design_markdown(agent_design), encoding="utf-8")
 
+    domain_pack_result = _prepare_runtime_domain_pack(profile, agent_design, architecture, evidence_pack, consulting_dir)
     productization_blueprint = build_productization_blueprint(profile, agent_design, architecture, evidence_pack)
+    productization_blueprint["domain_pack_mode"] = domain_pack_result["mode"]
+    productization_blueprint["runtime_domain_pack"] = domain_pack_result["domain_pack"]
+    productization_blueprint["domain_pack_validation"] = domain_pack_result["validation"]
     dump_json(code_agent_dir / "productization_blueprint.json", productization_blueprint)
     (code_agent_dir / "productization_blueprint.md").write_text(
         render_productization_markdown(productization_blueprint),
@@ -321,6 +383,8 @@ def run_pipeline(profile: dict, run_id: str = "") -> tuple[dict, dict]:
 
     result["prototype_manifest"] = prototype_manifest
     result["productization_blueprint"] = productization_blueprint
+    result["domain_pack_mode"] = domain_pack_result["mode"]
+    result["domain_pack_validation"] = domain_pack_result["validation"]
     result["generated_app"] = str(app_dir.resolve())
     result["sandbox_report"] = sandbox_report
     result["evaluation_results"] = evaluation_results

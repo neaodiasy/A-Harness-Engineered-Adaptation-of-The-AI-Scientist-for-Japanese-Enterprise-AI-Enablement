@@ -91,7 +91,7 @@ The Code Agent now builds the generated child app through a software engineering
 7. `repair_loop`: records failed checks and the next patch/regeneration action.
 8. `product_review`: scores the generated product.
 
-This keeps the framework flexible while avoiding a fixed single-file demo. Domain-specific material is not embedded in the core generator: the framework loads optional `templates/*/domain_pack.json` files when a submitted enterprise profile matches them, and otherwise falls back to a generic enterprise product template. The included real-estate pack is a case-study template, not a hard-coded assumption inside the agent harness.
+This keeps the framework flexible while avoiding a fixed single-file demo. Domain-specific material is not embedded in the core generator: the framework first loads optional `templates/*/domain_pack.json` files when a submitted enterprise profile matches them. If no template matches, the main pipeline now uses the Domain Pack Auto-Builder to draft a runtime domain pack from the enterprise profile and evidence/search context, then passes that pack into the Code Agent for the current run. The generic enterprise template remains the safety fallback if a draft pack cannot validate. The included real-estate pack is a case-study seed template, not a hard-coded assumption inside the agent harness.
 
 ## Harness Engineering Components
 
@@ -103,7 +103,7 @@ This keeps the framework flexible while avoiding a fixed single-file demo. Domai
 - `src/productization.py`: converts the selected opportunity into an enterprise software product blueprint before code generation.
 - `src/software_factory.py`: Software Builder Loop artifacts: PRD, architecture, file manifest, implementation plan, and repair trace.
 - `src/domain_templates.py`: loads and selects optional domain packs from `templates/*/domain_pack.json`.
-- `src/domain_pack_builder.py`: semi-automatically drafts new domain packs from enterprise profiles and source documents.
+- `src/domain_pack_builder.py`: drafts runtime or installable domain packs from enterprise profiles and source documents.
 - `src/prototype_builder.py`: writes generated multi-file product packages from the selected blueprint and domain template.
 - `src/ui_quality.py`: static frontend responsiveness harness for generated enterprise workbench UIs.
 - `src/sandbox_eval.py`: compiles and evaluates generated project packages in the local generated app folder.
@@ -169,7 +169,14 @@ export ENABLE_LIVE_SEARCH="1"
 python3 run.py --profile profiles/example_real_estate.json
 ```
 
-Draft a new domain pack from a different company profile:
+The full pipeline automatically writes the selected or auto-built runtime domain pack to:
+
+```text
+outputs/<timestamp>_api_run/01_consulting/domain_pack_candidate.json
+outputs/<timestamp>_api_run/01_consulting/domain_pack_validation.json
+```
+
+You can also draft a reusable domain pack manually:
 
 ```bash
 python3 -m src.domain_pack_builder \

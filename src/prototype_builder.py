@@ -49,7 +49,9 @@ def build_software_blueprint(
     app_kind = _infer_app_kind(agent_design)
     opportunity_name = opportunity.get("name", "Enterprise Agent Product")
     selected_archetype = productization_blueprint.get("selected_archetype", {}) or {}
-    domain_pack = select_domain_template(agent_design, productization_blueprint) or generic_domain_template(
+    runtime_domain_pack = productization_blueprint.get("runtime_domain_pack")
+    domain_pack = runtime_domain_pack if isinstance(runtime_domain_pack, dict) else None
+    domain_pack = domain_pack or select_domain_template(agent_design, productization_blueprint) or generic_domain_template(
         opportunity_name,
         opportunity.get("proposed_ai_capability", "Generated enterprise agent product."),
     )
