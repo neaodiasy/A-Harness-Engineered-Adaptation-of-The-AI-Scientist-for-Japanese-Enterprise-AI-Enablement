@@ -17,10 +17,9 @@ report_assets*/
 report_figures*/
 submission_ready_figures*/
 
-# Keep only the curated successful example run.
+# Runtime outputs are generated locally and should not be committed.
 outputs/*
-!outputs/20260505_013730_max_enterprise_product_ui_test/
-!outputs/20260505_013730_max_enterprise_product_ui_test/**
+!outputs/.gitkeep
 
 # Generated scratch folders from older iterations.
 generated_apps/
