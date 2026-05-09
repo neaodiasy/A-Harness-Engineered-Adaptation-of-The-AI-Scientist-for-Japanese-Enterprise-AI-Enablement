@@ -1,1 +1,0 @@
-"""Generated product backend package."""

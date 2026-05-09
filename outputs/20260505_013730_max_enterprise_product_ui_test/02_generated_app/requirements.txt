@@ -1,4 +1,0 @@
-# Generated product intentionally uses only the Python standard library.
-# Runtime requires:
-# - Python 3.9+
-# - DEEPSEEK_API_KEY for API-backed agent execution
