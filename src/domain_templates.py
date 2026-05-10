@@ -50,7 +50,7 @@ def select_domain_template(*context: object) -> dict[str, Any] | None:
 
 def generic_domain_template(opportunity_name: str, subtitle: str) -> dict[str, Any]:
     """Return a domain-neutral template for non-demo enterprise profiles."""
-    return {
+    template = {
         "template_id": "generic_enterprise",
         "source_path": "generated_generic_template",
         "product_name": f"{opportunity_name} Platform",
@@ -110,55 +110,61 @@ def generic_domain_template(opportunity_name: str, subtitle: str) -> dict[str, A
             "Check that the draft does not cross the human approval boundary.",
             "Confirm the workflow is useful for the submitted enterprise profile.",
         ],
-        "area_profiles": [
+        "domain_candidates": [
             {
                 "area_id": "workflow_standardization",
+                "candidate_id": "workflow_standardization",
                 "name_ja": "業務標準化候補",
                 "summary_ja": "反復的な判断、文書作成、証拠確認を標準化する候補です。",
                 "typical_budget_jpy_m": 50,
-                "commute_minutes": 30,
-                "station_access": 6,
-                "school_score": 5,
-                "family_score": 6,
-                "quiet_score": 5,
+                "time_or_effort_index": 30,
+                "access_score": 6,
+                "relevance_score": 5,
+                "user_fit_score": 6,
+                "stability_score": 5,
+                "risk_readiness_score": 5,
                 "risk_note_ja": "業務責任者による承認境界と例外処理の確認が必要です。",
             },
             {
                 "area_id": "knowledge_navigation",
+                "candidate_id": "knowledge_navigation",
                 "name_ja": "ナレッジ検索候補",
                 "summary_ja": "社内文書、FAQ、過去事例から根拠を検索して回答案を作る候補です。",
                 "typical_budget_jpy_m": 40,
-                "commute_minutes": 25,
-                "station_access": 7,
-                "school_score": 6,
-                "family_score": 7,
-                "quiet_score": 6,
+                "time_or_effort_index": 25,
+                "access_score": 7,
+                "relevance_score": 6,
+                "user_fit_score": 7,
+                "stability_score": 6,
+                "risk_readiness_score": 6,
                 "risk_note_ja": "古い文書や未承認文書の混入を避ける検証が必要です。",
             },
         ],
-        "property_listings": [
+        "item_records": [
             {
                 "property_id": "approval_packet_workflow",
+                "item_id": "approval_packet_workflow",
                 "area_id": "workflow_standardization",
                 "title_ja": "承認パケット生成ワークフロー",
                 "price_jpy_m": 45,
-                "station_walk_minutes": 8,
-                "school_score": 6,
-                "family_score": 7,
-                "quiet_score": 6,
-                "earthquake_score": 5,
+                "access_minutes": 8,
+                "relevance_score": 6,
+                "user_fit_score": 7,
+                "stability_score": 6,
+                "risk_readiness_score": 5,
                 "risk_note_ja": "承認前の自動送信は禁止です。",
             },
             {
                 "property_id": "evidence_answer_workflow",
+                "item_id": "evidence_answer_workflow",
                 "area_id": "knowledge_navigation",
                 "title_ja": "根拠付き回答ドラフトワークフロー",
                 "price_jpy_m": 42,
-                "station_walk_minutes": 6,
-                "school_score": 7,
-                "family_score": 7,
-                "quiet_score": 6,
-                "earthquake_score": 5,
+                "access_minutes": 6,
+                "relevance_score": 7,
+                "user_fit_score": 7,
+                "stability_score": 6,
+                "risk_readiness_score": 5,
                 "risk_note_ja": "根拠の鮮度と業務適合性を人間が確認してください。",
             },
         ],
@@ -171,3 +177,6 @@ def generic_domain_template(opportunity_name: str, subtitle: str) -> dict[str, A
             }
         ],
     }
+    template["area_profiles"] = template["domain_candidates"]
+    template["property_listings"] = template["item_records"]
+    return template

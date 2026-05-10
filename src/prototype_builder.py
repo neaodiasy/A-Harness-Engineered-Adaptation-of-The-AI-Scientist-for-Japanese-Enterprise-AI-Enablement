@@ -143,8 +143,8 @@ def build_agent_spec(agent_design: dict, architecture: dict, product_spec: dict)
         "system_prompt": (
             "You are the AI reasoning layer inside a generated enterprise software product. "
             "You receive deterministic local tool results and evidence. Return valid JSON only. "
-            "Do not invent area names, property facts, legal claims, financial guarantees, investment advice, "
-            "or disaster safety guarantees. Keep all customer-facing language in Japanese. "
+            "Do not invent candidate names, source facts, legal claims, financial guarantees, investment advice, "
+            "or safety guarantees. Keep customer-facing or business-facing language in Japanese when appropriate. "
             "Human approval is mandatory and send_allowed must be false."
         ),
         "output_contract": {
@@ -165,10 +165,10 @@ def build_agent_spec(agent_design: dict, architecture: dict, product_spec: dict)
             "audit_trace": {"evidence_ids": ["string"], "tool_names": ["string"], "model": "string"},
         },
         "reviewer_guidance": [
-            "Confirm the recommended areas and properties exist in local tool results.",
-            "Verify hazard maps, earthquake resilience, school zones, and listing freshness before customer-facing use.",
-            "Edit customer-facing Japanese before sending.",
-            "Keep the system as decision support; never treat it as legal, financial, or safety advice.",
+            "Confirm recommended candidates exist in local tool results.",
+            "Verify source freshness, risk boundaries, and missing evidence before customer-facing or operational use.",
+            "Edit customer-facing or business-facing Japanese before use.",
+            "Keep the system as decision support; never treat it as legal, financial, safety, or regulated-domain advice.",
         ],
     }
 
@@ -328,16 +328,16 @@ def _numeric(item: dict[str, Any], keys: list[str], default: float = 0.0) -> flo
     return default
 
 
-def _commute_minutes(candidate: dict[str, Any]) -> float:
+def _time_or_effort_value(candidate: dict[str, Any]) -> float:
     for key, value in candidate.items():
         if key.startswith("commute_minutes"):
             return float(value or 0)
-    return float(candidate.get("commute_minutes", 0) or 0)
+    return float(candidate.get("commute_minutes", candidate.get("time_or_effort_index", 0)) or 0)
 
 
 def score_candidate(candidate: dict[str, Any], case: dict[str, Any]) -> tuple[float, list[str]]:
     ceiling = _budget_ceiling(case.get("budget"))
-    commute_limit = _first_number(case.get("max_commute_minutes", ""), 45.0)
+    effort_limit = _first_number(case.get("max_commute_minutes", case.get("max_effort_index", "")), 45.0)
     score = 0.0
     reasons: list[str] = []
 
@@ -346,15 +346,15 @@ def score_candidate(candidate: dict[str, Any], case: dict[str, Any]) -> tuple[fl
     score += budget_score
     reasons.append(f"予算・コスト目安 {cost:g} に対して適合度を評価")
 
-    commute_value = _commute_minutes(candidate)
-    if commute_value:
-        commute_gap = max(0.0, commute_value - commute_limit)
-        commute_score = max(0.0, 22.0 - commute_gap * 1.8)
-        score += commute_score
-        reasons.append(f"時間・アクセス指標 {commute_value:g} を条件と比較")
+    effort_value = _time_or_effort_value(candidate)
+    if effort_value:
+        effort_gap = max(0.0, effort_value - effort_limit)
+        effort_score = max(0.0, 22.0 - effort_gap * 1.8)
+        score += effort_score
+        reasons.append(f"時間・工数・アクセス指標 {effort_value:g} を条件と比較")
 
     if _wants(case, ["school", "学校", "学区", "子ども", "子供", "family", "ファミリー"]):
-        score += _numeric(candidate, ["school_score"], 5.0) * 2.0 + _numeric(candidate, ["family_score"], 5.0) * 1.5
+        score += _numeric(candidate, ["relevance_score", "school_score"], 5.0) * 2.0 + _numeric(candidate, ["user_fit_score", "family_score"], 5.0) * 1.5
         reasons.append("家族・教育・利用者適合に関する指標を加点")
 
     if _wants(case, ["quiet", "静か", "閑静", "落ち着", "stable", "安定"]):
@@ -362,7 +362,7 @@ def score_candidate(candidate: dict[str, Any], case: dict[str, Any]) -> tuple[fl
         reasons.append("安定性・静穏性・運用品質に関する指標を加点")
 
     if _wants(case, ["risk", "safety", "resilience", "exception", "災害", "リスク", "例外"]):
-        score += _numeric(candidate, ["family_score", "risk_readiness_score"], 5.0) * 0.4
+        score += _numeric(candidate, ["risk_readiness_score", "family_score"], 5.0) * 0.4
         reasons.append("リスク確認は個別証拠と人間承認が必要")
 
     return round(score, 2), reasons
@@ -398,7 +398,7 @@ def score_item(item: dict[str, Any], candidate_rank: dict[str, dict[str, Any]], 
         reasons.append("アクセス条件を評価")
 
     if _wants(case, ["school", "学校", "family", "子ども", "ファミリー"]):
-        score += _numeric(item, ["school_score"], 5.0) * 1.5 + _numeric(item, ["family_score"], 5.0) * 1.5
+        score += _numeric(item, ["relevance_score", "school_score"], 5.0) * 1.5 + _numeric(item, ["user_fit_score", "family_score"], 5.0) * 1.5
         reasons.append("利用者適合・家族条件を評価")
 
     if _wants(case, ["risk", "safety", "resilience", "exception", "災害", "リスク", "例外"]):
@@ -1069,7 +1069,7 @@ def serve(port: int = 8766) -> None:
 '''
 
 
-EVALUATION = '''"""Evaluate the generated AI-driven property recommendation platform."""
+EVALUATION = '''"""Evaluate the generated enterprise agent product."""
 
 from __future__ import annotations
 
@@ -1110,8 +1110,8 @@ def evaluate_output(case: dict[str, Any], output: dict[str, Any]) -> dict[str, b
         "local_tool_results_exists": bool(output.get("local_tool_results")),
         "ranked_area_candidates_exists": bool(output.get("ranked_area_candidates")),
         "ranked_property_candidates_exists": bool(output.get("ranked_property_candidates")),
-        "uses_actual_area_names": any(name and name in combined for name in names),
-        "no_placeholder_area_names": not (PLACEHOLDER_PATTERN.search(combined) and not any(name in combined for name in names)),
+        "uses_actual_candidate_names": any(name and name in combined for name in names),
+        "no_placeholder_candidate_names": not (PLACEHOLDER_PATTERN.search(combined) and not any(name in combined for name in names)),
         "has_evidence": bool(output.get("evidence")),
         "has_missing_information": bool(output.get("missing_information")),
         "human_approval_required": output.get("human_approval_required") is True,
@@ -2346,6 +2346,26 @@ def build_product_brief(agent_design: dict, product_spec: dict) -> dict:
 def build_knowledge_base(agent_design: dict, product_spec: dict) -> str:
     opportunity = agent_design.get("selected_opportunity", {}) or {}
     context = agent_design.get("enterprise_context", {}) or {}
+    domain_template = product_spec.get("domain_template", {}) if isinstance(product_spec.get("domain_template"), dict) else {}
+    specific_rules = domain_template.get("specific_rules") or product_spec.get("specific_rules", [])
+    missing_rules = domain_template.get("missing_information_rules", [])
+    reviewer_guidance = domain_template.get("reviewer_guidance", [])
+    operating_rules = [
+        "- Always run deterministic local tools before DeepSeek drafting.",
+        "- Use concrete candidate names from local tool results.",
+        "- Never use placeholder recommendations such as Candidate A / Candidate B / エリアA.",
+        "- Treat generated output as decision support, not a final legal, financial, safety, employment, medical, or regulated-domain conclusion.",
+        "- Keep human_approval_required true and send_allowed false.",
+    ]
+    operating_rules.extend(f"- {rule}" for rule in specific_rules[:6])
+    human_checks = [
+        "- Current source evidence and internal policy.",
+        "- Domain-specific risk boundaries and approval owner.",
+        "- Missing information surfaced by the local tools.",
+        "- Human reviewer edits before any customer-facing or operationally consequential use.",
+    ]
+    human_checks.extend(f"- {item.get('message')}" for item in missing_rules[:6] if isinstance(item, dict) and item.get("message"))
+    human_checks.extend(f"- {item}" for item in reviewer_guidance[:4])
     return "\n".join([
         f"# {product_spec.get('product_name')} Knowledge Base",
         "",
@@ -2366,18 +2386,11 @@ def build_knowledge_base(agent_design: dict, product_spec: dict) -> str:
         "",
         "## Operating Rules",
         "",
-        "- Always run deterministic local tools before DeepSeek drafting.",
-        "- Use actual area and property names from local tool results.",
-        "- Never use placeholder recommendations such as エリアA / エリアB / エリアC.",
-        "- Treat property suitability as decision support, not a final financial, legal, investment, or disaster-safety conclusion.",
-        "- Keep human_approval_required true and send_allowed false.",
+        *operating_rules,
         "",
         "## Required Human Checks",
         "",
-        "- Hazard map and flood risk.",
-        "- Earthquake resilience and building management documents.",
-        "- School district, commute, station route, and listing freshness.",
-        "- Important matters explanation and licensed advisor review.",
+        *human_checks,
     ])
 
 
@@ -2549,23 +2562,26 @@ def write_pipeline_diagram(app_dir: Path, product_spec: dict) -> None:
     (app_dir / "pipeline_diagram.svg").write_text("\n".join(parts) + "\n", encoding="utf-8")
 
 
-def write_analysis_charts(app_dir: Path, areas: list[dict[str, Any]], product_spec: dict) -> None:
-    max_score = max(area["typical_budget_jpy_m"] for area in areas)
+def write_analysis_charts(app_dir: Path, candidates: list[dict[str, Any]], product_spec: dict) -> None:
+    if not candidates:
+        candidates = [{"name_ja": "Generated candidate", "typical_budget_jpy_m": 1}]
+    max_score = max(float(candidate.get("typical_budget_jpy_m", candidate.get("score", 1)) or 1) for candidate in candidates) or 1
     parts = [
         '<svg xmlns="http://www.w3.org/2000/svg" width="920" height="320" viewBox="0 0 920 320">',
         '<rect width="920" height="320" fill="#ffffff"/>',
-        f'<text x="24" y="36" font-size="22" font-weight="800" fill="#172026">{_svg_text(product_spec.get("product_name", "Generated Product"))} Area Data</text>',
+        f'<text x="24" y="36" font-size="22" font-weight="800" fill="#172026">{_svg_text(product_spec.get("product_name", "Generated Product"))} Candidate Data</text>',
         f'<text x="24" y="60" font-size="12" fill="#52606d">Selected opportunity: {_svg_text(product_spec.get("selected_opportunity", ""))}</text>',
     ]
     x = 56
-    for area in areas:
-        height = int(area["typical_budget_jpy_m"] / max_score * 170)
+    for candidate in candidates[:4]:
+        value = float(candidate.get("typical_budget_jpy_m", candidate.get("score", 1)) or 1)
+        height = int(value / max_score * 170)
         y = 250 - height
         parts.append(f'<rect x="{x}" y="{y}" width="92" height="{height}" fill="#166358"/>')
-        parts.append(f'<text x="{x}" y="272" font-size="13" fill="#172026">{_svg_text(area["name_ja"])}</text>')
-        parts.append(f'<text x="{x}" y="{y - 8}" font-size="12" fill="#52606d">{area["typical_budget_jpy_m"]}M</text>')
+        parts.append(f'<text x="{x}" y="272" font-size="13" fill="#172026">{_svg_text(candidate.get("name_ja", candidate.get("id", "Candidate")))}</text>')
+        parts.append(f'<text x="{x}" y="{y - 8}" font-size="12" fill="#52606d">{value:g}</text>')
         x += 190
-    parts.append('<text x="24" y="304" font-size="13" fill="#52606d">Bars show local budget reference for this property recommendation case; ranking also uses commute, station, school, quiet, and family scores.</text>')
+    parts.append('<text x="24" y="304" font-size="13" fill="#52606d">Bars show local candidate reference values; ranking also uses profile constraints, evidence, risk, and approval requirements.</text>')
     parts.append("</svg>")
     (app_dir / "analysis_charts.svg").write_text("\n".join(parts) + "\n", encoding="utf-8")
 
@@ -2622,12 +2638,14 @@ def build_prototype(
     builder_loop_trace = build_builder_loop_trace(product_requirements, project_architecture, file_manifest, implementation_plan)
     knowledge_base = build_knowledge_base(agent_design, product_spec)
     domain_template = product_spec.get("domain_template", {}) if isinstance(product_spec.get("domain_template"), dict) else {}
-    area_profiles = domain_template.get("area_profiles", [])
-    property_listings = domain_template.get("property_listings", [])
+    area_profiles = domain_template.get("domain_candidates") or domain_template.get("area_profiles", [])
+    property_listings = domain_template.get("item_records") or domain_template.get("property_listings", [])
     sample_cases = domain_template.get("sample_customers", [])
     domain_data = {
         "template_id": product_spec.get("domain_template_id"),
         "template_source": product_spec.get("domain_template_source"),
+        "domain_candidates": area_profiles,
+        "item_records": property_listings,
         "area_profiles": area_profiles,
         "property_listings": property_listings,
         "sample_customers": sample_cases,
@@ -2699,7 +2717,7 @@ This generated child app is a runnable local product MVP built by the Software B
 - Static frontend for consultants.
 - Backend modules for agent orchestration, deterministic tools, evidence, DeepSeek calls, guardrails, and data loading.
 - Runtime trusted-domain web evidence search in `backend/web_search.py`.
-- Local domain data for areas and properties.
+- Local domain candidate data and related item records.
 - Deterministic tests and API-backed evaluation.
 
 ## Run

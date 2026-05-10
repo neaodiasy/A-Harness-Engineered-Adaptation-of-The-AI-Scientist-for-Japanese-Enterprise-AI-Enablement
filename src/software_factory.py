@@ -189,8 +189,8 @@ def build_project_architecture(agent_design: dict, architecture: dict, product_s
             {"path": "frontend/app.js", "responsibility": "Calls local API and displays recommendation packets."},
         ],
         "data_modules": [
-            {"path": "data/areas.json", "responsibility": "Generated local area profiles."},
-            {"path": "data/properties.json", "responsibility": "Generated local property listings."},
+            {"path": "data/areas.json", "responsibility": "Generated local domain candidates."},
+            {"path": "data/properties.json", "responsibility": "Generated related item records."},
             {"path": "data/sample_customers.json", "responsibility": "Generated evaluation cases."},
         ],
         "quality_gates": [
@@ -248,8 +248,8 @@ def build_file_manifest(product_spec: dict) -> dict:
         ("frontend/index.html", "Generated product UI."),
         ("frontend/styles.css", "Generated product styling."),
         ("frontend/app.js", "Generated product UI behavior."),
-        ("data/areas.json", "Area profiles."),
-        ("data/properties.json", "Property listings."),
+        ("data/areas.json", "Domain candidate records."),
+        ("data/properties.json", "Related item records."),
         ("data/sample_customers.json", "Sample customer cases."),
         ("tests/test_recommendations.py", "Deterministic ranking tests."),
     ]
