@@ -25,8 +25,16 @@ REQUIRED_CHILD_FILES = [
     "production_readiness.md",
     "project_architecture.json",
     "file_manifest.json",
+    "llm_app_design.json",
+    "app_design.json",
+    "generated_product_rules.md",
+    "code_task_plan.json",
     "builder_loop_trace.json",
     "agent_spec.json",
+    "generated_reasoning_policy.json",
+    "generated_domain_logic_validation.json",
+    "evaluation_checklist.json",
+    "llm_builder_review.json",
     "sample_cases.json",
     "evaluation.py",
     "knowledge_base.md",
@@ -36,11 +44,15 @@ REQUIRED_CHILD_FILES = [
     "backend/api.py",
     "backend/data_store.py",
     "backend/guardrails.py",
+    "backend/generated_reasoning_policy.py",
+    "backend/generated_domain_adapter.py",
+    "backend/generated_domain_logic.py",
     "backend/llm_client.py",
     "backend/web_search.py",
     "backend/recommendation_engine.py",
     "backend/tools.py",
     "frontend/index.html",
+    "frontend/generated_ui_config.json",
     "frontend/styles.css",
     "frontend/app.js",
     "data/areas.json",
@@ -171,7 +183,7 @@ from pathlib import Path
 from backend.agent import run_case
 from backend.data_store import load_sample_cases
 from evaluation import evaluate_output
-case = [c for c in load_sample_cases() if c.get('case_id') == 'case_family_quiet_school'][0]
+case = load_sample_cases()[0]
 output = run_case(case)
 checks = evaluate_output(case, output)
 result = {'case_id': case['case_id'], 'passed': all(checks.values()), 'checks': checks, 'output': output}
@@ -234,6 +246,40 @@ def run_generated_evaluation(app_dir: Path, timeout: int = 600) -> Dict[str, Any
     import_result["name"] = "app_imports"
     checks.append(import_result)
 
+    generated_artifact_result = _run_command(
+        app_dir,
+        [
+            "python3",
+            "-c",
+            (
+                "import json;"
+                "from backend.generated_reasoning_policy import GENERATED_REASONING_POLICY as p;"
+                "from backend.generated_domain_adapter import GENERATED_DOMAIN_ADAPTER as a;"
+                "from backend.generated_domain_logic import adapt_case, build_domain_prompt_context;"
+                "allowed={'recommendation_workbench','customer_support_workbench','risk_review_console','knowledge_assistant','approval_workbench','domain_operations_workbench'};"
+                "design=json.load(open('llm_app_design.json'));"
+                "ui=json.load(open('frontend/generated_ui_config.json'));"
+                "ev=json.load(open('evaluation_checklist.json'));"
+                "rv=json.load(open('llm_builder_review.json'));"
+                "assert p.get('human_approval_required') is True;"
+                "assert p.get('send_allowed') is False;"
+                "assert a.get('adapter_version');"
+                "assert design.get('selected_scaffold_id') in allowed;"
+                "assert ui.get('ui_sections');"
+                "assert ev.get('approval_checks');"
+                "assert 'passed' in rv;"
+                "adapted=adapt_case({'case_id':'sandbox_case'}, {'domain_candidates':[], 'item_records':[]}, {'selected_scaffold_id':design.get('selected_scaffold_id')});"
+                "assert isinstance(adapted, dict);"
+                "ctx=build_domain_prompt_context(adapted, p, a);"
+                "assert isinstance(ctx, dict);"
+                "print('generated_artifacts_ok')"
+            ),
+        ],
+        timeout=timeout,
+    )
+    generated_artifact_result["name"] = "generated_llm_design_artifacts_import_and_validate"
+    checks.append(generated_artifact_result)
+
     try:
         unit_result = _run_command(app_dir, ["python3", "-m", "unittest", "discover", "-s", "tests"], timeout=timeout)
     except subprocess.TimeoutExpired as exc:
@@ -249,14 +295,14 @@ def run_generated_evaluation(app_dir: Path, timeout: int = 600) -> Dict[str, Any
     try:
         cli_result = _run_command(
             app_dir,
-            ["python3", "app.py", "--cli", "--case-id", "case_family_quiet_school"],
+            ["python3", "app.py", "--cli", "--max-cases", "1"],
             timeout=timeout,
             env_overrides=smoke_env,
         )
     except subprocess.TimeoutExpired as exc:
         cli_result = {
             "success": False,
-            "error": f"app.py --cli --case-id case_family_quiet_school timed out after {timeout} seconds",
+            "error": f"app.py --cli --max-cases 1 timed out after {timeout} seconds",
             "stdout": _tail(exc.stdout),
             "stderr": _tail(exc.stderr),
         }
@@ -267,7 +313,7 @@ def run_generated_evaluation(app_dir: Path, timeout: int = 600) -> Dict[str, Any
         evaluation_path = app_dir / "evaluation.py"
         supports_case_id = "--case-id" in evaluation_path.read_text(encoding="utf-8")
         evaluation_args = (
-            ["python3", "evaluation.py", "--case-id", "case_family_quiet_school"]
+            ["python3", "evaluation.py", "--max-cases", "1"]
             if supports_case_id
             else ["python3", "-c", INLINE_ONE_CASE_EVALUATION]
         )
@@ -282,7 +328,7 @@ def run_generated_evaluation(app_dir: Path, timeout: int = 600) -> Dict[str, Any
     except subprocess.TimeoutExpired as exc:
         evaluation_result = {
             "success": False,
-            "error": f"evaluation.py --case-id case_family_quiet_school timed out after {timeout} seconds",
+            "error": f"evaluation.py --max-cases 1 timed out after {timeout} seconds",
             "stdout": _tail(exc.stdout),
             "stderr": _tail(exc.stderr),
         }

@@ -355,7 +355,19 @@ def run_pipeline(profile: dict, run_id: str = "") -> tuple[dict, dict]:
     )
     dump_json(generator_context_dir / "productization_blueprint.json", productization_blueprint)
 
-    prototype_manifest = build_prototype(app_dir, agent_design, architecture, productization_blueprint)
+    model_router = ModelRouter.from_config(_load_model_config())
+    app_design_client = model_router.for_stage("build_app_design")
+    build_policy_client = model_router.for_stage("build_policy")
+    prototype_manifest = build_prototype(
+        app_dir,
+        agent_design,
+        architecture,
+        productization_blueprint,
+        profile=profile,
+        evidence_pack=evidence_pack,
+        app_design_llm_client=app_design_client,
+        build_llm_client=build_policy_client,
+    )
     dump_json(generator_context_dir / "prototype_manifest.json", prototype_manifest)
     product_spec = prototype_manifest.get("product_spec", {})
     product_brief = prototype_manifest.get("product_brief", {})
@@ -571,7 +583,7 @@ def _load_model_config() -> dict:
             "max_tokens": 4096,
             "timeout_seconds": 120,
             "retries": 2,
-            "stage_models": {"consultation": "strong"},
+            "stage_models": {"consultation": "strong", "build_app_design": "strong", "build_policy": "strong"},
         },
     }
     config_path = PROJECT_ROOT / "config.yaml"

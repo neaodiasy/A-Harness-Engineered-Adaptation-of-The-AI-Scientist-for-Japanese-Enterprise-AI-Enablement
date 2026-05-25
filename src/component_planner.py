@@ -30,6 +30,10 @@ def build_component_plan(
     architecture: dict[str, Any],
     product_spec: dict[str, Any],
     productization_blueprint: dict[str, Any],
+    llm_app_design: dict[str, Any] | None = None,
+    code_task_plan: dict[str, Any] | None = None,
+    role_outputs: dict[str, Any] | None = None,
+    selected_scaffold: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build the component assembly plan consumed by the generated app package."""
     selected_primitives = _as_list(architecture.get("selected_primitives"))
@@ -37,6 +41,21 @@ def build_component_plan(
     workspace_regions = _as_list(productization_blueprint.get("workspace_regions"))
     archetype = productization_blueprint.get("selected_archetype", {}) or {}
     domain_template = product_spec.get("domain_template", {}) if isinstance(product_spec.get("domain_template"), dict) else {}
+    llm_app_design = llm_app_design or {}
+    code_task_plan = code_task_plan or {}
+    role_outputs = role_outputs or {}
+    selected_scaffold = selected_scaffold or {}
+    selected_scaffold_id = str(llm_app_design.get("selected_scaffold_id") or selected_scaffold.get("scaffold_id") or "domain_operations_workbench")
+    design_ui_sections = _as_list(llm_app_design.get("ui_sections"))
+    design_backend_modules = _as_list(llm_app_design.get("backend_modules"))
+    design_local_tools = _as_list(llm_app_design.get("local_tools"))
+    design_guardrails = _as_list(llm_app_design.get("guardrails"))
+    design_evaluation = _as_list(llm_app_design.get("evaluation_requirements"))
+    specialized_roles = [
+        task.get("role", "")
+        for task in _as_list(code_task_plan.get("tasks"))
+        if isinstance(task, dict) and task.get("role")
+    ]
 
     modules: list[dict[str, Any]] = [
         {
@@ -47,9 +66,9 @@ def build_component_plan(
         },
         {
             "component": "agent_orchestrator",
-            "reason": "Coordinates case input, local tools, evidence, runtime LLM reasoning, and guardrails.",
-            "files": ["backend/agent.py", "backend/llm_client.py"],
-            "source": "deterministic scaffold with runtime DeepSeek usage",
+            "reason": "Coordinates case input, local tools, evidence, build-time policy, domain logic plugin, runtime LLM reasoning, and guardrails.",
+            "files": ["backend/agent.py", "backend/llm_client.py", "backend/generated_reasoning_policy.py", "backend/generated_domain_logic.py"],
+            "source": "selected scaffold plus validated build-time policy/config/code plugin and runtime DeepSeek usage",
         },
         {
             "component": "domain_data_adapter",
@@ -103,16 +122,32 @@ def build_component_plan(
             "source": "deterministic scaffold plus runtime LLM draft",
         })
 
+    if llm_app_design:
+        modules.append({
+            "component": "llm_app_design_adapter",
+            "reason": "Translates DeepSeek build-time application design into generated workbench requirements.",
+            "files": ["llm_app_design.json", "app_design.json", "component_plan.json", "product_spec.json"],
+            "source": "validated build-time DeepSeek JSON design",
+        })
+
     return {
         "component_plan_version": "plan_driven_builder_v1",
-        "builder_mode": "plan_driven_scaffold_assembly",
-        "selected_archetype": archetype,
+        "builder_mode": "deepseek_selected_scaffold_customization",
+        "selected_scaffold_id": selected_scaffold_id,
+        "scaffold_selection_reason": llm_app_design.get("reason_for_scaffold_selection", ""),
+        "selected_archetype": {
+            **archetype,
+            "llm_app_design_product_archetype": llm_app_design.get("product_archetype", ""),
+        },
         "source_artifacts": [
             "selected_opportunity.json",
             "agent_design.json",
             "recommended_architecture",
             "productization_blueprint.json",
             "runtime_domain_pack",
+            "llm_app_design.json",
+            "code_task_plan.json",
+            "generated_product_rules.md",
         ],
         "inputs_consumed": {
             "selected_primitives": selected_primitives,
@@ -120,10 +155,88 @@ def build_component_plan(
             "workspace_regions": workspace_regions,
             "domain_template_id": product_spec.get("domain_template_id", ""),
             "domain_pack_mode": productization_blueprint.get("domain_pack_mode", ""),
+            "llm_app_design_source": llm_app_design.get("design_source", ""),
+            "llm_ui_section_count": len(design_ui_sections),
+            "llm_backend_module_count": len(design_backend_modules),
+            "llm_local_tool_count": len(design_local_tools),
+            "code_task_plan_source": code_task_plan.get("source", ""),
+            "specialized_roles": specialized_roles,
+            "selected_scaffold_id": selected_scaffold_id,
         },
+        "planned_ui_sections": design_ui_sections,
+        "planned_backend_modules": design_backend_modules,
+        "planned_local_tools": design_local_tools,
+        "planned_guardrails": design_guardrails,
+        "planned_evaluation_checks": design_evaluation,
+        "llm_app_design_requirements": {
+            "product_archetype": llm_app_design.get("product_archetype", ""),
+            "target_workflow": llm_app_design.get("target_workflow", ""),
+            "primary_user": llm_app_design.get("primary_user", ""),
+            "ui_sections": design_ui_sections,
+            "backend_modules": design_backend_modules,
+            "local_tools": design_local_tools,
+            "guardrails": design_guardrails,
+            "evaluation_requirements": design_evaluation,
+            "domain_adaptation_notes": _as_list(llm_app_design.get("domain_adaptation_notes")),
+            "small_domain_logic_requirements": _as_list(llm_app_design.get("small_domain_logic_requirements")),
+        },
+        "code_task_plan_source": code_task_plan.get("source", ""),
+        "specialized_roles": specialized_roles,
+        "generated_artifacts": [
+            "llm_app_design.json",
+            "generated_product_rules.md",
+            "code_task_plan.json",
+            "backend/generated_reasoning_policy.py",
+            "backend/generated_domain_adapter.py",
+            "backend/generated_domain_logic.py",
+            "frontend/generated_ui_config.json",
+            "evaluation_checklist.json",
+            "llm_builder_review.json",
+        ],
+        "deepseek_controls": [
+            "selected_scaffold_id",
+            "reason_for_scaffold_selection",
+            "product_archetype",
+            "target_workflow",
+            "ui_sections",
+            "backend_modules",
+            "local_tools",
+            "runtime_llm_role",
+            "runtime_prompt_requirements",
+            "guardrails",
+            "evaluation_requirements",
+            "domain-specific policy/config/adapter artifacts",
+            "small generated domain logic plugin",
+        ],
+        "scaffold_provided_components": {
+            "scaffold_id": selected_scaffold.get("scaffold_id", selected_scaffold_id),
+            "purpose": selected_scaffold.get("purpose", ""),
+            "default_ui_sections": selected_scaffold.get("default_ui_sections", []),
+            "default_backend_modules": selected_scaffold.get("default_backend_modules", []),
+            "default_local_tools": selected_scaffold.get("default_local_tools", []),
+            "required_guardrails": selected_scaffold.get("required_guardrails", []),
+            "default_evaluation_checks": selected_scaffold.get("default_evaluation_checks", []),
+        },
+        "deepseek_customized_components": {
+            "ui_sections": design_ui_sections,
+            "backend_modules": design_backend_modules,
+            "local_tools": design_local_tools,
+            "guardrails": design_guardrails,
+            "evaluation_requirements": design_evaluation,
+            "role_outputs": sorted(key for key in role_outputs if key != "source"),
+        },
+        "scaffolded_components": [
+            "app.py entrypoint",
+            "backend/api.py local server",
+            "frontend shell",
+            "guardrail framework",
+            "evaluation framework",
+            "sandbox compatibility",
+        ],
         "modules": modules,
         "generation_contract": {
-            "source_code_generation": "deterministic_scaffold_with_variable_injection",
+            "source_code_generation": "selected_deterministic_scaffold_with_validated_build_time_design_and_small_domain_logic_plugin",
+            "build_time_llm_scope": "scaffold selection, app design, task planning, JSON policy/config artifacts, and one validated small domain logic module; no full-source app generation",
             "domain_behavior": "configured_by_runtime_domain_pack",
             "runtime_llm_usage": "backend/agent.py calls DeepSeek after the app is generated",
             "automatic_code_repair": False,

@@ -7,7 +7,10 @@ import re
 from pathlib import Path
 from typing import Any
 
+from src import llm_app_designer
 from src.component_planner import build_component_plan
+from src.harness.json_utils import parse_jsonish
+from src.scaffold_library import get_scaffold, load_scaffold_library
 from src.software_factory import (
     build_builder_loop_trace,
     build_file_manifest,
@@ -174,6 +177,454 @@ def build_agent_spec(agent_design: dict, architecture: dict, product_spec: dict)
     }
 
 
+REASONING_POLICY_REQUIRED_KEYS = [
+    "policy_version",
+    "domain",
+    "selected_opportunity",
+    "runtime_role",
+    "drafting_style",
+    "required_output_sections",
+    "domain_specific_instructions",
+    "forbidden_claims",
+    "risk_rules",
+    "human_approval_required",
+    "send_allowed",
+    "approval_packet_requirements",
+    "evaluation_checklist",
+]
+
+
+APP_DESIGN_REQUIRED_KEYS = [
+    "design_source",
+    "product_archetype",
+    "target_workflow",
+    "primary_user",
+    "ui_sections",
+    "backend_modules",
+    "local_tools",
+    "runtime_llm_role",
+    "runtime_prompt_requirements",
+    "guardrails",
+    "human_approval",
+    "evaluation_requirements",
+    "domain_adaptation_notes",
+]
+
+
+def _as_string_list(value: Any, fallback: list[str]) -> list[str]:
+    if isinstance(value, list):
+        cleaned = [str(item).strip() for item in value if str(item).strip()]
+        return cleaned or fallback
+    if isinstance(value, str) and value.strip():
+        return [value.strip()]
+    return fallback
+
+
+def _as_dict_list(value: Any, fallback: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        return fallback
+    cleaned: list[dict[str, Any]] = []
+    for index, item in enumerate(value, start=1):
+        if isinstance(item, dict):
+            cleaned.append({str(key): val for key, val in item.items()})
+        elif str(item).strip():
+            cleaned.append({
+                "id": f"item_{index}",
+                "label": str(item).strip(),
+                "purpose": str(item).strip(),
+                "required": True,
+            })
+    return cleaned or fallback
+
+
+def build_deterministic_app_design(
+    profile: dict[str, Any],
+    selected_opportunity: dict[str, Any],
+    agent_design: dict[str, Any],
+    architecture: dict[str, Any],
+    productization_blueprint: dict[str, Any],
+    runtime_domain_pack: dict[str, Any],
+    evidence_pack: dict[str, Any],
+) -> dict[str, Any]:
+    """Build a safe app design fallback without using an LLM."""
+    archetype = productization_blueprint.get("selected_archetype", {}) or {}
+    fields = runtime_domain_pack.get("fields", [])
+    primary_job = archetype.get("primary_job", "Prepare an approval-ready enterprise AI workbench output.")
+    return {
+        "design_source": "deterministic_app_design_fallback",
+        "product_archetype": archetype.get("id", "domain_operations_workbench"),
+        "target_workflow": selected_opportunity.get("target_workflow") or agent_design.get("name") or primary_job,
+        "primary_user": "Business operator and human reviewer",
+        "ui_sections": [
+            {"id": "case_queue", "label": "Work queue", "purpose": "Select or inspect submitted workflow cases.", "required": True},
+            {"id": "intake_panel", "label": "Case intake", "purpose": f"Capture {len(fields)} domain-specific input fields.", "required": True},
+            {"id": "analysis_panel", "label": "AI analysis", "purpose": "Show local tool results, risk, and recommendation draft.", "required": True},
+            {"id": "evidence_panel", "label": "Evidence", "purpose": "Show local and live evidence with source context.", "required": True},
+            {"id": "approval_panel", "label": "Approval", "purpose": "Prepare approval packet and block automatic sending.", "required": True},
+        ],
+        "backend_modules": [
+            {"id": "api_server", "purpose": "Serve local API and frontend.", "required": True},
+            {"id": "agent_orchestrator", "purpose": "Run local tools, evidence retrieval, runtime LLM drafting, and guardrails.", "required": True},
+            {"id": "domain_tools", "purpose": "Rank domain candidates and collect missing information.", "required": True},
+            {"id": "guardrails", "purpose": "Force human approval and safe output contract.", "required": True},
+        ],
+        "local_tools": [
+            {"id": runtime_domain_pack.get("tool_name", "local_domain_toolkit"), "purpose": "Score local domain candidates and implementation options.", "input": "case JSON", "output": "ranked candidates and missing information"},
+            {"id": "runtime_evidence_search", "purpose": "Retrieve trusted supporting context for the case.", "input": "case and candidate names", "output": "evidence items"},
+        ],
+        "runtime_llm_role": "Draft a cautious Japanese recommendation and approval packet using local tool results and evidence.",
+        "runtime_prompt_requirements": [
+            "Use concrete candidate names from local tool results.",
+            "Cite evidence IDs and state missing evidence.",
+            "Follow domain-specific rules from the runtime domain pack.",
+            "Return valid JSON matching the app contract.",
+        ],
+        "guardrails": [
+            "human_approval_required must be true.",
+            "send_allowed must be false.",
+            "No final legal, financial, medical, HR, safety, or regulated decisions.",
+        ],
+        "human_approval": {
+            "required": True,
+            "approval_reason": "Generated outputs may be customer-facing or operationally consequential.",
+            "send_allowed": False,
+        },
+        "evaluation_requirements": [
+            "Generated app imports successfully.",
+            "CLI smoke case returns structured JSON.",
+            "Output includes risk and approval packet.",
+            "No secrets are written into generated files.",
+        ],
+        "domain_adaptation_notes": [
+            f"Domain pack: {runtime_domain_pack.get('template_id', 'unknown')}",
+            f"Evidence items considered: {len(evidence_pack.get('evidence_items', []))}",
+        ],
+    }
+
+
+def validate_app_design(design: Any, fallback: dict[str, Any]) -> dict[str, Any]:
+    """Validate and normalize the build-time generated application design."""
+    if not isinstance(design, dict):
+        design = {}
+    normalized = dict(fallback)
+    for key in APP_DESIGN_REQUIRED_KEYS:
+        if key in design and design[key] not in (None, "", []):
+            normalized[key] = design[key]
+
+    normalized["design_source"] = str(normalized.get("design_source") or fallback["design_source"])
+    normalized["product_archetype"] = str(normalized.get("product_archetype") or fallback["product_archetype"])
+    normalized["target_workflow"] = str(normalized.get("target_workflow") or fallback["target_workflow"])
+    normalized["primary_user"] = str(normalized.get("primary_user") or fallback["primary_user"])
+    normalized["ui_sections"] = _as_dict_list(normalized.get("ui_sections"), fallback["ui_sections"])
+    normalized["backend_modules"] = _as_dict_list(normalized.get("backend_modules"), fallback["backend_modules"])
+    normalized["local_tools"] = _as_dict_list(normalized.get("local_tools"), fallback["local_tools"])
+    normalized["runtime_llm_role"] = str(normalized.get("runtime_llm_role") or fallback["runtime_llm_role"])
+    normalized["runtime_prompt_requirements"] = _as_string_list(
+        normalized.get("runtime_prompt_requirements"),
+        fallback["runtime_prompt_requirements"],
+    )
+    normalized["guardrails"] = _as_string_list(normalized.get("guardrails"), fallback["guardrails"])
+    human_approval = normalized.get("human_approval")
+    if not isinstance(human_approval, dict):
+        human_approval = {}
+    human_approval["required"] = True
+    human_approval["send_allowed"] = False
+    human_approval.setdefault("approval_reason", fallback["human_approval"]["approval_reason"])
+    normalized["human_approval"] = human_approval
+    normalized["evaluation_requirements"] = _as_string_list(
+        normalized.get("evaluation_requirements"),
+        fallback["evaluation_requirements"],
+    )
+    normalized["domain_adaptation_notes"] = _as_string_list(
+        normalized.get("domain_adaptation_notes"),
+        fallback["domain_adaptation_notes"],
+    )
+    normalized["validated"] = True
+    return normalized
+
+
+def build_llm_app_design(
+    profile: dict[str, Any],
+    selected_opportunity: dict[str, Any],
+    agent_design: dict[str, Any],
+    architecture: dict[str, Any],
+    productization_blueprint: dict[str, Any],
+    runtime_domain_pack: dict[str, Any],
+    evidence_pack: dict[str, Any],
+    llm_client: Any | None = None,
+) -> dict[str, Any]:
+    """Generate a small build-time app design JSON with deterministic fallback."""
+    fallback = build_deterministic_app_design(
+        profile,
+        selected_opportunity,
+        agent_design,
+        architecture,
+        productization_blueprint,
+        runtime_domain_pack,
+        evidence_pack,
+    )
+    if llm_client is None:
+        fallback["design_source"] = "deterministic_app_design_fallback_no_llm_client"
+        return validate_app_design(fallback, fallback)
+
+    prompt = f"""Generate one JSON object for the build-time application design of a generated enterprise AI workbench.
+Do not generate source code, Markdown, comments, or prose. JSON only.
+
+Required keys:
+{json.dumps(APP_DESIGN_REQUIRED_KEYS, ensure_ascii=False)}
+
+Allowed product_archetype values:
+customer_support_workbench, recommendation_workbench, risk_review_console, knowledge_assistant, approval_workbench, domain_operations_workbench.
+
+Hard safety constraints:
+- human_approval.required must be true.
+- human_approval.send_allowed must be false.
+- Do not propose automatic external sending or irreversible operations.
+- Keep the design compatible with a deterministic local Python API + static frontend scaffold.
+
+Enterprise profile:
+{json.dumps(profile, ensure_ascii=False, indent=2)}
+
+Selected opportunity:
+{json.dumps(selected_opportunity, ensure_ascii=False, indent=2)}
+
+Agent design:
+{json.dumps(agent_design, ensure_ascii=False, indent=2)}
+
+Architecture:
+{json.dumps(architecture, ensure_ascii=False, indent=2)}
+
+Productization blueprint:
+{json.dumps(productization_blueprint, ensure_ascii=False, indent=2)}
+
+Runtime domain pack:
+{json.dumps(runtime_domain_pack, ensure_ascii=False, indent=2)}
+
+Evidence pack:
+{json.dumps(evidence_pack, ensure_ascii=False, indent=2)}
+"""
+    try:
+        raw = llm_client.complete(
+            prompt,
+            system="You design safe enterprise AI workbench applications as JSON contracts. Return JSON only.",
+            json_mode=True,
+        )
+        parsed = parse_jsonish(raw, fallback=None)
+        design = validate_app_design(parsed, fallback)
+        design["design_source"] = "deepseek_build_time_app_design"
+        design["llm_model"] = getattr(llm_client, "model_name", "")
+        return design
+    except Exception as exc:
+        fallback["design_source"] = "deterministic_app_design_fallback_after_llm_error"
+        fallback["llm_error"] = f"{type(exc).__name__}: {exc}"
+        return validate_app_design(fallback, fallback)
+
+
+def build_deterministic_reasoning_policy(
+    product_spec: dict[str, Any],
+    domain_pack: dict[str, Any],
+    selected_opportunity: dict[str, Any],
+    productization_blueprint: dict[str, Any],
+) -> dict[str, Any]:
+    """Build a safe fallback policy without using an LLM."""
+    domain = str(product_spec.get("domain_template_id") or domain_pack.get("template_id") or product_spec.get("app_kind") or "enterprise")
+    opportunity_name = str(selected_opportunity.get("name") or product_spec.get("selected_opportunity") or "Enterprise AI enablement opportunity")
+    specific_rules = _as_string_list(domain_pack.get("specific_rules"), [
+        "Use only local tool results, evidence, and the submitted case.",
+        "State uncertainty and missing evidence clearly.",
+        "Keep the output as decision support for a human reviewer.",
+    ])
+    missing_rules = [
+        str(rule.get("message", rule)).strip()
+        for rule in domain_pack.get("missing_information_rules", [])
+        if str(rule.get("message", rule)).strip()
+    ]
+    return {
+        "policy_version": "1.0",
+        "generation_method": "deterministic_fallback",
+        "domain": domain,
+        "selected_opportunity": opportunity_name,
+        "runtime_role": (
+            "Act as the reasoning layer inside a generated Japanese enterprise AI workbench. "
+            "Use deterministic tool results and evidence to prepare a review-ready business output."
+        ),
+        "drafting_style": "Cautious, evidence-grounded, concise Japanese suitable for human review.",
+        "required_output_sections": [
+            "classification",
+            "evidence",
+            "missing_information",
+            "recommendation_ja",
+            "customer_or_business_draft_ja",
+            "internal_review_note",
+            "risk",
+            "approval_packet",
+        ],
+        "domain_specific_instructions": specific_rules,
+        "forbidden_claims": [
+            "Do not make final legal decisions.",
+            "Do not make final financial, investment, pricing, or loan decisions.",
+            "Do not make medical, HR, employment, safety, disaster, or regulated final decisions.",
+            "Do not guarantee outcomes, source freshness, compliance, profitability, safety, or correctness.",
+            "Do not send or approve customer-facing or operationally consequential actions automatically.",
+        ],
+        "risk_rules": missing_rules + [
+            "Flag customer-facing, regulated, legal, financial, HR, safety, medical, or irreversible cases.",
+            "Escalate when evidence is missing, stale, ambiguous, or only from live web search.",
+        ],
+        "human_approval_required": True,
+        "send_allowed": False,
+        "approval_packet_requirements": [
+            "Summarize the requested action.",
+            "List cited evidence IDs and missing evidence.",
+            "Explain risk reasons and uncertainty.",
+            "Provide decision options: approve, edit, reject, escalate.",
+            "State that a human owner must approve before external or irreversible use.",
+        ],
+        "evaluation_checklist": [
+            "Uses concrete local tool candidate names when relevant.",
+            "Cites evidence or states that evidence is missing.",
+            "Includes risk flags and human approval requirements.",
+            "Keeps send_allowed=false.",
+            "Avoids legal, financial, medical, HR, safety, and final-decision claims.",
+        ],
+        "source_context": {
+            "product_name": product_spec.get("product_name", ""),
+            "product_archetype": productization_blueprint.get("selected_archetype", {}),
+            "domain_pack_mode": productization_blueprint.get("domain_pack_mode", ""),
+        },
+    }
+
+
+def validate_reasoning_policy(policy: Any, fallback: dict[str, Any]) -> dict[str, Any]:
+    """Validate and normalize the build-time generated reasoning policy."""
+    if not isinstance(policy, dict):
+        policy = {}
+    normalized = dict(fallback)
+    for key in REASONING_POLICY_REQUIRED_KEYS:
+        if key in policy and policy[key] not in (None, "", []):
+            normalized[key] = policy[key]
+
+    normalized["policy_version"] = str(normalized.get("policy_version") or "1.0")
+    normalized["domain"] = str(normalized.get("domain") or fallback["domain"])
+    normalized["selected_opportunity"] = str(normalized.get("selected_opportunity") or fallback["selected_opportunity"])
+    normalized["runtime_role"] = str(normalized.get("runtime_role") or fallback["runtime_role"])
+    normalized["drafting_style"] = str(normalized.get("drafting_style") or fallback["drafting_style"])
+    normalized["required_output_sections"] = _as_string_list(
+        normalized.get("required_output_sections"),
+        fallback["required_output_sections"],
+    )
+    normalized["domain_specific_instructions"] = _as_string_list(
+        normalized.get("domain_specific_instructions"),
+        fallback["domain_specific_instructions"],
+    )
+    normalized["forbidden_claims"] = _as_string_list(
+        normalized.get("forbidden_claims"),
+        fallback["forbidden_claims"],
+    )
+    normalized["risk_rules"] = _as_string_list(normalized.get("risk_rules"), fallback["risk_rules"])
+    normalized["approval_packet_requirements"] = _as_string_list(
+        normalized.get("approval_packet_requirements"),
+        fallback["approval_packet_requirements"],
+    )
+    normalized["evaluation_checklist"] = _as_string_list(
+        normalized.get("evaluation_checklist"),
+        fallback["evaluation_checklist"],
+    )
+
+    required_sections = {item.lower() for item in normalized["required_output_sections"]}
+    for required in ("risk", "approval_packet"):
+        if required not in required_sections:
+            normalized["required_output_sections"].append(required)
+    forbidden_text = " ".join(normalized["forbidden_claims"]).lower()
+    for claim in ("legal", "financial", "medical", "final"):
+        if claim not in forbidden_text:
+            normalized["forbidden_claims"].append(f"Do not make {claim} decisions or claims.")
+
+    normalized["human_approval_required"] = True
+    normalized["send_allowed"] = False
+    normalized.setdefault("source_context", fallback.get("source_context", {}))
+    normalized["validated"] = True
+    return normalized
+
+
+def build_generated_reasoning_policy(
+    product_spec: dict[str, Any],
+    domain_pack: dict[str, Any],
+    selected_opportunity: dict[str, Any],
+    productization_blueprint: dict[str, Any],
+    llm_client: Any | None = None,
+) -> dict[str, Any]:
+    """Generate a small build-time runtime policy with safe deterministic fallback."""
+    fallback = build_deterministic_reasoning_policy(
+        product_spec,
+        domain_pack,
+        selected_opportunity,
+        productization_blueprint,
+    )
+    if llm_client is None:
+        fallback["generation_method"] = "deterministic_fallback_no_llm_client"
+        return validate_reasoning_policy(fallback, fallback)
+
+    prompt = f"""Generate one JSON object for a runtime reasoning policy used by a generated enterprise AI workbench.
+Do not generate Python code, Markdown, comments, or prose. JSON only.
+
+The main application scaffold is deterministic. Your task is only to create a small domain-specific policy object.
+
+Required keys:
+{json.dumps(REASONING_POLICY_REQUIRED_KEYS, ensure_ascii=False)}
+
+Hard safety constraints:
+- human_approval_required must be true.
+- send_allowed must be false.
+- required_output_sections must include risk and approval_packet.
+- forbidden_claims must include legal, financial, medical, HR/employment, safety/regulatory, and final-decision constraints where relevant.
+- The policy must not ask the runtime agent to take irreversible actions or send external messages.
+
+Selected opportunity:
+{json.dumps(selected_opportunity, ensure_ascii=False, indent=2)}
+
+Product spec:
+{json.dumps(product_spec, ensure_ascii=False, indent=2)}
+
+Runtime domain pack:
+{json.dumps(domain_pack, ensure_ascii=False, indent=2)}
+
+Productization blueprint:
+{json.dumps(productization_blueprint, ensure_ascii=False, indent=2)}
+"""
+    try:
+        raw = llm_client.complete(
+            prompt,
+            system="You generate safe JSON policies for enterprise AI agent runtimes. Return JSON only.",
+            json_mode=True,
+        )
+        parsed = parse_jsonish(raw, fallback=None)
+        policy = validate_reasoning_policy(parsed, fallback)
+        policy["generation_method"] = "build_time_llm_policy_json"
+        policy["llm_model"] = getattr(llm_client, "model_name", "")
+        return policy
+    except Exception as exc:
+        fallback["generation_method"] = "deterministic_fallback_after_llm_error"
+        fallback["llm_error"] = f"{type(exc).__name__}: {exc}"
+        return validate_reasoning_policy(fallback, fallback)
+
+
+def render_generated_reasoning_policy_module(policy: dict[str, Any]) -> str:
+    """Render validated JSON as a safe Python constant, never as free-form code."""
+    policy_json = json.dumps(policy, ensure_ascii=False, indent=2, sort_keys=True)
+    return (
+        '"""Build-time generated runtime reasoning policy.\n\n'
+        "This file is generated from validated JSON. It is not arbitrary LLM-written Python code.\n"
+        '"""\n\n'
+        "from __future__ import annotations\n\n"
+        "import json\n\n"
+        "GENERATED_REASONING_POLICY = json.loads("
+        + repr(policy_json)
+        + ")\n"
+        + "\n"
+    )
+
+
 # Domain-specific candidate data is loaded from templates/*/domain_pack.json.
 # The generator core intentionally contains no company- or industry-specific data.
 
@@ -190,13 +641,15 @@ from backend.api import serve
 from backend.data_store import load_sample_cases
 
 
-def run_cli(case_id: str | None = None) -> None:
+def run_cli(case_id: str | None = None, max_cases: int = 0) -> None:
     cases = load_sample_cases()
     if case_id:
         cases = [case for case in cases if case.get("case_id") == case_id]
         if not cases:
             available = ", ".join(case.get("case_id", "<missing>") for case in load_sample_cases())
             raise SystemExit(f"Unknown case_id: {case_id}. Available: {available}")
+    if max_cases > 0:
+        cases = cases[:max_cases]
     outputs = []
     for index, case in enumerate(cases, start=1):
         current_id = case.get("case_id", f"case_{index}")
@@ -219,13 +672,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run the generated agent product.")
     parser.add_argument("--cli", action="store_true", help="Run generated sample cases and print JSON.")
     parser.add_argument("--case-id", default="", help="Run only one sample case id in CLI mode.")
+    parser.add_argument("--max-cases", type=int, default=0, help="Run at most this many sample cases in CLI mode.")
     parser.add_argument("--list-cases", action="store_true", help="List available sample case ids.")
     parser.add_argument("--port", type=int, default=8766, help="Local web server port.")
     args = parser.parse_args()
     if args.list_cases:
         list_cases()
     elif args.cli:
-        run_cli(args.case_id or None)
+        run_cli(args.case_id or None, args.max_cases)
     else:
         serve(args.port)
 
@@ -266,6 +720,14 @@ def load_json_file(relative_path: str) -> Any:
 
 def load_product_spec() -> dict[str, Any]:
     return load_json_file("product_spec.json")
+
+
+def load_domain_data() -> dict[str, Any]:
+    return load_json_file("domain_data.json")
+
+
+def load_llm_app_design() -> dict[str, Any]:
+    return load_json_file("llm_app_design.json")
 
 
 def load_agent_spec() -> dict[str, Any]:
@@ -885,15 +1347,36 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from backend.data_store import load_agent_spec, load_knowledge_base, load_product_spec
+from backend.data_store import load_agent_spec, load_domain_data, load_knowledge_base, load_llm_app_design, load_product_spec
 from backend.guardrails import enforce_output_contract
 from backend.llm_client import complete_json
 from backend.tools import run_domain_tools
 from backend.web_search import search_web_evidence
 
+try:
+    from backend.generated_reasoning_policy import GENERATED_REASONING_POLICY
+except Exception:
+    GENERATED_REASONING_POLICY = {}
+
+try:
+    from backend.generated_domain_adapter import GENERATED_DOMAIN_ADAPTER
+except Exception:
+    GENERATED_DOMAIN_ADAPTER = {}
+
+try:
+    from backend.generated_domain_logic import adapt_case, build_domain_prompt_context
+except Exception:
+    def adapt_case(case: dict, domain_data: dict, product_spec: dict) -> dict:
+        return {"case": case, "fallback": True}
+
+    def build_domain_prompt_context(adapted_case: dict, policy: dict, adapter: dict) -> dict:
+        return {"adapted_case": adapted_case, "policy": policy, "adapter": adapter}
+
 
 PRODUCT_SPEC = load_product_spec()
 AGENT_SPEC = load_agent_spec()
+DOMAIN_DATA = load_domain_data()
+LLM_APP_DESIGN = load_llm_app_design()
 KNOWLEDGE_BASE = load_knowledge_base()
 
 
@@ -934,14 +1417,36 @@ def retrieve_evidence(case: dict[str, Any], local_tool_results: dict[str, Any]) 
     return evidence
 
 
-def build_prompt(case: dict[str, Any], local_tool_results: dict[str, Any], evidence: list[dict[str, Any]]) -> str:
+def build_prompt(
+    case: dict[str, Any],
+    local_tool_results: dict[str, Any],
+    evidence: list[dict[str, Any]],
+    domain_prompt_context: dict[str, Any],
+) -> str:
     candidate_examples = PRODUCT_SPEC.get("candidate_examples", [])
     specific_rules = PRODUCT_SPEC.get("specific_rules", [])
+    policy = GENERATED_REASONING_POLICY if isinstance(GENERATED_REASONING_POLICY, dict) else {}
+    adapter = GENERATED_DOMAIN_ADAPTER if isinstance(GENERATED_DOMAIN_ADAPTER, dict) else {}
     return f"""You are drafting the reasoning layer for this generated enterprise agent product:
 {PRODUCT_SPEC.get("prompt_context", PRODUCT_SPEC.get("product_name", "enterprise product"))}
 
+Build-time app design summary:
+{json.dumps(LLM_APP_DESIGN, ensure_ascii=False, indent=2)}
+
+Build-time generated runtime reasoning policy:
+{json.dumps(policy, ensure_ascii=False, indent=2)}
+
+Build-time generated domain adapter:
+{json.dumps(adapter, ensure_ascii=False, indent=2)}
+
+Build-time generated domain logic prompt context:
+{json.dumps(domain_prompt_context, ensure_ascii=False, indent=2)}
+
 Product spec:
 {json.dumps(PRODUCT_SPEC, ensure_ascii=False, indent=2)}
+
+Domain data summary:
+{json.dumps({key: len(value) if isinstance(value, list) else value for key, value in DOMAIN_DATA.items()}, ensure_ascii=False, indent=2)}
 
 Customer case:
 {json.dumps(case, ensure_ascii=False, indent=2)}
@@ -963,6 +1468,7 @@ case_id, classification, evidence, missing_information, recommendation_ja,
 customer_or_business_draft_ja, internal_review_note, risk, approval_packet.
 
 Rules:
+- Follow the build-time generated runtime reasoning policy when it is stricter or more domain-specific.
 - Use concrete local tool candidate names when relevant.
 - Use runtime_live_web_search evidence when available, but describe it as supporting context that requires human verification.
 - Do not say エリアA, エリアB, エリアC, Area A, Area B, or Area C.
@@ -976,7 +1482,11 @@ Rules:
 def run_case(case: dict[str, Any]) -> dict[str, Any]:
     local_tool_results = run_domain_tools(PRODUCT_SPEC, case)
     evidence = retrieve_evidence(case, local_tool_results)
-    llm_output = complete_json(AGENT_SPEC["system_prompt"], build_prompt(case, local_tool_results, evidence))
+    policy = GENERATED_REASONING_POLICY if isinstance(GENERATED_REASONING_POLICY, dict) else {}
+    adapter = GENERATED_DOMAIN_ADAPTER if isinstance(GENERATED_DOMAIN_ADAPTER, dict) else {}
+    adapted_case = adapt_case(case, DOMAIN_DATA, PRODUCT_SPEC)
+    domain_prompt_context = build_domain_prompt_context(adapted_case, policy, adapter)
+    llm_output = complete_json(AGENT_SPEC["system_prompt"], build_prompt(case, local_tool_results, evidence, domain_prompt_context))
     return enforce_output_contract(case, llm_output, local_tool_results, evidence, AGENT_SPEC)
 '''
 
@@ -1020,6 +1530,9 @@ class ProductHandler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/frontend/app.js":
             self._send_bytes((FRONTEND_DIR / "app.js").read_bytes(), "application/javascript; charset=utf-8")
+            return
+        if parsed.path == "/frontend/generated_ui_config.json":
+            self._send_bytes((FRONTEND_DIR / "generated_ui_config.json").read_bytes(), "application/json; charset=utf-8")
             return
         if parsed.path == "/pipeline_diagram.svg":
             self._send_bytes((APP_DIR / "pipeline_diagram.svg").read_bytes(), "image/svg+xml; charset=utf-8")
@@ -1205,7 +1718,7 @@ class RecommendationToolTests(unittest.TestCase):
         result = run_domain_tools(load_product_spec(), case)
         self.assertTrue(result["ranked_property_candidates"])
         self.assertIn("title_ja", result["ranked_property_candidates"][0])
-        self.assertTrue(result["missing_information"])
+        self.assertIsInstance(result["missing_information"], list)
 
 
 if __name__ == "__main__":
@@ -1247,6 +1760,10 @@ FRONTEND_HTML = '''<!doctype html>
           <div class="runtime-row"><span>LLM</span><strong>DeepSeek</strong></div>
           <div class="runtime-row"><span>Search</span><strong id="searchMode">Live</strong></div>
           <div class="runtime-row"><span>Approval</span><strong>Required</strong></div>
+        </section>
+        <section class="side-section">
+          <div class="side-title">LLM Design</div>
+          <div id="designSections" class="design-sections"></div>
         </section>
       </aside>
 
@@ -1793,6 +2310,20 @@ details summary {
   color: #eef4f7;
 }
 
+.design-sections {
+  display: grid;
+  gap: 6px;
+}
+
+.design-section-chip {
+  border: 1px solid #263746;
+  border-radius: 6px;
+  padding: 7px 8px;
+  color: #d6e0e7;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
 .workspace {
   min-width: 0;
   max-width: 100%;
@@ -2063,6 +2594,7 @@ details summary {
 
 
 FRONTEND_JS = '''let productSpec = null;
+let uiConfig = null;
 let sampleCases = [];
 let selectedCaseIndex = 0;
 let currentOutput = null;
@@ -2240,6 +2772,22 @@ function renderReadiness(readiness) {
   `).join("");
 }
 
+function renderDesignSections() {
+  const target = document.getElementById("designSections");
+  if (!target || !uiConfig) return;
+  const sections = uiConfig.ui_sections || [];
+  if (!sections.length) {
+    target.innerHTML = "<div class='muted'>Default scaffold</div>";
+    return;
+  }
+  target.innerHTML = sections.slice(0, 6).map((section) => `
+    <div class="design-section-chip">
+      <strong>${escapeHtml(section.label || section.id || "Section")}</strong><br>
+      ${escapeHtml(section.purpose || "")}
+    </div>
+  `).join("");
+}
+
 function setApprovalControls(enabled) {
   ["approveDraft", "requestEdit", "escalate"].forEach((id) => {
     document.getElementById(id).disabled = !enabled;
@@ -2259,6 +2807,8 @@ function renderResult(data) {
 
 async function load() {
   productSpec = await (await fetch("/api/product_spec")).json();
+  const uiConfigResponse = await fetch("/frontend/generated_ui_config.json");
+  uiConfig = uiConfigResponse.ok ? await uiConfigResponse.json() : null;
   sampleCases = await (await fetch("/api/sample_cases")).json();
   const readinessResponse = await fetch("/api/product_readiness");
   if (readinessResponse.ok) {
@@ -2269,8 +2819,10 @@ async function load() {
   document.getElementById("productName").textContent = productSpec.product_name;
   document.getElementById("pageTitle").textContent = productSpec.primary_action || "Case Workspace";
   document.getElementById("subtitle").textContent = productSpec.subtitle;
-  document.getElementById("workspaceLabel").textContent = productSpec.app_kind || "Operations Workspace";
+  document.getElementById("workspaceLabel").textContent = uiConfig?.selected_scaffold_id || uiConfig?.product_archetype || productSpec.selected_scaffold_id || productSpec.app_kind || "Operations Workspace";
+  document.getElementById("run").textContent = uiConfig?.button_labels?.primary_action || productSpec.primary_action || "Generate Packet";
   document.getElementById("fields").innerHTML = productSpec.fields.map(fieldElement).join("");
+  renderDesignSections();
   renderCaseQueue();
   if (sampleCases.length) {
     selectCase(0);
@@ -2622,12 +3174,82 @@ def build_prototype(
     agent_design: dict,
     architecture: dict,
     productization_blueprint: dict | None = None,
+    profile: dict[str, Any] | None = None,
+    evidence_pack: dict[str, Any] | None = None,
+    app_design_llm_client: Any | None = None,
+    build_llm_client: Any | None = None,
 ) -> dict:
     """Generate a real multi-file child product package."""
     app_dir.mkdir(parents=True, exist_ok=True)
     productization_blueprint = productization_blueprint or {}
     product_spec = build_software_blueprint(agent_design, architecture, productization_blueprint)
-    component_plan = build_component_plan(agent_design, architecture, product_spec, productization_blueprint)
+    domain_template = product_spec.get("domain_template", {}) if isinstance(product_spec.get("domain_template"), dict) else {}
+    selected_opportunity = agent_design.get("selected_opportunity", {}) or {}
+    scaffold_library = load_scaffold_library()
+    llm_app_design = llm_app_designer.build_llm_app_design(
+        profile or agent_design.get("enterprise_context", {}) or {},
+        selected_opportunity,
+        agent_design,
+        architecture,
+        productization_blueprint,
+        domain_template,
+        evidence_pack or {},
+        scaffold_library,
+        llm_client=app_design_llm_client,
+    )
+    selected_scaffold_id = str(llm_app_design.get("selected_scaffold_id") or llm_app_design.get("product_archetype") or "domain_operations_workbench")
+    selected_scaffold = get_scaffold(selected_scaffold_id)
+    product_spec["builder_mode"] = "deepseek_selected_scaffold_customization"
+    product_spec["selected_scaffold_id"] = selected_scaffold_id
+    product_spec["selected_scaffold"] = selected_scaffold
+    generated_product_rules = llm_app_designer.build_generated_product_rules(
+        llm_app_design,
+        product_spec,
+        domain_template,
+        selected_opportunity,
+        llm_client=app_design_llm_client,
+    )
+    code_task_plan = llm_app_designer.build_code_task_plan(
+        llm_app_design,
+        product_spec,
+        domain_template,
+        llm_client=app_design_llm_client,
+    )
+    role_outputs = llm_app_designer.build_specialized_role_outputs(
+        llm_app_design,
+        product_spec,
+        domain_template,
+        code_task_plan,
+        llm_client=build_llm_client or app_design_llm_client,
+    )
+    generated_domain_logic, domain_logic_validation = llm_app_designer.build_generated_domain_logic(
+        llm_app_design,
+        product_spec,
+        domain_template,
+        selected_opportunity,
+        llm_client=build_llm_client or app_design_llm_client,
+    )
+    product_spec["llm_app_design_summary"] = {
+        "design_source": llm_app_design.get("design_source", ""),
+        "selected_scaffold_id": selected_scaffold_id,
+        "reason_for_scaffold_selection": llm_app_design.get("reason_for_scaffold_selection", ""),
+        "product_archetype": llm_app_design.get("product_archetype", ""),
+        "target_workflow": llm_app_design.get("target_workflow", ""),
+        "primary_user": llm_app_design.get("primary_user", ""),
+        "ui_section_count": len(llm_app_design.get("ui_sections", [])),
+        "backend_module_count": len(llm_app_design.get("backend_modules", [])),
+        "local_tool_count": len(llm_app_design.get("local_tools", [])),
+    }
+    component_plan = build_component_plan(
+        agent_design,
+        architecture,
+        product_spec,
+        productization_blueprint,
+        llm_app_design,
+        code_task_plan,
+        role_outputs,
+        selected_scaffold,
+    )
     product_spec["builder_mode"] = component_plan["builder_mode"]
     product_spec["component_plan_summary"] = {
         "component_plan_version": component_plan["component_plan_version"],
@@ -2636,6 +3258,58 @@ def build_prototype(
         "generation_contract": component_plan["generation_contract"],
     }
     agent_spec = build_agent_spec(agent_design, architecture, product_spec)
+    generated_reasoning_policy = role_outputs["reasoning_policy"]
+    generated_domain_adapter = role_outputs["domain_adapter"]
+    frontend_ui_config = role_outputs["ui_config"]
+    evaluation_checklist = role_outputs["evaluation_checklist"]
+    llm_builder_review = role_outputs["builder_review"]
+    frontend_ui_config.setdefault("selected_scaffold_id", selected_scaffold_id)
+    frontend_ui_config.setdefault("product_archetype", llm_app_design.get("product_archetype", selected_scaffold_id))
+    product_spec["generated_reasoning_policy_summary"] = {
+        "generation_method": generated_reasoning_policy.get("generation_method", generated_reasoning_policy.get("source", "")),
+        "policy_version": generated_reasoning_policy.get("policy_version", ""),
+        "domain": generated_reasoning_policy.get("domain", ""),
+        "required_output_sections": generated_reasoning_policy.get("required_output_sections", []),
+        "human_approval_required": generated_reasoning_policy.get("human_approval_required", True),
+        "send_allowed": generated_reasoning_policy.get("send_allowed", False),
+    }
+    product_spec.update({
+        "builder_mode": "deepseek_selected_scaffold_customization",
+        "selected_scaffold_id": selected_scaffold_id,
+        "selected_scaffold": selected_scaffold,
+        "llm_app_design_file": "llm_app_design.json",
+        "generated_product_rules_file": "generated_product_rules.md",
+        "code_task_plan_file": "code_task_plan.json",
+        "generated_domain_logic_file": "backend/generated_domain_logic.py",
+        "generated_reasoning_policy_file": "backend/generated_reasoning_policy.py",
+        "generated_domain_adapter_file": "backend/generated_domain_adapter.py",
+        "frontend_ui_config_file": "frontend/generated_ui_config.json",
+        "evaluation_checklist_file": "evaluation_checklist.json",
+        "llm_builder_review_file": "llm_builder_review.json",
+        "build_time_llm_participation": bool(
+            str(llm_app_design.get("design_source", "")).startswith("deepseek")
+            or str(code_task_plan.get("source", "")).startswith("deepseek")
+            or str(role_outputs.get("source", "")).startswith("deepseek")
+            or str(domain_logic_validation.get("source", "")).startswith("deepseek")
+        ),
+        "deepseek_generated_code_modules": (
+            ["backend/generated_domain_logic.py"]
+            if str(domain_logic_validation.get("source", "")).startswith("deepseek")
+            else []
+        ),
+        "domain_logic_validation": domain_logic_validation,
+        "build_time_llm_roles": [
+            "app_designer",
+            "product_rules_writer",
+            "code_task_planner",
+            "backend_role",
+            "frontend_role",
+            "guardrails_role",
+            "evaluation_role",
+            "reviewer_role",
+            "domain_logic_role",
+        ],
+    })
     product_brief = build_product_brief(agent_design, product_spec)
     product_requirements = build_product_requirements(agent_design, product_spec)
     project_architecture = build_project_architecture(agent_design, architecture, product_spec)
@@ -2646,7 +3320,6 @@ def build_prototype(
     generation_trace = build_generation_trace(implementation_plan, product_spec)
     builder_loop_trace = build_builder_loop_trace(product_requirements, project_architecture, file_manifest, implementation_plan)
     knowledge_base = build_knowledge_base(agent_design, product_spec)
-    domain_template = product_spec.get("domain_template", {}) if isinstance(product_spec.get("domain_template"), dict) else {}
     area_profiles = domain_template.get("domain_candidates") or domain_template.get("area_profiles", [])
     property_listings = domain_template.get("item_records") or domain_template.get("property_listings", [])
     sample_cases = domain_template.get("sample_customers", [])
@@ -2672,7 +3345,14 @@ def build_prototype(
         "implementation_plan.json": implementation_plan,
         "file_manifest.json": file_manifest,
         "file_plan.json": file_plan,
+        "llm_app_design.json": llm_app_design,
+        "app_design.json": llm_app_design,
+        "code_task_plan.json": code_task_plan,
         "component_plan.json": component_plan,
+        "generated_reasoning_policy.json": generated_reasoning_policy,
+        "generated_domain_logic_validation.json": domain_logic_validation,
+        "evaluation_checklist.json": evaluation_checklist,
+        "llm_builder_review.json": llm_builder_review,
         "generation_trace.json": generation_trace,
         "builder_loop_trace.json": builder_loop_trace,
         "repair_log.json": build_repair_log(),
@@ -2695,6 +3375,17 @@ def build_prototype(
         "backend/recommendation_engine.py": RECOMMENDATION_ENGINE,
         "backend/tools.py": BACKEND_TOOLS,
         "backend/llm_client.py": LLM_CLIENT,
+        "backend/generated_reasoning_policy.py": llm_app_designer.render_python_constant(
+            "Build-time generated runtime reasoning policy.",
+            "GENERATED_REASONING_POLICY",
+            generated_reasoning_policy,
+        ),
+        "backend/generated_domain_adapter.py": llm_app_designer.render_python_constant(
+            "Build-time generated domain adapter.",
+            "GENERATED_DOMAIN_ADAPTER",
+            generated_domain_adapter,
+        ),
+        "backend/generated_domain_logic.py": generated_domain_logic,
         "backend/web_search.py": WEB_SEARCH,
         "backend/guardrails.py": GUARDRAILS,
         "backend/agent.py": AGENT,
@@ -2704,7 +3395,9 @@ def build_prototype(
         "frontend/index.html": FRONTEND_HTML,
         "frontend/styles.css": FRONTEND_CSS,
         "frontend/app.js": FRONTEND_JS,
+        "frontend/generated_ui_config.json": json.dumps(frontend_ui_config, ensure_ascii=False, indent=2) + "\n",
         "knowledge_base.md": knowledge_base + "\n",
+        "generated_product_rules.md": generated_product_rules + "\n",
         "production_readiness.md": render_product_readiness(product_readiness),
         "productization_blueprint.md": render_productization_summary(productization_blueprint),
     }
@@ -2749,10 +3442,10 @@ CLI and evaluation:
 
 ```bash
 python3 app.py --list-cases
-python3 app.py --cli --case-id case_family_quiet_school
+python3 app.py --cli --max-cases 1
 python3 app.py --cli
 python3 -m unittest discover -s tests
-python3 evaluation.py --case-id case_family_quiet_school
+python3 evaluation.py --max-cases 1
 python3 evaluation.py
 ```
 

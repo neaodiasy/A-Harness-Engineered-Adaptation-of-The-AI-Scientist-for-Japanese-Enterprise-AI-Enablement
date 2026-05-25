@@ -17,6 +17,8 @@ model:
     feasibility_check: strong
     candidate_search: strong
     agent_design: strong
+    build_app_design: strong
+    build_policy: strong
     software_factory: strong
     proposal: strong
     review: strong
