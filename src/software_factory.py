@@ -227,6 +227,7 @@ def build_file_manifest(product_spec: dict) -> dict:
         ("implementation_plan.json", "Software Builder Loop implementation plan."),
         ("file_manifest.json", "Authoritative file manifest."),
         ("file_plan.json", "Backward-compatible copy of the file manifest."),
+        ("component_plan.json", "Plan-driven component assembly contract consumed by the generated product package."),
         ("generation_trace.json", "Generation trace for reviewer inspection."),
         ("builder_loop_trace.json", "Software Builder Loop trace."),
         ("repair_log.json", "Repair-loop status and planned actions."),
@@ -274,6 +275,8 @@ def build_implementation_plan(agent_design: dict, architecture: dict, blueprint:
             "feasibility_results.json",
             "tree_search_trace.json",
             "selected_opportunity.json",
+            "productization_blueprint.json",
+            "component_plan.json",
             "product_brief.json",
             "agent_design.json",
         ],
@@ -303,7 +306,7 @@ def build_generation_trace(implementation_plan: dict, blueprint: dict) -> dict:
     """Return an auditable trace for the generated app construction stage."""
     return {
         "method": implementation_plan.get("method", "software_builder_loop_v1"),
-        "source": "selected_opportunity + product_requirements + project_architecture + file_manifest",
+        "source": "selected_opportunity + productization_blueprint + component_plan + product_requirements + project_architecture + file_manifest",
         "generated_product": blueprint.get("product_name", ""),
         "stages": implementation_plan.get("work_breakdown", []),
         "quality_gates": implementation_plan.get("quality_gates", []),

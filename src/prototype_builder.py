@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from src.component_planner import build_component_plan
 from src.software_factory import (
     build_builder_loop_trace,
     build_file_manifest,
@@ -299,7 +300,7 @@ from backend.data_store import load_areas, load_properties
 
 
 def _numbers(value: Any) -> list[float]:
-    return [float(item) for item in re.findall(r"\d+(?:\.\d+)?", str(value))]
+    return [float(item) for item in re.findall(r"\\d+(?:\\.\\d+)?", str(value))]
 
 
 def _first_number(value: Any, default: float) -> float:
@@ -2626,6 +2627,14 @@ def build_prototype(
     app_dir.mkdir(parents=True, exist_ok=True)
     productization_blueprint = productization_blueprint or {}
     product_spec = build_software_blueprint(agent_design, architecture, productization_blueprint)
+    component_plan = build_component_plan(agent_design, architecture, product_spec, productization_blueprint)
+    product_spec["builder_mode"] = component_plan["builder_mode"]
+    product_spec["component_plan_summary"] = {
+        "component_plan_version": component_plan["component_plan_version"],
+        "module_count": len(component_plan["modules"]),
+        "modules": [module["component"] for module in component_plan["modules"]],
+        "generation_contract": component_plan["generation_contract"],
+    }
     agent_spec = build_agent_spec(agent_design, architecture, product_spec)
     product_brief = build_product_brief(agent_design, product_spec)
     product_requirements = build_product_requirements(agent_design, product_spec)
@@ -2663,6 +2672,7 @@ def build_prototype(
         "implementation_plan.json": implementation_plan,
         "file_manifest.json": file_manifest,
         "file_plan.json": file_plan,
+        "component_plan.json": component_plan,
         "generation_trace.json": generation_trace,
         "builder_loop_trace.json": builder_loop_trace,
         "repair_log.json": build_repair_log(),
@@ -2718,6 +2728,7 @@ This generated child app is a runnable local product MVP built by the Software B
 - Backend modules for agent orchestration, deterministic tools, evidence, DeepSeek calls, guardrails, and data loading.
 - Runtime trusted-domain web evidence search in `backend/web_search.py`.
 - Local domain candidate data and related item records.
+- Plan-driven component assembly recorded in `component_plan.json`.
 - Deterministic tests and API-backed evaluation.
 
 ## Run
