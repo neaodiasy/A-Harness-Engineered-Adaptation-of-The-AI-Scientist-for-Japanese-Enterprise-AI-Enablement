@@ -177,6 +177,207 @@ def build_agent_spec(agent_design: dict, architecture: dict, product_spec: dict)
     }
 
 
+def _profile_values(profile: dict[str, Any] | None, key: str) -> list[str]:
+    value = (profile or {}).get(key)
+    if isinstance(value, list):
+        return [str(item) for item in value if str(item).strip()]
+    if value:
+        return [str(value)]
+    return []
+
+
+def build_scaffold_fields(
+    product_spec: dict[str, Any],
+    app_design: dict[str, Any],
+    profile: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    """Create scaffold-specific intake fields so generated products do not all feel alike."""
+    scaffold_id = str(app_design.get("selected_scaffold_id") or product_spec.get("selected_scaffold_id") or "")
+    target_users = _profile_values(profile, "target_users")
+    data_sources = _profile_values(profile, "available_data")
+    constraints = _profile_values(profile, "constraints")
+    if scaffold_id == "customer_support_workbench":
+        return [
+            {
+                "key": "customer_inquiry",
+                "label": "Customer inquiry",
+                "type": "textarea",
+                "required": True,
+                "default": "保険金請求に必要な書類と、書類が不足している場合の手続きを教えてください。",
+            },
+            {
+                "key": "policy_context",
+                "label": "FAQ / policy evidence",
+                "type": "textarea",
+                "required": True,
+                "default": "; ".join(data_sources[:4]) or "FAQ documents; claim procedure manuals; required document checklists",
+            },
+            {
+                "key": "claim_status",
+                "label": "Claim / ticket status",
+                "type": "text",
+                "required": False,
+                "default": "incomplete_submission",
+            },
+            {
+                "key": "risk_boundary",
+                "label": "Do-not-cross boundary",
+                "type": "textarea",
+                "required": True,
+                "default": "; ".join(constraints[:3]) or "No final claim decision; no automatic customer sending",
+            },
+            {
+                "key": "approval_owner",
+                "label": "Senior reviewer",
+                "type": "text",
+                "required": True,
+                "default": "Senior claims reviewer",
+            },
+        ]
+    if scaffold_id == "risk_review_console":
+        return [
+            {"key": "case_summary", "label": "Case summary", "type": "textarea", "required": True, "default": "Describe the case requiring risk review."},
+            {"key": "policy_evidence", "label": "Policy / rule evidence", "type": "textarea", "required": True, "default": "; ".join(data_sources[:4])},
+            {"key": "missing_information", "label": "Known missing information", "type": "textarea", "required": False, "default": "List unknown facts, documents, or approvals."},
+            {"key": "approval_owner", "label": "Risk owner", "type": "text", "required": True, "default": "Risk reviewer"},
+        ]
+    if scaffold_id == "knowledge_assistant":
+        return [
+            {"key": "user_question", "label": "Knowledge query", "type": "textarea", "required": True, "default": "Ask a question that should be answered from approved documents."},
+            {"key": "document_scope", "label": "Document scope", "type": "textarea", "required": True, "default": "; ".join(data_sources[:5])},
+            {"key": "approval_owner", "label": "Reviewer", "type": "text", "required": True, "default": "Knowledge owner"},
+        ]
+    if scaffold_id == "approval_workbench":
+        return [
+            {"key": "draft_to_review", "label": "Draft to review", "type": "textarea", "required": True, "default": "Paste the draft that needs approval."},
+            {"key": "supporting_evidence", "label": "Supporting evidence", "type": "textarea", "required": True, "default": "; ".join(data_sources[:5])},
+            {"key": "approval_owner", "label": "Approval owner", "type": "text", "required": True, "default": "Business approver"},
+        ]
+    if scaffold_id == "recommendation_workbench":
+        return product_spec.get("fields", [])
+    return [
+        {"key": "workflow_case", "label": "Workflow case", "type": "textarea", "required": True, "default": "Describe the operational case."},
+        {"key": "available_evidence", "label": "Available evidence", "type": "textarea", "required": True, "default": "; ".join(data_sources[:5])},
+        {"key": "target_user", "label": "Target user", "type": "text", "required": False, "default": target_users[0] if target_users else "Business user"},
+        {"key": "approval_owner", "label": "Approval owner", "type": "text", "required": True, "default": "Business owner"},
+    ]
+
+
+def build_scaffold_domain_data(
+    product_spec: dict[str, Any],
+    app_design: dict[str, Any],
+    profile: dict[str, Any] | None,
+    area_profiles: list[dict[str, Any]],
+    item_records: list[dict[str, Any]],
+    sample_cases: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """Make local data visibly match the selected product scaffold."""
+    scaffold_id = str(app_design.get("selected_scaffold_id") or product_spec.get("selected_scaffold_id") or "")
+    if scaffold_id != "customer_support_workbench":
+        return area_profiles, item_records, sample_cases
+
+    company = (profile or {}).get("company_name", "the company")
+    candidate_records = [
+        {
+            "area_id": "inquiry_classification",
+            "name_ja": "問い合わせ分類",
+            "summary_ja": "請求手続き、必要書類、補償条件、支払時期、曖昧事案を分類します。",
+            "typical_budget_jpy_m": 35,
+            "time_or_effort_index": 18,
+            "relevance_score": 9,
+            "user_fit_score": 9,
+            "stability_score": 7,
+            "risk_readiness_score": 8,
+            "risk_note_ja": "分類結果は返信前に担当者が確認します。",
+        },
+        {
+            "area_id": "faq_policy_evidence",
+            "name_ja": "FAQ・約款根拠検索",
+            "summary_ja": "FAQ、請求手続きマニュアル、必要書類チェックリストから根拠を抽出します。",
+            "typical_budget_jpy_m": 42,
+            "time_or_effort_index": 20,
+            "relevance_score": 10,
+            "user_fit_score": 8,
+            "stability_score": 8,
+            "risk_readiness_score": 8,
+            "risk_note_ja": "古いFAQや未承認文書を根拠にしないよう確認が必要です。",
+        },
+        {
+            "area_id": "missing_document_check",
+            "name_ja": "不足書類チェック",
+            "summary_ja": "診療明細、領収書、請求フォームなどの不足を確認し、追加案内を準備します。",
+            "typical_budget_jpy_m": 38,
+            "time_or_effort_index": 16,
+            "relevance_score": 9,
+            "user_fit_score": 8,
+            "stability_score": 7,
+            "risk_readiness_score": 9,
+            "risk_note_ja": "個別の支払可否は判断せず、必要書類の案内に留めます。",
+        },
+        {
+            "area_id": "senior_escalation",
+            "name_ja": "上席者エスカレーション",
+            "summary_ja": "補償可否、医療判断、曖昧な条件、苦情リスクを上席者に回します。",
+            "typical_budget_jpy_m": 45,
+            "time_or_effort_index": 12,
+            "relevance_score": 8,
+            "user_fit_score": 9,
+            "stability_score": 8,
+            "risk_readiness_score": 10,
+            "risk_note_ja": "最終判断と顧客送信は人間承認が必須です。",
+        },
+    ]
+    workflow_records = [
+        {
+            "property_id": "claim_documents_reply",
+            "area_id": "missing_document_check",
+            "title_ja": "必要書類案内ドラフト",
+            "summary_ja": "不足書類と提出手順を丁寧に説明する返信案を作成します。",
+            "price_jpy_m": 34,
+            "access_minutes": 6,
+            "relevance_score": 9,
+            "user_fit_score": 9,
+            "risk_readiness_score": 8,
+            "risk_note_ja": "支払可否を断定しないこと。",
+        },
+        {
+            "property_id": "payment_timeline_reply",
+            "area_id": "faq_policy_evidence",
+            "title_ja": "支払時期問い合わせ返信",
+            "summary_ja": "標準的な処理期間と確認中事項を根拠付きで案内します。",
+            "price_jpy_m": 36,
+            "access_minutes": 7,
+            "relevance_score": 8,
+            "user_fit_score": 8,
+            "risk_readiness_score": 8,
+            "risk_note_ja": "個別案件の確約表現は禁止です。",
+        },
+        {
+            "property_id": "ambiguous_claim_escalation",
+            "area_id": "senior_escalation",
+            "title_ja": "曖昧事案エスカレーション",
+            "summary_ja": "補償条件や医療判断が曖昧な問い合わせを承認パケット化します。",
+            "price_jpy_m": 48,
+            "access_minutes": 4,
+            "relevance_score": 9,
+            "user_fit_score": 9,
+            "risk_readiness_score": 10,
+            "risk_note_ja": "上席者の判断なしに返信しないこと。",
+        },
+    ]
+    cases = [
+        {
+            "case_id": "pet_insurance_case_001",
+            "customer_inquiry": f"{company}の契約者です。犬の通院費を請求したいのですが、領収書以外に必要な書類はありますか。書類が不足している場合の流れも知りたいです。",
+            "policy_context": "FAQ documents; claim procedure manuals; required document checklists",
+            "claim_status": "incomplete_submission",
+            "risk_boundary": "Do not make final claim decisions. Do not automatically send replies.",
+            "approval_owner": "Senior claims reviewer",
+        }
+    ]
+    return candidate_records, workflow_records, cases
+
+
 REASONING_POLICY_REQUIRED_KEYS = [
     "policy_version",
     "domain",
@@ -1770,11 +1971,11 @@ FRONTEND_HTML = '''<!doctype html>
           </div>
         </div>
         <nav class="nav-list" aria-label="Workspace navigation">
-          <a href="#intake" class="nav-item active">Intake</a>
-          <a href="#recommendations" class="nav-item">Recommendations</a>
-          <a href="#approval" class="nav-item">Approval</a>
-          <a href="#evidence" class="nav-item">Evidence</a>
-          <a href="#architecture" class="nav-item">Architecture</a>
+          <a id="navIntake" href="#intake" class="nav-item active">Intake</a>
+          <a id="navDecision" href="#recommendations" class="nav-item">Recommendations</a>
+          <a id="navApproval" href="#approval" class="nav-item">Approval</a>
+          <a id="navEvidence" href="#evidence" class="nav-item">Evidence</a>
+          <a id="navArchitecture" href="#architecture" class="nav-item">Architecture</a>
         </nav>
         <section class="side-section">
           <div class="side-title">Case Queue</div>
@@ -1809,7 +2010,7 @@ FRONTEND_HTML = '''<!doctype html>
         <section class="work-grid">
           <article id="intake" class="panel intake-panel">
             <div class="panel-header">
-              <h2>Case Intake</h2>
+              <h2 id="intakeTitle">Case Intake</h2>
               <button id="loadSample" class="secondary-action">Load Sample</button>
             </div>
             <div id="fields" class="field-grid"></div>
@@ -1817,7 +2018,7 @@ FRONTEND_HTML = '''<!doctype html>
 
           <article id="recommendations" class="panel decision-panel">
             <div class="panel-header">
-              <h2>Candidate Comparison</h2>
+              <h2 id="decisionTitle">Candidate Comparison</h2>
               <span id="candidateCount" class="small-chip">0 candidates</span>
             </div>
             <div id="rankings" class="candidate-list empty-state">No candidates yet.</div>
@@ -2698,18 +2899,55 @@ function candidateReason(item) {
   return item.reason_ja || item.summary_ja || item.risk_note_ja || item.summary || "";
 }
 
+function scaffoldId() {
+  return uiConfig?.selected_scaffold_id || productSpec?.selected_scaffold_id || productSpec?.app_kind || "";
+}
+
+function uiSectionLabel(id, fallback) {
+  const labels = uiConfig?.panel_labels || {};
+  if (labels[id]) return labels[id];
+  const section = (uiConfig?.ui_sections || []).find((item) => item.id === id || item.label === id);
+  return section?.label || fallback;
+}
+
+function decisionVocabulary() {
+  const scaffold = scaffoldId();
+  if (scaffold === "customer_support_workbench") {
+    return {
+      nav: "Support Desk",
+      intake: uiSectionLabel("inquiry_intake", "Inquiry Intake"),
+      decision: uiSectionLabel("policy_evidence", "Policy Evidence"),
+      count: "evidence items",
+      empty: uiConfig?.empty_state_text?.policy_evidence || "No policy evidence retrieved yet.",
+      firstColumn: "Evidence / workflow",
+      scoreColumn: "Match",
+      reasonColumn: "Support rationale",
+      metric: "Evidence",
+      draftTitle: uiSectionLabel("response_draft", "Response Draft"),
+    };
+  }
+  if (scaffold === "risk_review_console") {
+    return {nav: "Risk Review", intake: "Case Intake", decision: "Risk Checklist", count: "checks", empty: "No risk checks yet.", firstColumn: "Check", scoreColumn: "Risk", reasonColumn: "Finding", metric: "Checks", draftTitle: "Reviewer Notes"};
+  }
+  if (scaffold === "knowledge_assistant") {
+    return {nav: "Knowledge", intake: "Query Intake", decision: "Document Evidence", count: "sources", empty: "No document evidence yet.", firstColumn: "Source", scoreColumn: "Fit", reasonColumn: "Evidence note", metric: "Sources", draftTitle: "Answer Draft"};
+  }
+  return {nav: "Recommendations", intake: "Case Intake", decision: "Candidate Comparison", count: "candidates", empty: "No candidates yet.", firstColumn: "Candidate", scoreColumn: "Score", reasonColumn: "Reason", metric: "Candidates", draftTitle: "Draft"};
+}
+
 function renderCandidates(output) {
   const areaItems = output.ranked_area_candidates || [];
   const propertyItems = output.ranked_property_candidates || [];
   const items = propertyItems.length ? propertyItems : areaItems;
-  document.getElementById("candidateCount").textContent = `${items.length} candidates`;
+  const vocab = decisionVocabulary();
+  document.getElementById("candidateCount").textContent = `${items.length} ${vocab.count}`;
   if (!items.length) {
-    return "<div class='empty-state'>No candidates yet.</div>";
+    return `<div class='empty-state'>${escapeHtml(vocab.empty)}</div>`;
   }
   return `
     <table class="candidate-table">
       <thead>
-        <tr><th>Rank</th><th>Candidate</th><th>Score</th><th>Reason</th></tr>
+        <tr><th>Rank</th><th>${escapeHtml(vocab.firstColumn)}</th><th>${escapeHtml(vocab.scoreColumn)}</th><th>${escapeHtml(vocab.reasonColumn)}</th></tr>
       </thead>
       <tbody>
         ${items.slice(0, 6).map((item, index) => `
@@ -2730,11 +2968,12 @@ function renderSummary(output) {
   const risk = output.risk || {};
   const evidence = output.evidence || [];
   const liveEvidence = evidence.filter((item) => String(item.retrieval_method || "").includes("live")).length;
+  const vocab = decisionVocabulary();
   return `
     <div class="metric">Classification<strong>${escapeHtml(classification.label || "-")}</strong></div>
     <div class="metric">Confidence<strong>${escapeHtml(classification.confidence ?? "-")}</strong></div>
     <div class="metric">Risk<strong>${escapeHtml(risk.risk_level || "-")}</strong></div>
-    <div class="metric">Candidates<strong>${(output.ranked_area_candidates || []).length + (output.ranked_property_candidates || []).length}</strong></div>
+    <div class="metric">${escapeHtml(vocab.metric)}<strong>${(output.ranked_area_candidates || []).length + (output.ranked_property_candidates || []).length}</strong></div>
     <div class="metric">Live Sources<strong>${liveEvidence}</strong></div>
     <div class="metric">Send Allowed<strong>${output.send_allowed ? "Yes" : "No"}</strong></div>
   `;
@@ -2846,6 +3085,12 @@ async function load() {
   document.getElementById("subtitle").textContent = productSpec.subtitle;
   document.getElementById("workspaceLabel").textContent = uiConfig?.selected_scaffold_id || uiConfig?.product_archetype || productSpec.selected_scaffold_id || productSpec.app_kind || "Operations Workspace";
   document.getElementById("run").textContent = uiConfig?.button_labels?.primary_action || productSpec.primary_action || "Generate Packet";
+  const vocab = decisionVocabulary();
+  document.getElementById("navIntake").textContent = vocab.intake;
+  document.getElementById("navDecision").textContent = vocab.nav;
+  document.getElementById("intakeTitle").textContent = vocab.intake;
+  document.getElementById("decisionTitle").textContent = vocab.decision;
+  document.querySelector(".draft-panel h2").textContent = vocab.draftTitle;
   document.getElementById("fields").innerHTML = productSpec.fields.map(fieldElement).join("");
   renderDesignSections();
   renderCaseQueue();
@@ -3227,6 +3472,12 @@ def build_prototype(
     product_spec["builder_mode"] = "deepseek_selected_scaffold_customization"
     product_spec["selected_scaffold_id"] = selected_scaffold_id
     product_spec["selected_scaffold"] = selected_scaffold
+    product_spec["fields"] = build_scaffold_fields(product_spec, llm_app_design, profile)
+    if selected_scaffold_id == "customer_support_workbench":
+        product_spec["primary_action"] = "Generate Response Draft"
+        product_spec["candidate_collection_label"] = "policy evidence"
+        product_spec["item_collection_label"] = "reply workflows"
+        product_spec["tool_name"] = "support_evidence_toolkit"
     generated_product_rules = llm_app_designer.build_generated_product_rules(
         llm_app_design,
         product_spec,
@@ -3348,6 +3599,14 @@ def build_prototype(
     area_profiles = domain_template.get("domain_candidates") or domain_template.get("area_profiles", [])
     property_listings = domain_template.get("item_records") or domain_template.get("property_listings", [])
     sample_cases = domain_template.get("sample_customers", [])
+    area_profiles, property_listings, sample_cases = build_scaffold_domain_data(
+        product_spec,
+        llm_app_design,
+        profile,
+        area_profiles,
+        property_listings,
+        sample_cases,
+    )
     domain_data = {
         "template_id": product_spec.get("domain_template_id"),
         "template_source": product_spec.get("domain_template_source"),

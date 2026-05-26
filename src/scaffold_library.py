@@ -82,10 +82,25 @@ def get_scaffold(scaffold_id: str) -> dict[str, Any]:
 def select_scaffold_deterministically(*contexts: object) -> str:
     """Select a scaffold from keyword overlap for no-LLM fallback."""
     text = " ".join(str(item) for item in contexts).lower()
+    best_id = "domain_operations_workbench"
+    best_score = 0
+    priority = {
+        "customer_support_workbench": 5,
+        "risk_review_console": 4,
+        "knowledge_assistant": 3,
+        "approval_workbench": 2,
+        "recommendation_workbench": 1,
+    }
     for scaffold_id, scaffold in SCAFFOLD_LIBRARY.items():
         if scaffold_id == "domain_operations_workbench":
             continue
         terms = [str(term).lower() for term in scaffold.get("compatible_opportunity_keywords", [])]
-        if any(term and term in text for term in terms):
-            return scaffold_id
-    return "domain_operations_workbench"
+        score = sum(1 for term in terms if term and term in text)
+        if scaffold_id == "customer_support_workbench" and any(term in text for term in ("support", "inquiry", "faq", "reply", "customer")):
+            score += 2
+        if scaffold_id == "risk_review_console" and any(term in text for term in ("claim", "compliance", "risk", "approval")):
+            score += 1
+        if score > best_score or (score == best_score and score > 0 and priority.get(scaffold_id, 0) > priority.get(best_id, 0)):
+            best_id = scaffold_id
+            best_score = score
+    return best_id
