@@ -1575,6 +1575,7 @@ AGENT = '''"""Agent orchestration for the generated product."""
 from __future__ import annotations
 
 import json
+import os
 from typing import Any
 
 from backend.data_store import load_agent_spec, load_domain_data, load_interaction_config, load_knowledge_base, load_llm_app_design, load_product_spec
@@ -1828,8 +1829,36 @@ def run_interaction(payload: dict[str, Any]) -> dict[str, Any]:
         AGENT_SPEC["system_prompt"]
         + "\\nYou are now serving the generated app's interactive AI copilot. Return JSON only."
     )
-    llm_output = complete_json(system_prompt, build_interaction_prompt(payload, case, local_tool_results, evidence, domain_prompt_context))
-    return enforce_interaction_contract(llm_output, evidence, action_id)
+    api_error = ""
+    try:
+        llm_output = complete_json(system_prompt, build_interaction_prompt(payload, case, local_tool_results, evidence, domain_prompt_context))
+    except Exception as exc:
+        api_error = f"{type(exc).__name__}: {exc}"
+        llm_output = {
+            "reply_ja": (
+                "DeepSeek API の呼び出しに失敗しました。"
+                "この画面は対話リクエストを受け取り、ローカルツールと証拠取得までは実行しましたが、"
+                "最終的な AI 応答生成でエラーになりました。"
+                "DEEPSEEK_API_KEY、DEEPSEEK_BASE_URL、AGENT_MODEL、ネットワーク、または API 応答形式を確認してください。"
+            ),
+            "used_evidence": [item.get("id") for item in evidence[:5] if item.get("id")],
+            "suggested_next_actions": [
+                "Check the generated app server terminal for the DeepSeek error.",
+                "Confirm DEEPSEEK_API_KEY is exported in the same terminal that started app.py.",
+                "Retry the same Copilot action after the API environment is fixed.",
+            ],
+            "risk": {"risk_level": "medium", "risk_reasons": ["Runtime DeepSeek API call failed."]},
+            "approval_note": "API エラー時の回答は診断用です。業務利用前に人間が確認してください。",
+        }
+    result = enforce_interaction_contract(llm_output, evidence, action_id)
+    if api_error:
+        result["api_error"] = api_error
+        result["api_attempted"] = True
+        result["runtime_status"] = "deepseek_api_error"
+    else:
+        result["api_attempted"] = True
+        result["runtime_status"] = "deepseek_api_success"
+    return result
 '''
 
 
@@ -1839,6 +1868,7 @@ from __future__ import annotations
 
 import errno
 import json
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -1893,6 +1923,15 @@ class ProductHandler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/api/product_spec":
             self._send_json(load_product_spec())
+            return
+        if parsed.path == "/api/runtime_status":
+            self._send_json({
+                "deepseek_api_key_present": bool(os.environ.get("DEEPSEEK_API_KEY")),
+                "deepseek_base_url": os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
+                "agent_model": os.environ.get("AGENT_MODEL") or os.environ.get("DEEPSEEK_AGENT_MODEL") or "deepseek-v4-pro",
+                "thinking": os.environ.get("DEEPSEEK_THINKING", "1"),
+                "reasoning_effort": os.environ.get("DEEPSEEK_REASONING_EFFORT", "high"),
+            })
             return
         if parsed.path == "/api/app_design":
             self._send_json(json.loads((APP_DIR / "llm_app_design.json").read_text(encoding="utf-8")))
@@ -2851,9 +2890,15 @@ body[data-interface="chat_console"] .work-grid {
   grid-template-columns: minmax(280px, 0.7fr) minmax(420px, 1.3fr);
 }
 
+body[data-interface="chat_console"] .primitive-workspace {
+  grid-template-columns: minmax(360px, 1.4fr) minmax(240px, 0.8fr);
+}
+
 body[data-interface="chat_console"] .assistant-panel {
   grid-column: span 2;
   order: -4;
+  min-height: 420px;
+  border-color: var(--generated-accent, #7c3aed);
 }
 
 body[data-interface="chat_console"] .decision-panel {
@@ -3019,6 +3064,15 @@ body[data-interface="approval_queue"] .draft-panel {
   padding: 12px;
 }
 
+.runtime-error {
+  margin: 10px 0;
+  border: 1px solid #f1c27d;
+  border-radius: 8px;
+  background: #fff8eb;
+  color: #7a4b00;
+  padding: 10px;
+}
+
 .dynamic-design-panel {
   margin-top: 14px;
 }
@@ -3174,6 +3228,7 @@ let uiConfig = null;
 let appDesign = null;
 let layoutConfig = null;
 let interactionConfig = null;
+let runtimeStatus = null;
 let sampleCases = [];
 let selectedCaseIndex = 0;
 let currentOutput = null;
@@ -3435,6 +3490,7 @@ function renderAssistantOutput(data) {
   return `
     <div><strong>Reply</strong></div>
     <div>${escapeHtml(data.reply_ja || "")}</div>
+    ${data.api_error ? `<div class="runtime-error"><strong>Runtime diagnostic</strong><br>${escapeHtml(data.api_error)}</div>` : ""}
     <div class="evidence-method">Evidence: ${escapeHtml(evidence.join(", ") || "-")}</div>
     <div class="evidence-method">Risk: ${escapeHtml(risk.risk_level || "medium")} · send_allowed=${escapeHtml(data.send_allowed)}</div>
     <div><strong>Next actions</strong></div>
@@ -3546,6 +3602,10 @@ function applyGeneratedLayout() {
   const interfaceType = experience.interface_type || "operations_console";
   document.body.dataset.interface = interfaceType;
   const tokens = layoutConfig?.theme_tokens || {};
+  const colors = tokens.colors || {};
+  tokens.accent = tokens.accent || colors.primary || colors.accent;
+  tokens.surface = tokens.surface || colors.surface || colors.background;
+  tokens.sidebar = tokens.sidebar || colors.sidebar;
   if (tokens.accent) {
     document.documentElement.style.setProperty("--generated-accent", tokens.accent);
     document.querySelectorAll(".primary-action, .brand-mark").forEach((element) => {
@@ -3560,7 +3620,11 @@ function applyGeneratedLayout() {
     document.querySelector(".sidebar").style.background = tokens.sidebar;
   }
   document.getElementById("workspaceLabel").textContent = `${interfaceType} · ${experience.layout_variant || "generated layout"}`;
-  const order = experience.emphasis_order || [];
+  const order = [...(experience.emphasis_order || [])];
+  if (interfaceType === "chat_console") {
+    const withoutAssistant = order.filter((item) => item !== "assistant");
+    order.splice(0, order.length, "assistant", ...withoutAssistant);
+  }
   const orderMap = {intake: "intake", assistant: "assistant", recommendations: "recommendations", evidence: "evidence", draft: "draft-panel", approval: "approval", activity: "activityLog"};
   order.forEach((key, index) => {
     const idOrClass = orderMap[key] || key;
@@ -3588,6 +3652,8 @@ function renderResult(data) {
 
 async function load() {
   productSpec = await (await fetch("/api/product_spec")).json();
+  const runtimeStatusResponse = await fetch("/api/runtime_status");
+  runtimeStatus = runtimeStatusResponse.ok ? await runtimeStatusResponse.json() : null;
   const appDesignResponse = await fetch("/api/app_design");
   appDesign = appDesignResponse.ok ? await appDesignResponse.json() : null;
   const layoutConfigResponse = await fetch("/frontend/generated_layout_config.json");
@@ -3608,6 +3674,10 @@ async function load() {
   document.getElementById("subtitle").textContent = productSpec.subtitle;
   document.getElementById("workspaceLabel").textContent = uiConfig?.selected_scaffold_id || uiConfig?.product_archetype || productSpec.selected_scaffold_id || productSpec.app_kind || "Operations Workspace";
   document.getElementById("run").textContent = uiConfig?.button_labels?.primary_action || productSpec.primary_action || "Generate Packet";
+  if (runtimeStatus && !runtimeStatus.deepseek_api_key_present) {
+    document.getElementById("status").textContent = "API Key Missing";
+    appendLog("DeepSeek API key is not present in the app.py server environment.");
+  }
   document.getElementById("assistantTitle").textContent = interactionConfig?.assistant_title || "AI Copilot";
   document.getElementById("assistantNotice").textContent = interactionConfig?.safety_notice || "AI output is draft-only and requires human approval.";
   document.getElementById("assistantMessage").placeholder = interactionConfig?.input_placeholder || "Ask the AI about this case.";

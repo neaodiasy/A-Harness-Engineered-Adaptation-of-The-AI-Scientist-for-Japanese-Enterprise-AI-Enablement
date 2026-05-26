@@ -44,7 +44,7 @@ SCAFFOLD_LIBRARY: dict[str, dict[str, Any]] = {
         "default_local_tools": ["doc_lookup", "evidence_matcher"],
         "required_guardrails": ["cite evidence", "flag uncertainty", "approval when needed"],
         "default_evaluation_checks": ["evidence-grounded answer", "uncertainty flags", "approval when needed"],
-        "compatible_opportunity_keywords": ["knowledge", "document", "manual", "faq", "policy", "ナレッジ", "マニュアル"],
+        "compatible_opportunity_keywords": ["knowledge", "document", "manual", "sop", "troubleshooting", "alarm", "technical", "chatbox", "chat", "faq", "policy", "ナレッジ", "マニュアル"],
     },
     "approval_workbench": {
         "scaffold_id": "approval_workbench",
@@ -111,6 +111,8 @@ def select_scaffold_deterministically(*contexts: object) -> str:
             score += 3
         if scaffold_id == "risk_review_console" and any(term in text for term in ("claim", "compliance", "policy review", "risk review", "legal", "financial", "hr")):
             score += 1
+        if scaffold_id == "knowledge_assistant" and any(term in text for term in ("chatbox", "chat console", "manual", "sop", "troubleshooting", "alarm", "technical knowledge", "internal knowledge")):
+            score += 4
         if score > best_score or (score == best_score and score > 0 and priority.get(scaffold_id, 0) > priority.get(best_id, 0)):
             best_id = scaffold_id
             best_score = score

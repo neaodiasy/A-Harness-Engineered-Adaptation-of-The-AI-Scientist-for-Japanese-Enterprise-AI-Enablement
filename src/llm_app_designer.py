@@ -647,6 +647,80 @@ def _frontend_layout_fallback(app_design: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _title_from_id(value: str) -> str:
+    return value.replace("_", " ").replace("-", " ").title()
+
+
+def _normalize_ui_primitives(value: Any, fallback: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Normalize LLM-shaped primitive output into a list of primitive objects."""
+    primitive_library = load_ui_primitive_library()
+    raw_items = _as_list(value)
+    normalized: list[dict[str, Any]] = []
+    for raw in raw_items:
+        if not isinstance(raw, dict):
+            primitive_id = str(raw).strip()
+            if primitive_id:
+                normalized.append({"id": primitive_id, "type": primitive_id, "label": _title_from_id(primitive_id), "purpose": "", "span": "medium", "source": "llm_primitive_id"})
+            continue
+        if raw.get("id") or raw.get("type") or raw.get("primitive_id"):
+            primitive_id = str(raw.get("type") or raw.get("primitive_id") or raw.get("id"))
+            primitive = primitive_library.get(primitive_id, {})
+            normalized.append({
+                "id": str(raw.get("id") or primitive_id),
+                "type": primitive_id,
+                "label": str(raw.get("label") or raw.get("name") or _title_from_id(primitive_id)),
+                "purpose": str(raw.get("purpose") or primitive.get("purpose", "")),
+                "span": str(raw.get("span") or primitive.get("default_span", "medium")),
+                "priority": raw.get("priority", len(normalized) + 1),
+                "bound_action": str(raw.get("bound_action") or raw.get("user_interaction") or ""),
+                "source": str(raw.get("source") or "deepseek_frontend_layout_role"),
+            })
+            continue
+        for key, nested in raw.items():
+            if not isinstance(nested, dict):
+                continue
+            primitive_id = str(nested.get("type") or nested.get("primitive_id") or key)
+            primitive = primitive_library.get(primitive_id, {})
+            normalized.append({
+                "id": str(nested.get("id") or primitive_id),
+                "type": primitive_id,
+                "label": str(nested.get("label") or nested.get("name") or _title_from_id(primitive_id)),
+                "purpose": str(nested.get("purpose") or primitive.get("purpose", "")),
+                "span": str(nested.get("span") or primitive.get("default_span", "medium")),
+                "priority": nested.get("priority", len(normalized) + 1),
+                "bound_action": str(nested.get("bound_action") or nested.get("user_interaction") or ""),
+                "source": str(nested.get("source") or "deepseek_frontend_layout_role"),
+            })
+    if not normalized:
+        normalized = fallback
+    for index, item in enumerate(normalized, start=1):
+        item.setdefault("id", item.get("type", f"primitive_{index}"))
+        item.setdefault("type", item["id"])
+        item.setdefault("label", _title_from_id(str(item["id"])))
+        item.setdefault("purpose", "")
+        item.setdefault("span", "medium")
+        item.setdefault("priority", index)
+        item.setdefault("source", "normalized_primitive")
+    return normalized
+
+
+def _normalize_theme_tokens(value: Any, fallback: dict[str, Any]) -> dict[str, Any]:
+    """Normalize nested or direct theme tokens into the frontend contract."""
+    tokens = dict(fallback)
+    if isinstance(value, dict):
+        colors = value.get("colors") if isinstance(value.get("colors"), dict) else {}
+        tokens.update({key: item for key, item in value.items() if key not in {"colors", "typography", "spacing"}})
+        tokens["accent"] = str(tokens.get("accent") or colors.get("primary") or colors.get("accent") or fallback.get("accent", "#166358"))
+        tokens["surface"] = str(tokens.get("surface") or colors.get("surface") or colors.get("background") or fallback.get("surface", "#f4f6f8"))
+        tokens["sidebar"] = str(tokens.get("sidebar") or colors.get("sidebar") or fallback.get("sidebar", "#101820"))
+        if colors:
+            tokens["colors"] = colors
+    tokens.setdefault("accent", fallback.get("accent", "#166358"))
+    tokens.setdefault("surface", fallback.get("surface", "#f4f6f8"))
+    tokens.setdefault("sidebar", fallback.get("sidebar", "#101820"))
+    return tokens
+
+
 def _interaction_config_fallback(app_design: dict[str, Any]) -> dict[str, Any]:
     selected_scaffold_id = app_design.get("selected_scaffold_id", app_design.get("product_archetype", "domain_operations_workbench"))
     interactions = _fallback_interactions(str(selected_scaffold_id), {"name": app_design.get("target_workflow", "enterprise workflow")})
@@ -729,10 +803,20 @@ def _validate_role_outputs(outputs: dict[str, Any], app_design: dict[str, Any], 
         frontend_layout.setdefault(key, value)
     frontend_layout["human_approval_required"] = True
     frontend_layout["send_allowed"] = False
-    if not frontend_layout.get("ui_primitives"):
-        frontend_layout["ui_primitives"] = frontend_layout_fallback["ui_primitives"]
+    frontend_layout["ui_primitives"] = _normalize_ui_primitives(frontend_layout.get("ui_primitives"), frontend_layout_fallback["ui_primitives"])
+    frontend_layout["theme_tokens"] = _normalize_theme_tokens(frontend_layout.get("theme_tokens"), frontend_layout_fallback["theme_tokens"])
     if not frontend_layout.get("feature_cards"):
         frontend_layout["feature_cards"] = frontend_layout_fallback["feature_cards"]
+    if not frontend_layout.get("page_regions"):
+        frontend_layout["page_regions"] = [
+            {
+                "id": primitive.get("id", f"region_{index}"),
+                "label": primitive.get("label", ""),
+                "purpose": primitive.get("purpose", ""),
+                "bound_action": primitive.get("bound_action", ""),
+            }
+            for index, primitive in enumerate(frontend_layout["ui_primitives"], start=1)
+        ]
     outputs["frontend_layout"] = frontend_layout
 
     interaction = outputs["interaction_config"] if isinstance(outputs["interaction_config"], dict) else interaction_fallback
