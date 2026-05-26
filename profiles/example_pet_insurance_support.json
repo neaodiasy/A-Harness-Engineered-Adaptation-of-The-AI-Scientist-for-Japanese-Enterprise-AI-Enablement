@@ -1,0 +1,39 @@
+{
+  "company_name": "Sakura Pet Mutual",
+  "country": "Japan",
+  "industry": "pet_insurance",
+  "main_business": "The company provides pet insurance products for dog and cat owners in Japan. Customer support staff answer policyholder questions about claim procedures, required documents, compensation criteria, incomplete submissions, payment timelines, and ambiguous claim situations.",
+  "target_users": [
+    "customer support representatives",
+    "claims intake staff",
+    "senior claims reviewers",
+    "policyholder service managers"
+  ],
+  "current_workflow": "Policyholders send inquiries by email or web form. Support staff manually classify the inquiry, search FAQ and claims procedure documents, draft a cautious reply, and escalate ambiguous or high-risk cases to senior claims reviewers. Staff must avoid making final claim decisions in customer-facing replies.",
+  "pain_points": [
+    "customer inquiries are repetitive but time-consuming to classify",
+    "FAQ and claims procedure knowledge is scattered across documents",
+    "support replies vary by staff experience",
+    "incomplete claim submissions require careful explanation",
+    "ambiguous claim cases need escalation but are not always flagged consistently",
+    "incorrect customer-facing explanations create compliance and trust risk"
+  ],
+  "available_data": [
+    "customer inquiry emails",
+    "FAQ documents",
+    "claim procedure manuals",
+    "required document checklists",
+    "compensation criteria notes",
+    "past support reply examples",
+    "escalation rules"
+  ],
+  "constraints": [
+    "the system must not make final claim decisions",
+    "the system must not automatically send replies to customers",
+    "human approval is required before customer-facing use",
+    "ambiguous or risky cases must be escalated to a senior claims reviewer",
+    "outputs must cite FAQ or procedure evidence and state uncertainty clearly"
+  ],
+  "business_goal": "Build an AI-enabled customer support workbench that classifies pet insurance inquiries, retrieves relevant FAQ or claim-procedure evidence, drafts cautious Japanese replies, flags risk, and prepares approval packets for human reviewers.",
+  "preferred_enablement_direction": "customer support inquiry triage and approval-ready reply drafting"
+}
