@@ -14,7 +14,7 @@ SCAFFOLD_LIBRARY: dict[str, dict[str, Any]] = {
         "default_local_tools": ["candidate_ranker", "evidence_lookup"],
         "required_guardrails": ["candidate names must come from local data", "human approval required", "send_allowed false"],
         "default_evaluation_checks": ["candidate output exists", "evidence exists", "risk flags exist", "approval required"],
-        "compatible_opportunity_keywords": ["recommend", "recommendation", "ranking", "rank", "match", "matching", "compare", "preference", "suitable", "property", "real estate", "area", "候補", "推薦", "比較"],
+        "compatible_opportunity_keywords": ["recommend", "recommendation", "ranking", "matching", "compare", "preference", "suitable", "property", "real estate", "area", "候補", "推薦", "比較"],
     },
     "customer_support_workbench": {
         "scaffold_id": "customer_support_workbench",
@@ -79,9 +79,18 @@ def get_scaffold(scaffold_id: str) -> dict[str, Any]:
     return dict(SCAFFOLD_LIBRARY.get(scaffold_id) or SCAFFOLD_LIBRARY["domain_operations_workbench"])
 
 
+def _value_text(value: object) -> str:
+    """Convert nested user-provided values to text without counting dict keys."""
+    if isinstance(value, dict):
+        return " ".join(_value_text(item) for item in value.values())
+    if isinstance(value, (list, tuple, set)):
+        return " ".join(_value_text(item) for item in value)
+    return str(value)
+
+
 def select_scaffold_deterministically(*contexts: object) -> str:
     """Select a scaffold from keyword overlap for no-LLM fallback."""
-    text = " ".join(str(item) for item in contexts).lower()
+    text = " ".join(_value_text(item) for item in contexts).lower()
     best_id = "domain_operations_workbench"
     best_score = 0
     priority = {
@@ -96,7 +105,7 @@ def select_scaffold_deterministically(*contexts: object) -> str:
             continue
         terms = [str(term).lower() for term in scaffold.get("compatible_opportunity_keywords", [])]
         score = sum(1 for term in terms if term and term in text)
-        if scaffold_id == "customer_support_workbench" and any(term in text for term in ("support", "inquiry", "faq", "reply", "customer")):
+        if scaffold_id == "customer_support_workbench" and any(term in text for term in ("support", "inquiry", "faq", "reply")):
             score += 2
         if scaffold_id == "recommendation_workbench" and any(term in text for term in ("recommendation", "preference", "ranking", "matching", "property", "real estate", "suitable")):
             score += 3

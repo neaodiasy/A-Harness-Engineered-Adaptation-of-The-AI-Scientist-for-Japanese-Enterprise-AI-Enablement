@@ -12,6 +12,7 @@ from typing import Any
 
 from src.harness.json_utils import parse_jsonish
 from src.scaffold_library import get_scaffold, select_scaffold_deterministically
+from src.ui_primitive_library import build_ui_primitive_plan, load_ui_primitive_library
 
 
 ALLOWED_ARCHETYPES = {
@@ -42,6 +43,8 @@ APP_DESIGN_REQUIRED_KEYS = [
     "small_domain_logic_requirements",
     "product_feature_plan",
     "frontend_experience",
+    "custom_product_blueprint",
+    "ui_primitive_plan",
     "interaction_modes",
     "user_actions",
     "conversation_starters",
@@ -228,11 +231,11 @@ def _fallback_frontend_experience(selected_scaffold_id: str) -> dict[str, Any]:
             "emphasis_order": ["draft", "approval", "evidence", "assistant", "intake", "activity"],
         }
     return {
-        "interface_type": "operations_console",
-        "layout_variant": "intake_copilot_evidence_approval",
-        "visual_style": "enterprise_operations",
-        "primary_surface": "Business case intake, AI copilot, evidence, risk, approval packet, audit trail.",
-        "navigation_model": "case_queue",
+        "interface_type": "custom_workbench",
+        "layout_variant": "primitive_composed_custom_workbench",
+        "visual_style": "custom_enterprise_workbench",
+        "primary_surface": "Custom business case intake, AI copilot, selected primitives, evidence, risk, approval packet, audit trail.",
+        "navigation_model": "custom_case_queue",
         "emphasis_order": ["intake", "assistant", "evidence", "draft", "approval", "activity"],
     }
 
@@ -283,12 +286,13 @@ def _fallback_app_design(
     evidence_pack: dict[str, Any],
     scaffold_library: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    selected_scaffold_id = select_scaffold_deterministically(profile, selected_opportunity, agent_design, runtime_domain_pack)
+    selected_scaffold_id = select_scaffold_deterministically(profile, selected_opportunity, agent_design)
     scaffold = (scaffold_library or {}).get(selected_scaffold_id) or get_scaffold(selected_scaffold_id)
     archetype_id = selected_scaffold_id
     interactions = _fallback_interactions(selected_scaffold_id, selected_opportunity)
     frontend_experience = _fallback_frontend_experience(selected_scaffold_id)
     feature_plan = _fallback_feature_plan(selected_scaffold_id, selected_opportunity)
+    ui_primitive_plan = build_ui_primitive_plan(frontend_experience["interface_type"], feature_plan)
     return {
         "design_source": "deterministic_fallback",
         "selected_scaffold_id": selected_scaffold_id,
@@ -338,6 +342,14 @@ def _fallback_app_design(
         ],
         "product_feature_plan": feature_plan,
         "frontend_experience": frontend_experience,
+        "custom_product_blueprint": {
+            "source": "deterministic_fallback",
+            "product_goal": selected_opportunity.get("target_workflow") or selected_opportunity.get("name", "Enterprise workflow support"),
+            "primary_entities": ["case", "evidence", "draft", "risk", "approval"],
+            "unique_workflows": [item.get("label", item.get("id", "")) for item in feature_plan],
+            "ui_composition_strategy": "Assemble a responsive product from reusable UI primitives.",
+        },
+        "ui_primitive_plan": ui_primitive_plan,
         **interactions,
     }
 
@@ -368,9 +380,15 @@ def validate_app_design(design: Any, fallback: dict[str, Any]) -> dict[str, Any]
     for key, value in frontend_fallback.items():
         frontend.setdefault(key, value)
     allowed_interfaces = {"support_desk", "recommendation_dashboard", "risk_review_console", "chat_console", "approval_queue", "operations_console"}
+    allowed_interfaces.add("custom_workbench")
     if frontend.get("interface_type") not in allowed_interfaces:
         frontend["interface_type"] = frontend_fallback["interface_type"]
     out["frontend_experience"] = frontend
+    custom_blueprint = out.get("custom_product_blueprint") if isinstance(out.get("custom_product_blueprint"), dict) else {}
+    for key, value in fallback["custom_product_blueprint"].items():
+        custom_blueprint.setdefault(key, value)
+    out["custom_product_blueprint"] = custom_blueprint
+    out["ui_primitive_plan"] = _dict_list(out.get("ui_primitive_plan"), fallback["ui_primitive_plan"])
     out["interaction_modes"] = _dict_list(out.get("interaction_modes"), fallback["interaction_modes"])
     out["user_actions"] = _dict_list(out.get("user_actions"), fallback["user_actions"])
     out["conversation_starters"] = _string_list(out.get("conversation_starters"), fallback["conversation_starters"])
@@ -404,7 +422,9 @@ Allowed selected_scaffold_id and product_archetype values: {sorted(ALLOWED_ARCHE
 human_approval.required must be true and human_approval.send_allowed must be false.
 Select exactly one scaffold from the scaffold library, then design the product capabilities, frontend experience, UI sections, backend modules, local tools, guardrails, evaluation checks, and small domain logic requirements.
 Do not merely rename a fixed workbench. Decide what product functions are actually needed for this enterprise workflow.
-frontend_experience.interface_type must be one of support_desk, recommendation_dashboard, risk_review_console, chat_console, approval_queue, operations_console.
+frontend_experience.interface_type must be one of support_desk, recommendation_dashboard, risk_review_console, chat_console, approval_queue, operations_console, custom_workbench.
+If no existing product pattern fits, use custom_workbench and provide custom_product_blueprint plus ui_primitive_plan.
+Available UI primitive library: {json.dumps(load_ui_primitive_library(), ensure_ascii=False)}
 
 Scaffold library: {json.dumps(scaffold_library or {}, ensure_ascii=False)}
 Enterprise profile: {json.dumps(profile, ensure_ascii=False)}
@@ -587,6 +607,8 @@ def _frontend_layout_fallback(app_design: dict[str, Any]) -> dict[str, Any]:
     frontend_experience = app_design.get("frontend_experience") if isinstance(app_design.get("frontend_experience"), dict) else {}
     selected_scaffold_id = app_design.get("selected_scaffold_id", app_design.get("product_archetype", "domain_operations_workbench"))
     interface_type = frontend_experience.get("interface_type") or _fallback_frontend_experience(str(selected_scaffold_id))["interface_type"]
+    feature_plan = app_design.get("product_feature_plan", [])
+    ui_primitive_plan = app_design.get("ui_primitive_plan") or build_ui_primitive_plan(str(interface_type), feature_plan if isinstance(feature_plan, list) else [])
     return {
         "source": "deterministic_fallback",
         "selected_scaffold_id": selected_scaffold_id,
@@ -597,6 +619,9 @@ def _frontend_layout_fallback(app_design: dict[str, Any]) -> dict[str, Any]:
         "navigation_model": frontend_experience.get("navigation_model", "case_queue"),
         "emphasis_order": frontend_experience.get("emphasis_order", ["intake", "assistant", "evidence", "draft", "approval", "activity"]),
         "feature_cards": app_design.get("product_feature_plan", []),
+        "ui_primitives": ui_primitive_plan,
+        "primitive_library_version": "ui_primitive_library_v1",
+        "custom_product_blueprint": app_design.get("custom_product_blueprint", {}),
         "page_regions": [
             {"id": item.get("id", f"section_{index}"), "label": item.get("label", item.get("id", "")), "purpose": item.get("purpose", ""), "bound_action": item.get("user_interaction", "")}
             for index, item in enumerate(app_design.get("product_feature_plan", []), start=1)
@@ -608,8 +633,15 @@ def _frontend_layout_fallback(app_design: dict[str, Any]) -> dict[str, Any]:
             "risk_review_console": {"accent": "#b45309", "surface": "#fffaf2", "sidebar": "#231a0d"},
             "chat_console": {"accent": "#7c3aed", "surface": "#faf7ff", "sidebar": "#17102a"},
             "approval_queue": {"accent": "#be123c", "surface": "#fff7f9", "sidebar": "#2a1018"},
+            "custom_workbench": {"accent": "#166358", "surface": "#f4f8fb", "sidebar": "#10202a"},
             "operations_console": {"accent": "#166358", "surface": "#f4f6f8", "sidebar": "#101820"},
         }.get(interface_type, {"accent": "#166358", "surface": "#f4f6f8", "sidebar": "#101820"}),
+        "responsive_policy": {
+            "desktop_grid": "auto-fit minmax cards",
+            "tablet_grid": "two columns when width permits",
+            "mobile_grid": "single column, no horizontal overflow",
+            "text_policy": "wrap long words and keep controls inside cards",
+        },
         "human_approval_required": True,
         "send_allowed": False,
     }
@@ -697,6 +729,10 @@ def _validate_role_outputs(outputs: dict[str, Any], app_design: dict[str, Any], 
         frontend_layout.setdefault(key, value)
     frontend_layout["human_approval_required"] = True
     frontend_layout["send_allowed"] = False
+    if not frontend_layout.get("ui_primitives"):
+        frontend_layout["ui_primitives"] = frontend_layout_fallback["ui_primitives"]
+    if not frontend_layout.get("feature_cards"):
+        frontend_layout["feature_cards"] = frontend_layout_fallback["feature_cards"]
     outputs["frontend_layout"] = frontend_layout
 
     interaction = outputs["interaction_config"] if isinstance(outputs["interaction_config"], dict) else interaction_fallback
@@ -745,7 +781,7 @@ def build_specialized_role_outputs(app_design: dict[str, Any], product_spec: dic
         "reasoning_policy": "Generate JSON for backend/generated_reasoning_policy.py with policy_version, source, product_archetype, runtime_role, required_output_sections, runtime_prompt_requirements, domain_specific_instructions, forbidden_claims, risk_rules, approval_packet_requirements, human_approval_required, send_allowed, evaluation_checklist.",
         "domain_adapter": "Generate JSON for backend/generated_domain_adapter.py with adapter_version, source, domain, product_archetype, target_workflow, reasoning_steps, tool_policy, ui_binding_notes, domain_fields, sample_case_strategy.",
         "ui_config": "Generate JSON for frontend/generated_ui_config.json with product_archetype, ui_sections, panel_labels, button_labels, empty_state_text, approval_labels.",
-        "frontend_layout": "Generate JSON for frontend/generated_layout_config.json with selected_scaffold_id, interface_type, layout_variant, visual_style, primary_surface, navigation_model, emphasis_order, feature_cards, page_regions, theme_tokens, human_approval_required, send_allowed. Make the product UI visibly suited to the enterprise workflow, not one generic layout.",
+        "frontend_layout": "Generate JSON for frontend/generated_layout_config.json with selected_scaffold_id, interface_type, layout_variant, visual_style, primary_surface, navigation_model, emphasis_order, feature_cards, ui_primitives, page_regions, custom_product_blueprint, responsive_policy, theme_tokens, human_approval_required, send_allowed. Make the product UI visibly suited to the enterprise workflow, not one generic layout. Use custom_workbench with a composed ui_primitives plan when no standard interface fits.",
         "interaction_config": "Generate JSON for frontend/generated_interaction_config.json with selected_scaffold_id, product_archetype, assistant_title, input_placeholder, interaction_modes, user_actions, conversation_starters, safety_notice, response_contract, human_approval_required, send_allowed. User actions must be business-specific and must let the user interact with DeepSeek for the useful enterprise workflow.",
         "evaluation_checklist": "Generate JSON for evaluation_checklist.json with required_fields, runtime_checks, approval_checks, risk_checks, domain_specific_checks.",
         "builder_review": "Generate JSON for llm_builder_review.json with review_source, passed, missing_fields, safety_concerns, fallback_recommendation.",

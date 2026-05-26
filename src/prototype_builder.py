@@ -2141,6 +2141,8 @@ FRONTEND_HTML = '''<!doctype html>
 
         <section class="kpi-strip" id="summaryCards"></section>
 
+        <section id="primitiveWorkspace" class="primitive-workspace" aria-label="Generated UI primitive workspace"></section>
+
         <section class="work-grid">
           <article id="intake" class="panel intake-panel">
             <div class="panel-header">
@@ -2790,6 +2792,54 @@ details summary {
   margin-bottom: 16px;
 }
 
+.primitive-workspace {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.primitive-card {
+  min-width: 0;
+  border: 1px solid #d8dee5;
+  border-left: 4px solid var(--generated-accent, #166358);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 14px;
+}
+
+.primitive-card.wide {
+  grid-column: span 2;
+}
+
+.primitive-card h2,
+.primitive-card h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.primitive-card p {
+  margin: 0 0 12px;
+  color: #425466;
+  line-height: 1.45;
+}
+
+.primitive-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.primitive-chip {
+  border-radius: 999px;
+  background: #eef4f7;
+  color: #425466;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .work-grid {
   display: grid;
   grid-template-columns: minmax(280px, 0.85fr) minmax(360px, 1.15fr) minmax(280px, 0.85fr);
@@ -3060,8 +3110,13 @@ body[data-interface="approval_queue"] .draft-panel {
   }
 
   .kpi-strip,
+  .primitive-workspace,
   .work-grid {
     grid-template-columns: 1fr;
+  }
+
+  .primitive-card.wide {
+    grid-column: auto;
   }
 
   .decision-panel,
@@ -3449,6 +3504,43 @@ function renderDynamicDesignPanels() {
   });
 }
 
+function primitiveActionPrompt(primitive) {
+  const label = primitive.label || primitive.id || primitive.type || "this component";
+  const purpose = primitive.purpose || "the generated enterprise workflow";
+  return `Use the ${label} component for the current case. Purpose: ${purpose}. Explain what the user should do next, cite evidence when possible, and keep human approval required.`;
+}
+
+function renderPrimitiveWorkspace() {
+  const target = document.getElementById("primitiveWorkspace");
+  if (!target || !layoutConfig) return;
+  const primitives = layoutConfig.ui_primitives || [];
+  if (!primitives.length) {
+    target.innerHTML = "";
+    return;
+  }
+  target.innerHTML = primitives.slice(0, 8).map((primitive) => {
+    const span = primitive.span === "wide" ? " wide" : "";
+    const type = primitive.type || primitive.id || "component";
+    return `
+      <article class="primitive-card${span}" data-primitive-type="${escapeHtml(type)}">
+        <div class="primitive-meta">
+          <span class="primitive-chip">${escapeHtml(type)}</span>
+          <span class="primitive-chip">${escapeHtml(primitive.source || "generated")}</span>
+        </div>
+        <h3>${escapeHtml(primitive.label || primitive.id || "Generated component")}</h3>
+        <p>${escapeHtml(primitive.purpose || "Generated from the build-time product blueprint.")}</p>
+        <button class="secondary-action primitive-ask" data-primitive-prompt="${escapeHtml(primitiveActionPrompt(primitive))}">Use with AI</button>
+      </article>
+    `;
+  }).join("");
+  target.querySelectorAll("[data-primitive-prompt]").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.getElementById("assistantMessage").value = button.dataset.primitivePrompt || "";
+      document.getElementById("assistant").scrollIntoView({behavior: "smooth", block: "start"});
+    });
+  });
+}
+
 function applyGeneratedLayout() {
   const experience = layoutConfig || appDesign?.frontend_experience || {};
   const interfaceType = experience.interface_type || "operations_console";
@@ -3531,6 +3623,7 @@ async function load() {
   renderDesignSections();
   renderAssistantActions();
   renderDynamicDesignPanels();
+  renderPrimitiveWorkspace();
   renderCaseQueue();
   if (sampleCases.length) {
     selectCase(0);

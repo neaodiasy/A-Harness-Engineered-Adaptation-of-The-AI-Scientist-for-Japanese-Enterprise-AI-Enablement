@@ -214,6 +214,7 @@ def build_component_plan(
             "domain-specific policy/config/adapter artifacts",
             "interactive AI copilot modes and user actions",
             "frontend experience type, layout variant, and product feature cards",
+            "responsive UI primitive composition",
             "small generated domain logic plugin",
         ],
         "scaffold_provided_components": {

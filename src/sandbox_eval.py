@@ -273,6 +273,7 @@ def run_generated_evaluation(app_dir: Path, timeout: int = 600) -> Dict[str, Any
                 "assert design.get('selected_scaffold_id') in allowed;"
                 "assert ui.get('ui_sections');"
                 "assert layout.get('interface_type');"
+                "assert layout.get('ui_primitives');"
                 "assert layout.get('human_approval_required') is True;"
                 "assert layout.get('send_allowed') is False;"
                 "assert ic.get('user_actions');"
