@@ -190,6 +190,7 @@ def build_component_plan(
             "backend/generated_domain_adapter.py",
             "backend/generated_domain_logic.py",
             "frontend/generated_ui_config.json",
+            "frontend/generated_interaction_config.json",
             "evaluation_checklist.json",
             "llm_builder_review.json",
         ],
@@ -206,6 +207,7 @@ def build_component_plan(
             "guardrails",
             "evaluation_requirements",
             "domain-specific policy/config/adapter artifacts",
+            "interactive AI copilot modes and user actions",
             "small generated domain logic plugin",
         ],
         "scaffold_provided_components": {

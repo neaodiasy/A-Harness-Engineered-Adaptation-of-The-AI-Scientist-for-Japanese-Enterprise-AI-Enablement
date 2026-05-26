@@ -837,7 +837,7 @@ import argparse
 import json
 import sys
 
-from backend.agent import run_case
+from backend.agent import run_case, run_interaction
 from backend.api import serve
 from backend.data_store import load_sample_cases
 
@@ -929,6 +929,10 @@ def load_domain_data() -> dict[str, Any]:
 
 def load_llm_app_design() -> dict[str, Any]:
     return load_json_file("llm_app_design.json")
+
+
+def load_interaction_config() -> dict[str, Any]:
+    return load_json_file("frontend/generated_interaction_config.json")
 
 
 def load_agent_spec() -> dict[str, Any]:
@@ -1573,7 +1577,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from backend.data_store import load_agent_spec, load_domain_data, load_knowledge_base, load_llm_app_design, load_product_spec
+from backend.data_store import load_agent_spec, load_domain_data, load_interaction_config, load_knowledge_base, load_llm_app_design, load_product_spec
 from backend.guardrails import enforce_output_contract
 from backend.llm_client import complete_json
 from backend.tools import run_domain_tools
@@ -1603,6 +1607,7 @@ PRODUCT_SPEC = load_product_spec()
 AGENT_SPEC = load_agent_spec()
 DOMAIN_DATA = load_domain_data()
 LLM_APP_DESIGN = load_llm_app_design()
+INTERACTION_CONFIG = load_interaction_config()
 KNOWLEDGE_BASE = load_knowledge_base()
 
 
@@ -1705,6 +1710,98 @@ Rules:
 """
 
 
+def _selected_action(action_id: str) -> dict[str, Any]:
+    for action in INTERACTION_CONFIG.get("user_actions", []):
+        if isinstance(action, dict) and action.get("id") == action_id:
+            return action
+    actions = INTERACTION_CONFIG.get("user_actions", [])
+    return actions[0] if actions and isinstance(actions[0], dict) else {}
+
+
+def build_interaction_prompt(
+    payload: dict[str, Any],
+    case: dict[str, Any],
+    local_tool_results: dict[str, Any],
+    evidence: list[dict[str, Any]],
+    domain_prompt_context: dict[str, Any],
+) -> str:
+    action = _selected_action(str(payload.get("action_id", "")))
+    policy = GENERATED_REASONING_POLICY if isinstance(GENERATED_REASONING_POLICY, dict) else {}
+    adapter = GENERATED_DOMAIN_ADAPTER if isinstance(GENERATED_DOMAIN_ADAPTER, dict) else {}
+    message = str(payload.get("message", "")).strip()
+    return f"""You are the interactive AI copilot inside a generated enterprise product.
+The user is interacting with the generated app, not asking for a generic chatbot answer.
+
+Selected interaction action:
+{json.dumps(action, ensure_ascii=False, indent=2)}
+
+User message:
+{message}
+
+Interaction configuration:
+{json.dumps(INTERACTION_CONFIG, ensure_ascii=False, indent=2)}
+
+Build-time app design:
+{json.dumps(LLM_APP_DESIGN, ensure_ascii=False, indent=2)}
+
+Generated runtime policy:
+{json.dumps(policy, ensure_ascii=False, indent=2)}
+
+Generated domain adapter:
+{json.dumps(adapter, ensure_ascii=False, indent=2)}
+
+Generated domain prompt context:
+{json.dumps(domain_prompt_context, ensure_ascii=False, indent=2)}
+
+Current case:
+{json.dumps(case, ensure_ascii=False, indent=2)}
+
+Local tool results:
+{json.dumps(local_tool_results, ensure_ascii=False, indent=2)}
+
+Evidence:
+{json.dumps(evidence, ensure_ascii=False, indent=2)}
+
+Return one JSON object with these keys:
+reply_ja, used_evidence, suggested_next_actions, risk, approval_note,
+human_approval_required, send_allowed.
+
+Rules:
+- This is an interactive business copilot for the selected scaffold and enterprise scenario.
+- Answer the user's actual message and selected action.
+- Use local tool results and evidence IDs when relevant.
+- Ask for missing information when the request cannot be handled safely.
+- Never send messages, approve decisions, or make final legal/financial/medical/HR/safety/regulated decisions.
+- human_approval_required must be true and send_allowed must be false.
+"""
+
+
+def enforce_interaction_contract(output: dict[str, Any], evidence: list[dict[str, Any]], action_id: str) -> dict[str, Any]:
+    if not isinstance(output, dict):
+        output = {}
+    risk = output.get("risk") if isinstance(output.get("risk"), dict) else {}
+    used_evidence = output.get("used_evidence")
+    if not isinstance(used_evidence, list):
+        used_evidence = [item.get("id") for item in evidence[:5] if item.get("id")]
+    next_actions = output.get("suggested_next_actions")
+    if not isinstance(next_actions, list) or not next_actions:
+        next_actions = ["Verify evidence", "Edit draft", "Request human approval"]
+    return {
+        "action_id": action_id,
+        "reply_ja": str(output.get("reply_ja") or output.get("answer") or "追加情報と人間の確認が必要です。"),
+        "used_evidence": used_evidence,
+        "suggested_next_actions": [str(item) for item in next_actions[:6]],
+        "risk": {
+            "risk_flag": True,
+            "risk_level": risk.get("risk_level", "medium"),
+            "risk_reasons": risk.get("risk_reasons", ["Human approval is required before operational use."]),
+        },
+        "approval_note": str(output.get("approval_note") or "この回答はドラフトです。顧客向け・業務上重要な利用前に人間の承認が必要です。"),
+        "human_approval_required": True,
+        "send_allowed": False,
+    }
+
+
 def run_case(case: dict[str, Any]) -> dict[str, Any]:
     local_tool_results = run_domain_tools(PRODUCT_SPEC, case)
     evidence = retrieve_evidence(case, local_tool_results)
@@ -1714,6 +1811,25 @@ def run_case(case: dict[str, Any]) -> dict[str, Any]:
     domain_prompt_context = build_domain_prompt_context(adapted_case, policy, adapter)
     llm_output = complete_json(AGENT_SPEC["system_prompt"], build_prompt(case, local_tool_results, evidence, domain_prompt_context))
     return enforce_output_contract(case, llm_output, local_tool_results, evidence, AGENT_SPEC)
+
+
+def run_interaction(payload: dict[str, Any]) -> dict[str, Any]:
+    case = payload.get("case") if isinstance(payload.get("case"), dict) else {}
+    if not case:
+        case = {key: value for key, value in payload.items() if key not in {"message", "action_id"}}
+    local_tool_results = run_domain_tools(PRODUCT_SPEC, case)
+    evidence = retrieve_evidence(case, local_tool_results)
+    policy = GENERATED_REASONING_POLICY if isinstance(GENERATED_REASONING_POLICY, dict) else {}
+    adapter = GENERATED_DOMAIN_ADAPTER if isinstance(GENERATED_DOMAIN_ADAPTER, dict) else {}
+    adapted_case = adapt_case(case, DOMAIN_DATA, PRODUCT_SPEC)
+    domain_prompt_context = build_domain_prompt_context(adapted_case, policy, adapter)
+    action_id = str(payload.get("action_id", "general"))
+    system_prompt = (
+        AGENT_SPEC["system_prompt"]
+        + "\\nYou are now serving the generated app's interactive AI copilot. Return JSON only."
+    )
+    llm_output = complete_json(system_prompt, build_interaction_prompt(payload, case, local_tool_results, evidence, domain_prompt_context))
+    return enforce_interaction_contract(llm_output, evidence, action_id)
 '''
 
 
@@ -1760,6 +1876,9 @@ class ProductHandler(BaseHTTPRequestHandler):
         if parsed.path == "/frontend/generated_ui_config.json":
             self._send_bytes((FRONTEND_DIR / "generated_ui_config.json").read_bytes(), "application/json; charset=utf-8")
             return
+        if parsed.path == "/frontend/generated_interaction_config.json":
+            self._send_bytes((FRONTEND_DIR / "generated_interaction_config.json").read_bytes(), "application/json; charset=utf-8")
+            return
         if parsed.path == "/pipeline_diagram.svg":
             self._send_bytes((APP_DIR / "pipeline_diagram.svg").read_bytes(), "image/svg+xml; charset=utf-8")
             return
@@ -1772,6 +1891,9 @@ class ProductHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/product_spec":
             self._send_json(load_product_spec())
             return
+        if parsed.path == "/api/interaction_config":
+            self._send_json(json.loads((FRONTEND_DIR / "generated_interaction_config.json").read_text(encoding="utf-8")))
+            return
         if parsed.path == "/api/sample_cases":
             self._send_json(load_sample_cases())
             return
@@ -1779,14 +1901,17 @@ class ProductHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
-        if parsed.path != "/api/recommend":
+        if parsed.path not in {"/api/recommend", "/api/assistant"}:
             self._send_json({"error": "not found"}, 404)
             return
         length = int(self.headers.get("Content-Length", "0"))
         raw = self.rfile.read(length).decode("utf-8") if length else "{}"
         try:
             payload = json.loads(raw or "{}")
-            self._send_json(run_case(payload))
+            if parsed.path == "/api/assistant":
+                self._send_json(run_interaction(payload))
+            else:
+                self._send_json(run_case(payload))
         except Exception as exc:  # pragma: no cover
             self._send_json({"error": str(exc)}, 500)
 
@@ -2043,6 +2168,21 @@ FRONTEND_HTML = '''<!doctype html>
               <span class="small-chip">Editable</span>
             </div>
             <textarea id="draftEditor" class="draft-editor" spellcheck="false">No draft yet.</textarea>
+          </article>
+
+          <article id="assistant" class="panel assistant-panel">
+            <div class="panel-header">
+              <h2 id="assistantTitle">AI Copilot</h2>
+              <span class="small-chip">DeepSeek</span>
+            </div>
+            <p id="assistantNotice" class="muted">AI output is draft-only and requires human approval.</p>
+            <div id="assistantActions" class="assistant-actions"></div>
+            <textarea id="assistantMessage" class="assistant-message" spellcheck="false"></textarea>
+            <div class="assistant-toolbar">
+              <button id="askAssistant" class="primary-action">Ask AI</button>
+              <button id="useStarter" class="secondary-action">Use Starter</button>
+            </div>
+            <div id="assistantOutput" class="assistant-output empty-state">Ask the copilot to analyze the case, retrieve evidence, or draft safely.</div>
           </article>
 
           <article id="evidence" class="panel evidence-panel">
@@ -2671,6 +2811,7 @@ details summary {
 
 .decision-panel,
 .draft-panel,
+.assistant-panel,
 .visual-panel {
   grid-column: span 2;
 }
@@ -2708,6 +2849,49 @@ details summary {
 .draft-editor {
   min-height: 280px;
   line-height: 1.65;
+}
+
+.assistant-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.assistant-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.action-chip {
+  min-height: 32px;
+  border-color: #c9d2dc;
+  background: #ffffff;
+  color: #172026;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.action-chip.active {
+  border-color: #166358;
+  background: #e8f3f1;
+  color: #166358;
+}
+
+.assistant-message {
+  min-height: 92px;
+}
+
+.assistant-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.assistant-output {
+  place-items: stretch;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  padding: 12px;
 }
 
 .approval-actions {
@@ -2772,6 +2956,7 @@ details summary {
 
   .decision-panel,
   .draft-panel,
+  .assistant-panel,
   .visual-panel {
     grid-column: auto;
   }
@@ -2821,9 +3006,11 @@ details summary {
 
 FRONTEND_JS = '''let productSpec = null;
 let uiConfig = null;
+let interactionConfig = null;
 let sampleCases = [];
 let selectedCaseIndex = 0;
 let currentOutput = null;
+let selectedActionId = "";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -3052,6 +3239,44 @@ function renderDesignSections() {
   `).join("");
 }
 
+function renderAssistantActions() {
+  const target = document.getElementById("assistantActions");
+  if (!target || !interactionConfig) return;
+  const actions = interactionConfig.user_actions || [];
+  if (!selectedActionId && actions.length) {
+    selectedActionId = actions[0].id || "general";
+  }
+  target.innerHTML = actions.map((action) => {
+    const id = action.id || action.label || "general";
+    const active = id === selectedActionId ? " active" : "";
+    return `<button class="action-chip${active}" data-action-id="${escapeHtml(id)}">${escapeHtml(action.label || id)}</button>`;
+  }).join("");
+  target.querySelectorAll("[data-action-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedActionId = button.dataset.actionId;
+      const action = actions.find((item) => (item.id || item.label) === selectedActionId) || {};
+      document.getElementById("assistantMessage").value = action.prompt || document.getElementById("assistantMessage").value;
+      renderAssistantActions();
+    });
+  });
+}
+
+function renderAssistantOutput(data) {
+  const risk = data.risk || {};
+  const evidence = data.used_evidence || [];
+  const next = data.suggested_next_actions || [];
+  return `
+    <div><strong>Reply</strong></div>
+    <div>${escapeHtml(data.reply_ja || "")}</div>
+    <div class="evidence-method">Evidence: ${escapeHtml(evidence.join(", ") || "-")}</div>
+    <div class="evidence-method">Risk: ${escapeHtml(risk.risk_level || "medium")} · send_allowed=${escapeHtml(data.send_allowed)}</div>
+    <div><strong>Next actions</strong></div>
+    <ul class="risk-list">${next.map(item => `<li>${escapeHtml(item)}</li>`).join("") || "<li>Human review</li>"}</ul>
+    <div><strong>Approval note</strong></div>
+    <div>${escapeHtml(data.approval_note || "")}</div>
+  `;
+}
+
 function setApprovalControls(enabled) {
   ["approveDraft", "requestEdit", "escalate"].forEach((id) => {
     document.getElementById(id).disabled = !enabled;
@@ -3073,6 +3298,8 @@ async function load() {
   productSpec = await (await fetch("/api/product_spec")).json();
   const uiConfigResponse = await fetch("/frontend/generated_ui_config.json");
   uiConfig = uiConfigResponse.ok ? await uiConfigResponse.json() : null;
+  const interactionConfigResponse = await fetch("/frontend/generated_interaction_config.json");
+  interactionConfig = interactionConfigResponse.ok ? await interactionConfigResponse.json() : null;
   sampleCases = await (await fetch("/api/sample_cases")).json();
   const readinessResponse = await fetch("/api/product_readiness");
   if (readinessResponse.ok) {
@@ -3085,6 +3312,10 @@ async function load() {
   document.getElementById("subtitle").textContent = productSpec.subtitle;
   document.getElementById("workspaceLabel").textContent = uiConfig?.selected_scaffold_id || uiConfig?.product_archetype || productSpec.selected_scaffold_id || productSpec.app_kind || "Operations Workspace";
   document.getElementById("run").textContent = uiConfig?.button_labels?.primary_action || productSpec.primary_action || "Generate Packet";
+  document.getElementById("assistantTitle").textContent = interactionConfig?.assistant_title || "AI Copilot";
+  document.getElementById("assistantNotice").textContent = interactionConfig?.safety_notice || "AI output is draft-only and requires human approval.";
+  document.getElementById("assistantMessage").placeholder = interactionConfig?.input_placeholder || "Ask the AI about this case.";
+  document.getElementById("assistantMessage").value = (interactionConfig?.conversation_starters || [])[0] || "";
   const vocab = decisionVocabulary();
   document.getElementById("navIntake").textContent = vocab.intake;
   document.getElementById("navDecision").textContent = vocab.nav;
@@ -3093,6 +3324,7 @@ async function load() {
   document.querySelector(".draft-panel h2").textContent = vocab.draftTitle;
   document.getElementById("fields").innerHTML = productSpec.fields.map(fieldElement).join("");
   renderDesignSections();
+  renderAssistantActions();
   renderCaseQueue();
   if (sampleCases.length) {
     selectCase(0);
@@ -3127,10 +3359,49 @@ async function run() {
   }
 }
 
+async function askAssistant() {
+  const button = document.getElementById("askAssistant");
+  const target = document.getElementById("assistantOutput");
+  button.disabled = true;
+  target.classList.remove("empty-state");
+  target.textContent = "Thinking with DeepSeek...";
+  appendLog("Started interactive AI copilot request.");
+  try {
+    const response = await fetch("/api/assistant", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        action_id: selectedActionId,
+        message: document.getElementById("assistantMessage").value,
+        case: collectCase(),
+        current_output: currentOutput
+      })
+    });
+    const data = await response.json();
+    target.innerHTML = response.ok ? renderAssistantOutput(data) : `<strong>Error</strong><br>${escapeHtml(data.error || JSON.stringify(data))}`;
+    document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+    appendLog(response.ok ? "AI copilot response generated." : "AI copilot returned an error.");
+  } catch (error) {
+    target.textContent = String(error);
+    appendLog("AI copilot runtime error.");
+  } finally {
+    button.disabled = false;
+  }
+}
+
 document.getElementById("run").addEventListener("click", run);
 document.getElementById("loadSample").addEventListener("click", () => {
   if (sampleCases.length) {
     selectCase((selectedCaseIndex + 1) % sampleCases.length);
+  }
+});
+document.getElementById("askAssistant").addEventListener("click", askAssistant);
+document.getElementById("useStarter").addEventListener("click", () => {
+  const starters = interactionConfig?.conversation_starters || [];
+  if (starters.length) {
+    const current = document.getElementById("assistantMessage").value;
+    const index = Math.max(0, starters.indexOf(current));
+    document.getElementById("assistantMessage").value = starters[(index + 1) % starters.length];
   }
 });
 document.getElementById("approveDraft").addEventListener("click", () => appendLog("Draft marked approved in local review state."));
@@ -3537,10 +3808,13 @@ def build_prototype(
     generated_reasoning_policy = role_outputs["reasoning_policy"]
     generated_domain_adapter = role_outputs["domain_adapter"]
     frontend_ui_config = role_outputs["ui_config"]
+    frontend_interaction_config = role_outputs["interaction_config"]
     evaluation_checklist = role_outputs["evaluation_checklist"]
     llm_builder_review = role_outputs["builder_review"]
     frontend_ui_config.setdefault("selected_scaffold_id", selected_scaffold_id)
     frontend_ui_config.setdefault("product_archetype", llm_app_design.get("product_archetype", selected_scaffold_id))
+    frontend_interaction_config.setdefault("selected_scaffold_id", selected_scaffold_id)
+    frontend_interaction_config.setdefault("product_archetype", llm_app_design.get("product_archetype", selected_scaffold_id))
     product_spec["generated_reasoning_policy_summary"] = {
         "generation_method": generated_reasoning_policy.get("generation_method", generated_reasoning_policy.get("source", "")),
         "policy_version": generated_reasoning_policy.get("policy_version", ""),
@@ -3560,6 +3834,7 @@ def build_prototype(
         "generated_reasoning_policy_file": "backend/generated_reasoning_policy.py",
         "generated_domain_adapter_file": "backend/generated_domain_adapter.py",
         "frontend_ui_config_file": "frontend/generated_ui_config.json",
+        "frontend_interaction_config_file": "frontend/generated_interaction_config.json",
         "evaluation_checklist_file": "evaluation_checklist.json",
         "llm_builder_review_file": "llm_builder_review.json",
         "build_time_llm_participation": bool(
@@ -3584,6 +3859,7 @@ def build_prototype(
             "evaluation_role",
             "reviewer_role",
             "domain_logic_role",
+            "interaction_role",
         ],
     })
     product_brief = build_product_brief(agent_design, product_spec)
@@ -3635,6 +3911,7 @@ def build_prototype(
         "component_plan.json": component_plan,
         "generated_reasoning_policy.json": generated_reasoning_policy,
         "generated_domain_logic_validation.json": domain_logic_validation,
+        "generated_interaction_config.json": frontend_interaction_config,
         "evaluation_checklist.json": evaluation_checklist,
         "llm_builder_review.json": llm_builder_review,
         "generation_trace.json": generation_trace,
@@ -3680,6 +3957,7 @@ def build_prototype(
         "frontend/styles.css": FRONTEND_CSS,
         "frontend/app.js": FRONTEND_JS,
         "frontend/generated_ui_config.json": json.dumps(frontend_ui_config, ensure_ascii=False, indent=2) + "\n",
+        "frontend/generated_interaction_config.json": json.dumps(frontend_interaction_config, ensure_ascii=False, indent=2) + "\n",
         "knowledge_base.md": knowledge_base + "\n",
         "generated_product_rules.md": generated_product_rules + "\n",
         "production_readiness.md": render_product_readiness(product_readiness),

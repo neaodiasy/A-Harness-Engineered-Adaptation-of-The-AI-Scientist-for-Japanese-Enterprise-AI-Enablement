@@ -33,6 +33,7 @@ REQUIRED_CHILD_FILES = [
     "agent_spec.json",
     "generated_reasoning_policy.json",
     "generated_domain_logic_validation.json",
+    "generated_interaction_config.json",
     "evaluation_checklist.json",
     "llm_builder_review.json",
     "sample_cases.json",
@@ -53,6 +54,7 @@ REQUIRED_CHILD_FILES = [
     "backend/tools.py",
     "frontend/index.html",
     "frontend/generated_ui_config.json",
+    "frontend/generated_interaction_config.json",
     "frontend/styles.css",
     "frontend/app.js",
     "data/areas.json",
@@ -259,6 +261,7 @@ def run_generated_evaluation(app_dir: Path, timeout: int = 600) -> Dict[str, Any
                 "allowed={'recommendation_workbench','customer_support_workbench','risk_review_console','knowledge_assistant','approval_workbench','domain_operations_workbench'};"
                 "design=json.load(open('llm_app_design.json'));"
                 "ui=json.load(open('frontend/generated_ui_config.json'));"
+                "ic=json.load(open('frontend/generated_interaction_config.json'));"
                 "ev=json.load(open('evaluation_checklist.json'));"
                 "rv=json.load(open('llm_builder_review.json'));"
                 "assert p.get('human_approval_required') is True;"
@@ -266,6 +269,9 @@ def run_generated_evaluation(app_dir: Path, timeout: int = 600) -> Dict[str, Any
                 "assert a.get('adapter_version');"
                 "assert design.get('selected_scaffold_id') in allowed;"
                 "assert ui.get('ui_sections');"
+                "assert ic.get('user_actions');"
+                "assert ic.get('human_approval_required') is True;"
+                "assert ic.get('send_allowed') is False;"
                 "assert ev.get('approval_checks');"
                 "assert 'passed' in rv;"
                 "adapted=adapt_case({'case_id':'sandbox_case'}, {'domain_candidates':[], 'item_records':[]}, {'selected_scaffold_id':design.get('selected_scaffold_id')});"

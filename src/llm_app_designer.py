@@ -40,6 +40,9 @@ APP_DESIGN_REQUIRED_KEYS = [
     "evaluation_requirements",
     "domain_adaptation_notes",
     "small_domain_logic_requirements",
+    "interaction_modes",
+    "user_actions",
+    "conversation_starters",
 ]
 
 
@@ -71,6 +74,110 @@ def _complete_json(llm_client: Any, prompt: str, system: str) -> Any:
     return parse_jsonish(raw, fallback=None)
 
 
+def _fallback_interactions(selected_scaffold_id: str, selected_opportunity: dict[str, Any]) -> dict[str, Any]:
+    """Create scaffold-specific AI interaction affordances for fallback builds."""
+    opportunity_name = selected_opportunity.get("name", "selected opportunity")
+    if selected_scaffold_id == "customer_support_workbench":
+        return {
+            "interaction_modes": [
+                {"id": "triage_chat", "label": "Inquiry Triage", "purpose": "Classify the customer inquiry and identify missing information."},
+                {"id": "policy_evidence_chat", "label": "Policy Evidence Q&A", "purpose": "Explain relevant FAQ, policy, or claim-procedure evidence."},
+                {"id": "reply_coach", "label": "Reply Draft Coach", "purpose": "Draft a cautious customer-support reply for human review."},
+            ],
+            "user_actions": [
+                {"id": "classify_inquiry", "label": "Classify inquiry", "prompt": "Classify this inquiry and explain the confidence and escalation boundary."},
+                {"id": "retrieve_policy_evidence", "label": "Find policy evidence", "prompt": "Find relevant FAQ, policy, or procedure evidence and cite evidence IDs."},
+                {"id": "draft_customer_reply", "label": "Draft customer reply", "prompt": "Draft a cautious Japanese customer-support reply that requires human approval."},
+                {"id": "check_escalation", "label": "Check escalation", "prompt": "Identify ambiguity, missing documents, risk flags, and escalation reasons."},
+            ],
+            "conversation_starters": [
+                f"Help me triage a customer inquiry for {opportunity_name}.",
+                "What evidence should I cite before drafting a reply?",
+                "Draft a safe customer-facing reply and list what a reviewer must approve.",
+            ],
+        }
+    if selected_scaffold_id == "risk_review_console":
+        return {
+            "interaction_modes": [
+                {"id": "risk_review_chat", "label": "Risk Review", "purpose": "Review policy, compliance, safety, or exception risks."},
+                {"id": "missing_info_chat", "label": "Missing Information", "purpose": "Identify facts required before a decision-support draft."},
+            ],
+            "user_actions": [
+                {"id": "summarize_risk", "label": "Summarize risk", "prompt": "Summarize risk factors, missing information, and approval boundary."},
+                {"id": "policy_check", "label": "Check policy fit", "prompt": "Check the case against available policy evidence and explain uncertainty."},
+                {"id": "prepare_reviewer_note", "label": "Reviewer note", "prompt": "Prepare a reviewer note with evidence, risk flags, and decision options."},
+            ],
+            "conversation_starters": [
+                "What are the main risk flags in this case?",
+                "What must a human reviewer verify before approval?",
+            ],
+        }
+    if selected_scaffold_id == "knowledge_assistant":
+        return {
+            "interaction_modes": [
+                {"id": "knowledge_chat", "label": "Knowledge Q&A", "purpose": "Answer operator questions from local and live evidence."},
+                {"id": "evidence_summary_chat", "label": "Evidence Summary", "purpose": "Summarize evidence and uncertainty for human review."},
+            ],
+            "user_actions": [
+                {"id": "answer_with_evidence", "label": "Answer with evidence", "prompt": "Answer using evidence IDs and clearly state uncertainty."},
+                {"id": "summarize_documents", "label": "Summarize documents", "prompt": "Summarize the most relevant knowledge base and live evidence."},
+                {"id": "ask_followups", "label": "Ask follow-ups", "prompt": "List follow-up questions needed before using the answer operationally."},
+            ],
+            "conversation_starters": [
+                "Answer this operational question using available evidence.",
+                "What evidence supports this answer?",
+            ],
+        }
+    if selected_scaffold_id == "approval_workbench":
+        return {
+            "interaction_modes": [
+                {"id": "approval_chat", "label": "Approval Review", "purpose": "Help reviewers inspect drafts, evidence, and risk boundaries."},
+                {"id": "edit_request_chat", "label": "Edit Request", "purpose": "Suggest safe edits before approval."},
+            ],
+            "user_actions": [
+                {"id": "review_draft", "label": "Review draft", "prompt": "Review this draft for unsupported claims and approval blockers."},
+                {"id": "request_edits", "label": "Request edits", "prompt": "Write edit requests that make the draft safer and more evidence-grounded."},
+                {"id": "build_approval_packet", "label": "Approval packet", "prompt": "Build an approval packet with evidence, risk, and decision options."},
+            ],
+            "conversation_starters": [
+                "Review this draft before approval.",
+                "What edits are needed before this can be sent?",
+            ],
+        }
+    if selected_scaffold_id == "recommendation_workbench":
+        return {
+            "interaction_modes": [
+                {"id": "preference_chat", "label": "Preference Analysis", "purpose": "Analyze user requirements and refine ranking criteria."},
+                {"id": "candidate_explainer", "label": "Candidate Explainer", "purpose": "Explain candidate trade-offs using local tool results and evidence."},
+                {"id": "recommendation_draft", "label": "Recommendation Draft", "purpose": "Draft a recommendation packet for human approval."},
+            ],
+            "user_actions": [
+                {"id": "analyze_preferences", "label": "Analyze preferences", "prompt": "Analyze the user's preferences and identify ranking criteria."},
+                {"id": "compare_candidates", "label": "Compare candidates", "prompt": "Compare top candidates using evidence, trade-offs, and uncertainty."},
+                {"id": "draft_recommendation", "label": "Draft recommendation", "prompt": "Draft a cautious recommendation with human approval required."},
+            ],
+            "conversation_starters": [
+                f"Analyze this case for {opportunity_name}.",
+                "Explain the top candidate trade-offs.",
+            ],
+        }
+    return {
+        "interaction_modes": [
+            {"id": "operations_chat", "label": "Operations Copilot", "purpose": "Discuss the case, evidence, risks, and next actions."},
+            {"id": "approval_chat", "label": "Approval Support", "purpose": "Prepare approval-ready outputs for human review."},
+        ],
+        "user_actions": [
+            {"id": "analyze_case", "label": "Analyze case", "prompt": "Analyze this enterprise case and identify useful next actions."},
+            {"id": "find_evidence", "label": "Find evidence", "prompt": "Find and summarize relevant evidence and uncertainty."},
+            {"id": "prepare_packet", "label": "Prepare packet", "prompt": "Prepare an approval-ready packet with risks and decision options."},
+        ],
+        "conversation_starters": [
+            "Analyze this workflow case and recommend next actions.",
+            "What evidence and risks should the reviewer check?",
+        ],
+    }
+
+
 def _fallback_app_design(
     profile: dict[str, Any],
     selected_opportunity: dict[str, Any],
@@ -84,6 +191,7 @@ def _fallback_app_design(
     selected_scaffold_id = select_scaffold_deterministically(profile, selected_opportunity, agent_design, runtime_domain_pack)
     scaffold = (scaffold_library or {}).get(selected_scaffold_id) or get_scaffold(selected_scaffold_id)
     archetype_id = selected_scaffold_id
+    interactions = _fallback_interactions(selected_scaffold_id, selected_opportunity)
     return {
         "design_source": "deterministic_fallback",
         "selected_scaffold_id": selected_scaffold_id,
@@ -131,6 +239,7 @@ def _fallback_app_design(
             "Adapt raw case fields into scaffold-specific prompt context.",
             "Return dictionaries only and keep human approval flags visible.",
         ],
+        **interactions,
     }
 
 
@@ -154,6 +263,9 @@ def validate_app_design(design: Any, fallback: dict[str, Any]) -> dict[str, Any]
     out["evaluation_requirements"] = _string_list(out.get("evaluation_requirements"), fallback["evaluation_requirements"])
     out["domain_adaptation_notes"] = _string_list(out.get("domain_adaptation_notes"), fallback["domain_adaptation_notes"])
     out["small_domain_logic_requirements"] = _string_list(out.get("small_domain_logic_requirements"), fallback["small_domain_logic_requirements"])
+    out["interaction_modes"] = _dict_list(out.get("interaction_modes"), fallback["interaction_modes"])
+    out["user_actions"] = _dict_list(out.get("user_actions"), fallback["user_actions"])
+    out["conversation_starters"] = _string_list(out.get("conversation_starters"), fallback["conversation_starters"])
     human = out.get("human_approval") if isinstance(out.get("human_approval"), dict) else {}
     human["required"] = True
     human["send_allowed"] = False
@@ -282,6 +394,7 @@ def _fallback_task_plan(app_design: dict[str, Any]) -> dict[str, Any]:
             {"role": "evaluation_role", "task": "Generate domain-specific evaluation checklist", "target_files": ["evaluation_checklist.json"], "inputs": ["llm_app_design"], "acceptance_checks": ["checklist_non_empty"]},
             {"role": "reviewer_role", "task": "Review generated LLM design artifacts for missing safety fields", "target_files": ["llm_builder_review.json"], "inputs": ["all_llm_design_artifacts"], "acceptance_checks": ["review_passed_or_fallback"]},
             {"role": "domain_logic_role", "task": "Generate safe domain-specific code plugin", "target_files": ["backend/generated_domain_logic.py"], "inputs": ["selected_scaffold_id", "runtime_domain_pack", "llm_app_design"], "acceptance_checks": ["ast_safe", "adapt_case_returns_dict", "prompt_context_returns_dict"]},
+            {"role": "interaction_role", "task": "Generate business-specific AI copilot interaction modes and user actions", "target_files": ["frontend/generated_interaction_config.json"], "inputs": ["llm_app_design", "product_spec", "runtime_domain_pack"], "acceptance_checks": ["user_actions_non_empty", "human_approval_required", "send_allowed_false"]},
         ],
         "app_design_archetype": app_design.get("product_archetype", ""),
     }
@@ -292,7 +405,7 @@ def build_code_task_plan(app_design: dict[str, Any], product_spec: dict[str, Any
     if llm_client is None:
         return fallback
     prompt = f"""Return one JSON code task plan for specialized roles. JSON only.
-    Roles must include backend_role, frontend_role, guardrails_role, evaluation_role, reviewer_role, domain_logic_role.
+Roles must include backend_role, frontend_role, guardrails_role, evaluation_role, reviewer_role, domain_logic_role, interaction_role.
 Each task needs role, task, target_files, inputs, acceptance_checks.
 App design: {json.dumps(app_design, ensure_ascii=False)}
 Product spec: {json.dumps(product_spec, ensure_ascii=False)}
@@ -303,7 +416,7 @@ Domain pack: {json.dumps(runtime_domain_pack, ensure_ascii=False)}
         if not isinstance(plan, dict) or not isinstance(plan.get("tasks"), list):
             return fallback
         roles = {str(task.get("role")) for task in plan["tasks"] if isinstance(task, dict)}
-        required = {"backend_role", "frontend_role", "guardrails_role", "evaluation_role", "reviewer_role", "domain_logic_role"}
+        required = {"backend_role", "frontend_role", "guardrails_role", "evaluation_role", "reviewer_role", "domain_logic_role", "interaction_role"}
         if not required.issubset(roles):
             return fallback
         plan["source"] = "deepseek_code_task_planner"
@@ -359,6 +472,35 @@ def _ui_fallback(app_design: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _interaction_config_fallback(app_design: dict[str, Any]) -> dict[str, Any]:
+    selected_scaffold_id = app_design.get("selected_scaffold_id", app_design.get("product_archetype", "domain_operations_workbench"))
+    interactions = _fallback_interactions(str(selected_scaffold_id), {"name": app_design.get("target_workflow", "enterprise workflow")})
+    return {
+        "source": "deterministic_fallback",
+        "selected_scaffold_id": selected_scaffold_id,
+        "product_archetype": app_design.get("product_archetype", selected_scaffold_id),
+        "assistant_title": {
+            "customer_support_workbench": "Support AI Copilot",
+            "recommendation_workbench": "Recommendation AI Copilot",
+            "risk_review_console": "Risk Review AI Copilot",
+            "knowledge_assistant": "Knowledge AI Copilot",
+            "approval_workbench": "Approval AI Copilot",
+        }.get(str(selected_scaffold_id), "Enterprise AI Copilot"),
+        "input_placeholder": "Ask the AI to analyze this case, find evidence, draft safely, or prepare approval notes.",
+        "interaction_modes": app_design.get("interaction_modes") or interactions["interaction_modes"],
+        "user_actions": app_design.get("user_actions") or interactions["user_actions"],
+        "conversation_starters": app_design.get("conversation_starters") or interactions["conversation_starters"],
+        "safety_notice": "AI output is draft-only. Human approval is required before customer-facing or operational use.",
+        "response_contract": {
+            "required_keys": ["reply_ja", "used_evidence", "suggested_next_actions", "risk", "approval_note", "human_approval_required", "send_allowed"],
+            "human_approval_required": True,
+            "send_allowed": False,
+        },
+        "human_approval_required": True,
+        "send_allowed": False,
+    }
+
+
 def _evaluation_fallback(app_design: dict[str, Any]) -> dict[str, Any]:
     return {
         "required_fields": ["case_id", "risk", "approval_packet", "human_approval_required", "send_allowed"],
@@ -377,11 +519,13 @@ def _validate_role_outputs(outputs: dict[str, Any], app_design: dict[str, Any], 
     policy_fallback = _policy_fallback(app_design, product_spec, runtime_domain_pack)
     adapter_fallback = _adapter_fallback(app_design, product_spec, runtime_domain_pack)
     ui_fallback = _ui_fallback(app_design)
+    interaction_fallback = _interaction_config_fallback(app_design)
     evaluation_fallback = _evaluation_fallback(app_design)
     review_fallback = _review_fallback()
     outputs.setdefault("reasoning_policy", policy_fallback)
     outputs.setdefault("domain_adapter", adapter_fallback)
     outputs.setdefault("ui_config", ui_fallback)
+    outputs.setdefault("interaction_config", interaction_fallback)
     outputs.setdefault("evaluation_checklist", evaluation_fallback)
     outputs.setdefault("builder_review", review_fallback)
     policy = outputs["reasoning_policy"] if isinstance(outputs["reasoning_policy"], dict) else _policy_fallback(app_design, product_spec, runtime_domain_pack)
@@ -402,6 +546,19 @@ def _validate_role_outputs(outputs: dict[str, Any], app_design: dict[str, Any], 
     if not ui.get("ui_sections"):
         ui["ui_sections"] = ui_fallback["ui_sections"]
     outputs["ui_config"] = ui
+
+    interaction = outputs["interaction_config"] if isinstance(outputs["interaction_config"], dict) else interaction_fallback
+    for key, value in interaction_fallback.items():
+        interaction.setdefault(key, value)
+    interaction["human_approval_required"] = True
+    interaction["send_allowed"] = False
+    if not interaction.get("user_actions"):
+        interaction["user_actions"] = interaction_fallback["user_actions"]
+    if not interaction.get("interaction_modes"):
+        interaction["interaction_modes"] = interaction_fallback["interaction_modes"]
+    if not interaction.get("conversation_starters"):
+        interaction["conversation_starters"] = interaction_fallback["conversation_starters"]
+    outputs["interaction_config"] = interaction
 
     evaluation = outputs["evaluation_checklist"] if isinstance(outputs["evaluation_checklist"], dict) else evaluation_fallback
     for key, value in evaluation_fallback.items():
@@ -424,6 +581,7 @@ def build_specialized_role_outputs(app_design: dict[str, Any], product_spec: dic
         "reasoning_policy": _policy_fallback(app_design, product_spec, runtime_domain_pack),
         "domain_adapter": _adapter_fallback(app_design, product_spec, runtime_domain_pack),
         "ui_config": _ui_fallback(app_design),
+        "interaction_config": _interaction_config_fallback(app_design),
         "evaluation_checklist": _evaluation_fallback(app_design),
         "builder_review": _review_fallback(),
     }
@@ -433,7 +591,8 @@ def build_specialized_role_outputs(app_design: dict[str, Any], product_spec: dic
     role_specs = {
         "reasoning_policy": "Generate JSON for backend/generated_reasoning_policy.py with policy_version, source, product_archetype, runtime_role, required_output_sections, runtime_prompt_requirements, domain_specific_instructions, forbidden_claims, risk_rules, approval_packet_requirements, human_approval_required, send_allowed, evaluation_checklist.",
         "domain_adapter": "Generate JSON for backend/generated_domain_adapter.py with adapter_version, source, domain, product_archetype, target_workflow, reasoning_steps, tool_policy, ui_binding_notes, domain_fields, sample_case_strategy.",
-            "ui_config": "Generate JSON for frontend/generated_ui_config.json with product_archetype, ui_sections, panel_labels, button_labels, empty_state_text, approval_labels.",
+        "ui_config": "Generate JSON for frontend/generated_ui_config.json with product_archetype, ui_sections, panel_labels, button_labels, empty_state_text, approval_labels.",
+        "interaction_config": "Generate JSON for frontend/generated_interaction_config.json with selected_scaffold_id, product_archetype, assistant_title, input_placeholder, interaction_modes, user_actions, conversation_starters, safety_notice, response_contract, human_approval_required, send_allowed. User actions must be business-specific and must let the user interact with DeepSeek for the useful enterprise workflow.",
         "evaluation_checklist": "Generate JSON for evaluation_checklist.json with required_fields, runtime_checks, approval_checks, risk_checks, domain_specific_checks.",
         "builder_review": "Generate JSON for llm_builder_review.json with review_source, passed, missing_fields, safety_concerns, fallback_recommendation.",
     }
