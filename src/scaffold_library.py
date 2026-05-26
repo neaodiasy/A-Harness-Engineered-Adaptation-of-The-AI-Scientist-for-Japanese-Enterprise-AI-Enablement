@@ -14,7 +14,7 @@ SCAFFOLD_LIBRARY: dict[str, dict[str, Any]] = {
         "default_local_tools": ["candidate_ranker", "evidence_lookup"],
         "required_guardrails": ["candidate names must come from local data", "human approval required", "send_allowed false"],
         "default_evaluation_checks": ["candidate output exists", "evidence exists", "risk flags exist", "approval required"],
-        "compatible_opportunity_keywords": ["recommend", "ranking", "rank", "match", "compare", "候補", "推薦", "比較"],
+        "compatible_opportunity_keywords": ["recommend", "recommendation", "ranking", "rank", "match", "matching", "compare", "preference", "suitable", "property", "real estate", "area", "候補", "推薦", "比較"],
     },
     "customer_support_workbench": {
         "scaffold_id": "customer_support_workbench",
@@ -98,7 +98,9 @@ def select_scaffold_deterministically(*contexts: object) -> str:
         score = sum(1 for term in terms if term and term in text)
         if scaffold_id == "customer_support_workbench" and any(term in text for term in ("support", "inquiry", "faq", "reply", "customer")):
             score += 2
-        if scaffold_id == "risk_review_console" and any(term in text for term in ("claim", "compliance", "risk", "approval")):
+        if scaffold_id == "recommendation_workbench" and any(term in text for term in ("recommendation", "preference", "ranking", "matching", "property", "real estate", "suitable")):
+            score += 3
+        if scaffold_id == "risk_review_console" and any(term in text for term in ("claim", "compliance", "policy review", "risk review", "legal", "financial", "hr")):
             score += 1
         if score > best_score or (score == best_score and score > 0 and priority.get(scaffold_id, 0) > priority.get(best_id, 0)):
             best_id = scaffold_id

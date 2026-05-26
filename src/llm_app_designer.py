@@ -40,6 +40,8 @@ APP_DESIGN_REQUIRED_KEYS = [
     "evaluation_requirements",
     "domain_adaptation_notes",
     "small_domain_logic_requirements",
+    "product_feature_plan",
+    "frontend_experience",
     "interaction_modes",
     "user_actions",
     "conversation_starters",
@@ -178,6 +180,99 @@ def _fallback_interactions(selected_scaffold_id: str, selected_opportunity: dict
     }
 
 
+def _fallback_frontend_experience(selected_scaffold_id: str) -> dict[str, Any]:
+    """Select a visibly different frontend product experience per scaffold."""
+    if selected_scaffold_id == "customer_support_workbench":
+        return {
+            "interface_type": "support_desk",
+            "layout_variant": "ticket_intake_copilot_draft",
+            "visual_style": "service_operations",
+            "primary_surface": "Customer inquiry intake, AI copilot, policy evidence, response draft, escalation and approval.",
+            "navigation_model": "ticket_queue",
+            "emphasis_order": ["intake", "assistant", "draft", "policy_evidence", "approval", "activity"],
+        }
+    if selected_scaffold_id == "recommendation_workbench":
+        return {
+            "interface_type": "recommendation_dashboard",
+            "layout_variant": "criteria_candidates_explanation",
+            "visual_style": "consultative_recommendation",
+            "primary_surface": "Preference intake, candidate ranking, comparison evidence, recommendation draft, approval.",
+            "navigation_model": "case_queue_plus_candidate_board",
+            "emphasis_order": ["intake", "recommendations", "assistant", "evidence", "draft", "approval"],
+        }
+    if selected_scaffold_id == "risk_review_console":
+        return {
+            "interface_type": "risk_review_console",
+            "layout_variant": "case_evidence_risk_approval",
+            "visual_style": "review_and_control",
+            "primary_surface": "Case facts, policy checks, risk checklist, missing information, approval decision support.",
+            "navigation_model": "review_queue",
+            "emphasis_order": ["intake", "approval", "evidence", "assistant", "draft", "activity"],
+        }
+    if selected_scaffold_id == "knowledge_assistant":
+        return {
+            "interface_type": "chat_console",
+            "layout_variant": "question_answer_evidence",
+            "visual_style": "knowledge_workbench",
+            "primary_surface": "Question intake, AI answer workspace, document evidence, uncertainty flags, approval note.",
+            "navigation_model": "query_history",
+            "emphasis_order": ["assistant", "intake", "evidence", "draft", "approval", "activity"],
+        }
+    if selected_scaffold_id == "approval_workbench":
+        return {
+            "interface_type": "approval_queue",
+            "layout_variant": "draft_review_evidence_controls",
+            "visual_style": "approval_operations",
+            "primary_surface": "Draft review, evidence review, risk notes, approval controls, audit trail.",
+            "navigation_model": "approval_queue",
+            "emphasis_order": ["draft", "approval", "evidence", "assistant", "intake", "activity"],
+        }
+    return {
+        "interface_type": "operations_console",
+        "layout_variant": "intake_copilot_evidence_approval",
+        "visual_style": "enterprise_operations",
+        "primary_surface": "Business case intake, AI copilot, evidence, risk, approval packet, audit trail.",
+        "navigation_model": "case_queue",
+        "emphasis_order": ["intake", "assistant", "evidence", "draft", "approval", "activity"],
+    }
+
+
+def _fallback_feature_plan(selected_scaffold_id: str, selected_opportunity: dict[str, Any]) -> list[dict[str, Any]]:
+    """Create product-level features that the generated app should expose."""
+    opportunity = selected_opportunity.get("name", "Selected opportunity")
+    if selected_scaffold_id == "customer_support_workbench":
+        return [
+            {"id": "inquiry_triage", "label": "Inquiry triage", "purpose": "Classify customer inquiries and identify ambiguity.", "user_interaction": "classify_inquiry"},
+            {"id": "policy_evidence", "label": "Policy evidence retrieval", "purpose": "Retrieve FAQ, policy, procedure, and claim evidence.", "user_interaction": "retrieve_policy_evidence"},
+            {"id": "reply_drafting", "label": "Cautious reply drafting", "purpose": "Draft customer-support replies for human approval.", "user_interaction": "draft_customer_reply"},
+            {"id": "escalation_review", "label": "Escalation review", "purpose": "Flag missing information, ambiguous claims, and senior-review cases.", "user_interaction": "check_escalation"},
+        ]
+    if selected_scaffold_id == "recommendation_workbench":
+        return [
+            {"id": "preference_intake", "label": "Preference intake", "purpose": "Turn customer requirements into ranking criteria.", "user_interaction": "analyze_preferences"},
+            {"id": "candidate_ranking", "label": "Candidate ranking", "purpose": "Rank candidates using local tools and evidence.", "user_interaction": "compare_candidates"},
+            {"id": "tradeoff_explanation", "label": "Trade-off explanation", "purpose": "Explain why candidates fit or do not fit.", "user_interaction": "compare_candidates"},
+            {"id": "recommendation_packet", "label": "Recommendation packet", "purpose": "Draft approval-ready recommendations.", "user_interaction": "draft_recommendation"},
+        ]
+    if selected_scaffold_id == "risk_review_console":
+        return [
+            {"id": "risk_classification", "label": "Risk classification", "purpose": "Classify risk and identify review severity.", "user_interaction": "summarize_risk"},
+            {"id": "policy_condition_check", "label": "Policy condition check", "purpose": "Check policy fit and missing information.", "user_interaction": "policy_check"},
+            {"id": "reviewer_note", "label": "Reviewer note", "purpose": "Prepare evidence-grounded reviewer notes.", "user_interaction": "prepare_reviewer_note"},
+        ]
+    if selected_scaffold_id == "knowledge_assistant":
+        return [
+            {"id": "knowledge_qa", "label": "Knowledge Q&A", "purpose": "Answer operator questions using evidence.", "user_interaction": "answer_with_evidence"},
+            {"id": "document_summary", "label": "Document summary", "purpose": "Summarize relevant knowledge and source uncertainty.", "user_interaction": "summarize_documents"},
+            {"id": "followup_questions", "label": "Follow-up questions", "purpose": "Ask for missing facts before operational use.", "user_interaction": "ask_followups"},
+        ]
+    return [
+        {"id": "case_analysis", "label": f"{opportunity} analysis", "purpose": "Analyze the business case and identify next actions.", "user_interaction": "analyze_case"},
+        {"id": "evidence_review", "label": "Evidence review", "purpose": "Find and summarize supporting evidence.", "user_interaction": "find_evidence"},
+        {"id": "approval_packet", "label": "Approval packet", "purpose": "Prepare approval-ready output.", "user_interaction": "prepare_packet"},
+    ]
+
+
 def _fallback_app_design(
     profile: dict[str, Any],
     selected_opportunity: dict[str, Any],
@@ -192,6 +287,8 @@ def _fallback_app_design(
     scaffold = (scaffold_library or {}).get(selected_scaffold_id) or get_scaffold(selected_scaffold_id)
     archetype_id = selected_scaffold_id
     interactions = _fallback_interactions(selected_scaffold_id, selected_opportunity)
+    frontend_experience = _fallback_frontend_experience(selected_scaffold_id)
+    feature_plan = _fallback_feature_plan(selected_scaffold_id, selected_opportunity)
     return {
         "design_source": "deterministic_fallback",
         "selected_scaffold_id": selected_scaffold_id,
@@ -239,6 +336,8 @@ def _fallback_app_design(
             "Adapt raw case fields into scaffold-specific prompt context.",
             "Return dictionaries only and keep human approval flags visible.",
         ],
+        "product_feature_plan": feature_plan,
+        "frontend_experience": frontend_experience,
         **interactions,
     }
 
@@ -263,6 +362,15 @@ def validate_app_design(design: Any, fallback: dict[str, Any]) -> dict[str, Any]
     out["evaluation_requirements"] = _string_list(out.get("evaluation_requirements"), fallback["evaluation_requirements"])
     out["domain_adaptation_notes"] = _string_list(out.get("domain_adaptation_notes"), fallback["domain_adaptation_notes"])
     out["small_domain_logic_requirements"] = _string_list(out.get("small_domain_logic_requirements"), fallback["small_domain_logic_requirements"])
+    out["product_feature_plan"] = _dict_list(out.get("product_feature_plan"), fallback["product_feature_plan"])
+    frontend = out.get("frontend_experience") if isinstance(out.get("frontend_experience"), dict) else {}
+    frontend_fallback = fallback["frontend_experience"]
+    for key, value in frontend_fallback.items():
+        frontend.setdefault(key, value)
+    allowed_interfaces = {"support_desk", "recommendation_dashboard", "risk_review_console", "chat_console", "approval_queue", "operations_console"}
+    if frontend.get("interface_type") not in allowed_interfaces:
+        frontend["interface_type"] = frontend_fallback["interface_type"]
+    out["frontend_experience"] = frontend
     out["interaction_modes"] = _dict_list(out.get("interaction_modes"), fallback["interaction_modes"])
     out["user_actions"] = _dict_list(out.get("user_actions"), fallback["user_actions"])
     out["conversation_starters"] = _string_list(out.get("conversation_starters"), fallback["conversation_starters"])
@@ -294,7 +402,9 @@ Do not write source code. JSON only.
 Required keys: {json.dumps(APP_DESIGN_REQUIRED_KEYS)}
 Allowed selected_scaffold_id and product_archetype values: {sorted(ALLOWED_ARCHETYPES)}
 human_approval.required must be true and human_approval.send_allowed must be false.
-Select exactly one scaffold from the scaffold library, then customize UI sections, backend modules, local tools, guardrails, evaluation checks, and small domain logic requirements.
+Select exactly one scaffold from the scaffold library, then design the product capabilities, frontend experience, UI sections, backend modules, local tools, guardrails, evaluation checks, and small domain logic requirements.
+Do not merely rename a fixed workbench. Decide what product functions are actually needed for this enterprise workflow.
+frontend_experience.interface_type must be one of support_desk, recommendation_dashboard, risk_review_console, chat_console, approval_queue, operations_console.
 
 Scaffold library: {json.dumps(scaffold_library or {}, ensure_ascii=False)}
 Enterprise profile: {json.dumps(profile, ensure_ascii=False)}
@@ -395,6 +505,7 @@ def _fallback_task_plan(app_design: dict[str, Any]) -> dict[str, Any]:
             {"role": "reviewer_role", "task": "Review generated LLM design artifacts for missing safety fields", "target_files": ["llm_builder_review.json"], "inputs": ["all_llm_design_artifacts"], "acceptance_checks": ["review_passed_or_fallback"]},
             {"role": "domain_logic_role", "task": "Generate safe domain-specific code plugin", "target_files": ["backend/generated_domain_logic.py"], "inputs": ["selected_scaffold_id", "runtime_domain_pack", "llm_app_design"], "acceptance_checks": ["ast_safe", "adapt_case_returns_dict", "prompt_context_returns_dict"]},
             {"role": "interaction_role", "task": "Generate business-specific AI copilot interaction modes and user actions", "target_files": ["frontend/generated_interaction_config.json"], "inputs": ["llm_app_design", "product_spec", "runtime_domain_pack"], "acceptance_checks": ["user_actions_non_empty", "human_approval_required", "send_allowed_false"]},
+            {"role": "frontend_layout_role", "task": "Generate product-specific frontend layout and visual experience configuration", "target_files": ["frontend/generated_layout_config.json"], "inputs": ["llm_app_design", "product_feature_plan", "frontend_experience"], "acceptance_checks": ["interface_type_valid", "feature_cards_present", "approval_required_true"]},
         ],
         "app_design_archetype": app_design.get("product_archetype", ""),
     }
@@ -405,7 +516,7 @@ def build_code_task_plan(app_design: dict[str, Any], product_spec: dict[str, Any
     if llm_client is None:
         return fallback
     prompt = f"""Return one JSON code task plan for specialized roles. JSON only.
-Roles must include backend_role, frontend_role, guardrails_role, evaluation_role, reviewer_role, domain_logic_role, interaction_role.
+Roles must include backend_role, frontend_role, frontend_layout_role, guardrails_role, evaluation_role, reviewer_role, domain_logic_role, interaction_role.
 Each task needs role, task, target_files, inputs, acceptance_checks.
 App design: {json.dumps(app_design, ensure_ascii=False)}
 Product spec: {json.dumps(product_spec, ensure_ascii=False)}
@@ -416,7 +527,7 @@ Domain pack: {json.dumps(runtime_domain_pack, ensure_ascii=False)}
         if not isinstance(plan, dict) or not isinstance(plan.get("tasks"), list):
             return fallback
         roles = {str(task.get("role")) for task in plan["tasks"] if isinstance(task, dict)}
-        required = {"backend_role", "frontend_role", "guardrails_role", "evaluation_role", "reviewer_role", "domain_logic_role", "interaction_role"}
+        required = {"backend_role", "frontend_role", "frontend_layout_role", "guardrails_role", "evaluation_role", "reviewer_role", "domain_logic_role", "interaction_role"}
         if not required.issubset(roles):
             return fallback
         plan["source"] = "deepseek_code_task_planner"
@@ -472,6 +583,38 @@ def _ui_fallback(app_design: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _frontend_layout_fallback(app_design: dict[str, Any]) -> dict[str, Any]:
+    frontend_experience = app_design.get("frontend_experience") if isinstance(app_design.get("frontend_experience"), dict) else {}
+    selected_scaffold_id = app_design.get("selected_scaffold_id", app_design.get("product_archetype", "domain_operations_workbench"))
+    interface_type = frontend_experience.get("interface_type") or _fallback_frontend_experience(str(selected_scaffold_id))["interface_type"]
+    return {
+        "source": "deterministic_fallback",
+        "selected_scaffold_id": selected_scaffold_id,
+        "interface_type": interface_type,
+        "layout_variant": frontend_experience.get("layout_variant", "intake_copilot_evidence_approval"),
+        "visual_style": frontend_experience.get("visual_style", "enterprise_operations"),
+        "primary_surface": frontend_experience.get("primary_surface", ""),
+        "navigation_model": frontend_experience.get("navigation_model", "case_queue"),
+        "emphasis_order": frontend_experience.get("emphasis_order", ["intake", "assistant", "evidence", "draft", "approval", "activity"]),
+        "feature_cards": app_design.get("product_feature_plan", []),
+        "page_regions": [
+            {"id": item.get("id", f"section_{index}"), "label": item.get("label", item.get("id", "")), "purpose": item.get("purpose", ""), "bound_action": item.get("user_interaction", "")}
+            for index, item in enumerate(app_design.get("product_feature_plan", []), start=1)
+            if isinstance(item, dict)
+        ],
+        "theme_tokens": {
+            "support_desk": {"accent": "#0f766e", "surface": "#f7fbfa", "sidebar": "#10201f"},
+            "recommendation_dashboard": {"accent": "#1d4ed8", "surface": "#f7f9ff", "sidebar": "#111827"},
+            "risk_review_console": {"accent": "#b45309", "surface": "#fffaf2", "sidebar": "#231a0d"},
+            "chat_console": {"accent": "#7c3aed", "surface": "#faf7ff", "sidebar": "#17102a"},
+            "approval_queue": {"accent": "#be123c", "surface": "#fff7f9", "sidebar": "#2a1018"},
+            "operations_console": {"accent": "#166358", "surface": "#f4f6f8", "sidebar": "#101820"},
+        }.get(interface_type, {"accent": "#166358", "surface": "#f4f6f8", "sidebar": "#101820"}),
+        "human_approval_required": True,
+        "send_allowed": False,
+    }
+
+
 def _interaction_config_fallback(app_design: dict[str, Any]) -> dict[str, Any]:
     selected_scaffold_id = app_design.get("selected_scaffold_id", app_design.get("product_archetype", "domain_operations_workbench"))
     interactions = _fallback_interactions(str(selected_scaffold_id), {"name": app_design.get("target_workflow", "enterprise workflow")})
@@ -519,12 +662,14 @@ def _validate_role_outputs(outputs: dict[str, Any], app_design: dict[str, Any], 
     policy_fallback = _policy_fallback(app_design, product_spec, runtime_domain_pack)
     adapter_fallback = _adapter_fallback(app_design, product_spec, runtime_domain_pack)
     ui_fallback = _ui_fallback(app_design)
+    frontend_layout_fallback = _frontend_layout_fallback(app_design)
     interaction_fallback = _interaction_config_fallback(app_design)
     evaluation_fallback = _evaluation_fallback(app_design)
     review_fallback = _review_fallback()
     outputs.setdefault("reasoning_policy", policy_fallback)
     outputs.setdefault("domain_adapter", adapter_fallback)
     outputs.setdefault("ui_config", ui_fallback)
+    outputs.setdefault("frontend_layout", frontend_layout_fallback)
     outputs.setdefault("interaction_config", interaction_fallback)
     outputs.setdefault("evaluation_checklist", evaluation_fallback)
     outputs.setdefault("builder_review", review_fallback)
@@ -546,6 +691,13 @@ def _validate_role_outputs(outputs: dict[str, Any], app_design: dict[str, Any], 
     if not ui.get("ui_sections"):
         ui["ui_sections"] = ui_fallback["ui_sections"]
     outputs["ui_config"] = ui
+
+    frontend_layout = outputs["frontend_layout"] if isinstance(outputs["frontend_layout"], dict) else frontend_layout_fallback
+    for key, value in frontend_layout_fallback.items():
+        frontend_layout.setdefault(key, value)
+    frontend_layout["human_approval_required"] = True
+    frontend_layout["send_allowed"] = False
+    outputs["frontend_layout"] = frontend_layout
 
     interaction = outputs["interaction_config"] if isinstance(outputs["interaction_config"], dict) else interaction_fallback
     for key, value in interaction_fallback.items():
@@ -581,6 +733,7 @@ def build_specialized_role_outputs(app_design: dict[str, Any], product_spec: dic
         "reasoning_policy": _policy_fallback(app_design, product_spec, runtime_domain_pack),
         "domain_adapter": _adapter_fallback(app_design, product_spec, runtime_domain_pack),
         "ui_config": _ui_fallback(app_design),
+        "frontend_layout": _frontend_layout_fallback(app_design),
         "interaction_config": _interaction_config_fallback(app_design),
         "evaluation_checklist": _evaluation_fallback(app_design),
         "builder_review": _review_fallback(),
@@ -592,6 +745,7 @@ def build_specialized_role_outputs(app_design: dict[str, Any], product_spec: dic
         "reasoning_policy": "Generate JSON for backend/generated_reasoning_policy.py with policy_version, source, product_archetype, runtime_role, required_output_sections, runtime_prompt_requirements, domain_specific_instructions, forbidden_claims, risk_rules, approval_packet_requirements, human_approval_required, send_allowed, evaluation_checklist.",
         "domain_adapter": "Generate JSON for backend/generated_domain_adapter.py with adapter_version, source, domain, product_archetype, target_workflow, reasoning_steps, tool_policy, ui_binding_notes, domain_fields, sample_case_strategy.",
         "ui_config": "Generate JSON for frontend/generated_ui_config.json with product_archetype, ui_sections, panel_labels, button_labels, empty_state_text, approval_labels.",
+        "frontend_layout": "Generate JSON for frontend/generated_layout_config.json with selected_scaffold_id, interface_type, layout_variant, visual_style, primary_surface, navigation_model, emphasis_order, feature_cards, page_regions, theme_tokens, human_approval_required, send_allowed. Make the product UI visibly suited to the enterprise workflow, not one generic layout.",
         "interaction_config": "Generate JSON for frontend/generated_interaction_config.json with selected_scaffold_id, product_archetype, assistant_title, input_placeholder, interaction_modes, user_actions, conversation_starters, safety_notice, response_contract, human_approval_required, send_allowed. User actions must be business-specific and must let the user interact with DeepSeek for the useful enterprise workflow.",
         "evaluation_checklist": "Generate JSON for evaluation_checklist.json with required_fields, runtime_checks, approval_checks, risk_checks, domain_specific_checks.",
         "builder_review": "Generate JSON for llm_builder_review.json with review_source, passed, missing_fields, safety_concerns, fallback_recommendation.",

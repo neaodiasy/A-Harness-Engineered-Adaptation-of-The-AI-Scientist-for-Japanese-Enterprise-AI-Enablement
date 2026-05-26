@@ -51,6 +51,8 @@ def build_component_plan(
     design_local_tools = _as_list(llm_app_design.get("local_tools"))
     design_guardrails = _as_list(llm_app_design.get("guardrails"))
     design_evaluation = _as_list(llm_app_design.get("evaluation_requirements"))
+    product_feature_plan = _as_list(llm_app_design.get("product_feature_plan"))
+    frontend_experience = llm_app_design.get("frontend_experience", {}) if isinstance(llm_app_design.get("frontend_experience"), dict) else {}
     specialized_roles = [
         task.get("role", "")
         for task in _as_list(code_task_plan.get("tasks"))
@@ -179,6 +181,8 @@ def build_component_plan(
             "evaluation_requirements": design_evaluation,
             "domain_adaptation_notes": _as_list(llm_app_design.get("domain_adaptation_notes")),
             "small_domain_logic_requirements": _as_list(llm_app_design.get("small_domain_logic_requirements")),
+            "product_feature_plan": product_feature_plan,
+            "frontend_experience": frontend_experience,
         },
         "code_task_plan_source": code_task_plan.get("source", ""),
         "specialized_roles": specialized_roles,
@@ -190,6 +194,7 @@ def build_component_plan(
             "backend/generated_domain_adapter.py",
             "backend/generated_domain_logic.py",
             "frontend/generated_ui_config.json",
+            "frontend/generated_layout_config.json",
             "frontend/generated_interaction_config.json",
             "evaluation_checklist.json",
             "llm_builder_review.json",
@@ -208,6 +213,7 @@ def build_component_plan(
             "evaluation_requirements",
             "domain-specific policy/config/adapter artifacts",
             "interactive AI copilot modes and user actions",
+            "frontend experience type, layout variant, and product feature cards",
             "small generated domain logic plugin",
         ],
         "scaffold_provided_components": {
@@ -225,6 +231,8 @@ def build_component_plan(
             "local_tools": design_local_tools,
             "guardrails": design_guardrails,
             "evaluation_requirements": design_evaluation,
+            "product_feature_plan": product_feature_plan,
+            "frontend_experience": frontend_experience,
             "role_outputs": sorted(key for key in role_outputs if key != "source"),
         },
         "scaffolded_components": [

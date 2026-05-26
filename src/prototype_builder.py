@@ -1879,6 +1879,9 @@ class ProductHandler(BaseHTTPRequestHandler):
         if parsed.path == "/frontend/generated_interaction_config.json":
             self._send_bytes((FRONTEND_DIR / "generated_interaction_config.json").read_bytes(), "application/json; charset=utf-8")
             return
+        if parsed.path == "/frontend/generated_layout_config.json":
+            self._send_bytes((FRONTEND_DIR / "generated_layout_config.json").read_bytes(), "application/json; charset=utf-8")
+            return
         if parsed.path == "/pipeline_diagram.svg":
             self._send_bytes((APP_DIR / "pipeline_diagram.svg").read_bytes(), "image/svg+xml; charset=utf-8")
             return
@@ -1896,6 +1899,9 @@ class ProductHandler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/api/interaction_config":
             self._send_json(json.loads((FRONTEND_DIR / "generated_interaction_config.json").read_text(encoding="utf-8")))
+            return
+        if parsed.path == "/api/layout_config":
+            self._send_json(json.loads((FRONTEND_DIR / "generated_layout_config.json").read_text(encoding="utf-8")))
             return
         if parsed.path == "/api/sample_cases":
             self._send_json(load_sample_cases())
@@ -2791,6 +2797,61 @@ details summary {
   align-items: start;
 }
 
+body[data-interface="chat_console"] .work-grid {
+  grid-template-columns: minmax(280px, 0.7fr) minmax(420px, 1.3fr);
+}
+
+body[data-interface="chat_console"] .assistant-panel {
+  grid-column: span 2;
+  order: -4;
+}
+
+body[data-interface="chat_console"] .decision-panel {
+  grid-column: span 1;
+}
+
+body[data-interface="recommendation_dashboard"] .work-grid {
+  grid-template-columns: minmax(320px, 0.8fr) minmax(520px, 1.4fr);
+}
+
+body[data-interface="recommendation_dashboard"] .decision-panel {
+  grid-column: span 1;
+  min-height: 420px;
+  order: -3;
+}
+
+body[data-interface="recommendation_dashboard"] .intake-panel {
+  order: -4;
+}
+
+body[data-interface="support_desk"] .work-grid {
+  grid-template-columns: minmax(320px, 0.8fr) minmax(420px, 1fr) minmax(360px, 0.9fr);
+}
+
+body[data-interface="support_desk"] .assistant-panel {
+  grid-column: span 1;
+  order: -3;
+}
+
+body[data-interface="support_desk"] .draft-panel {
+  grid-column: span 1;
+}
+
+body[data-interface="risk_review_console"] {
+  background: #fffaf2;
+}
+
+body[data-interface="risk_review_console"] .approval-panel {
+  border-color: #f1c27d;
+  background: #fffdf7;
+  order: -3;
+}
+
+body[data-interface="approval_queue"] .approval-panel,
+body[data-interface="approval_queue"] .draft-panel {
+  order: -3;
+}
+
 .panel {
   min-width: 0;
   border: 1px solid #d8dee5;
@@ -3056,6 +3117,7 @@ details summary {
 FRONTEND_JS = '''let productSpec = null;
 let uiConfig = null;
 let appDesign = null;
+let layoutConfig = null;
 let interactionConfig = null;
 let sampleCases = [];
 let selectedCaseIndex = 0;
@@ -3345,7 +3407,7 @@ function actionPromptForSection(section) {
 function renderDynamicDesignPanels() {
   const target = document.getElementById("dynamicDesignPanels");
   if (!target || !appDesign) return;
-  const sections = appDesign.ui_sections || [];
+  const sections = layoutConfig?.page_regions?.length ? layoutConfig.page_regions : (appDesign.ui_sections || []);
   const modules = appDesign.backend_modules || [];
   const tools = appDesign.local_tools || [];
   const modes = interactionConfig?.interaction_modes || appDesign.interaction_modes || [];
@@ -3371,12 +3433,47 @@ function renderDynamicDesignPanels() {
       <ul>${designList(modes, "label", 5)}</ul>
     </article>
   `;
-  target.innerHTML = sectionCards + architectureCard + interactionCard;
+  const surfaceCard = `
+    <article class="design-card">
+      <h3>${escapeHtml(layoutConfig?.interface_type || appDesign.frontend_experience?.interface_type || "Generated interface")}</h3>
+      <p>${escapeHtml(layoutConfig?.primary_surface || appDesign.frontend_experience?.primary_surface || "Product surface selected by build-time design.")}</p>
+      <ul>${designList(layoutConfig?.feature_cards || appDesign.product_feature_plan || [], "label", 5)}</ul>
+    </article>
+  `;
+  target.innerHTML = surfaceCard + sectionCards + architectureCard + interactionCard;
   target.querySelectorAll("[data-design-prompt]").forEach((button) => {
     button.addEventListener("click", () => {
       document.getElementById("assistantMessage").value = button.dataset.designPrompt || "";
       document.getElementById("assistant").scrollIntoView({behavior: "smooth", block: "start"});
     });
+  });
+}
+
+function applyGeneratedLayout() {
+  const experience = layoutConfig || appDesign?.frontend_experience || {};
+  const interfaceType = experience.interface_type || "operations_console";
+  document.body.dataset.interface = interfaceType;
+  const tokens = layoutConfig?.theme_tokens || {};
+  if (tokens.accent) {
+    document.documentElement.style.setProperty("--generated-accent", tokens.accent);
+    document.querySelectorAll(".primary-action, .brand-mark").forEach((element) => {
+      element.style.background = tokens.accent;
+      element.style.borderColor = tokens.accent;
+    });
+  }
+  if (tokens.surface) {
+    document.body.style.background = tokens.surface;
+  }
+  if (tokens.sidebar) {
+    document.querySelector(".sidebar").style.background = tokens.sidebar;
+  }
+  document.getElementById("workspaceLabel").textContent = `${interfaceType} · ${experience.layout_variant || "generated layout"}`;
+  const order = experience.emphasis_order || [];
+  const orderMap = {intake: "intake", assistant: "assistant", recommendations: "recommendations", evidence: "evidence", draft: "draft-panel", approval: "approval", activity: "activityLog"};
+  order.forEach((key, index) => {
+    const idOrClass = orderMap[key] || key;
+    const element = document.getElementById(idOrClass) || document.querySelector(`.${idOrClass}`);
+    if (element) element.style.order = String(index - 10);
   });
 }
 
@@ -3401,6 +3498,8 @@ async function load() {
   productSpec = await (await fetch("/api/product_spec")).json();
   const appDesignResponse = await fetch("/api/app_design");
   appDesign = appDesignResponse.ok ? await appDesignResponse.json() : null;
+  const layoutConfigResponse = await fetch("/frontend/generated_layout_config.json");
+  layoutConfig = layoutConfigResponse.ok ? await layoutConfigResponse.json() : null;
   const uiConfigResponse = await fetch("/frontend/generated_ui_config.json");
   uiConfig = uiConfigResponse.ok ? await uiConfigResponse.json() : null;
   const interactionConfigResponse = await fetch("/frontend/generated_interaction_config.json");
@@ -3428,6 +3527,7 @@ async function load() {
   document.getElementById("decisionTitle").textContent = vocab.decision;
   document.querySelector(".draft-panel h2").textContent = vocab.draftTitle;
   document.getElementById("fields").innerHTML = productSpec.fields.map(fieldElement).join("");
+  applyGeneratedLayout();
   renderDesignSections();
   renderAssistantActions();
   renderDynamicDesignPanels();
@@ -3914,11 +4014,14 @@ def build_prototype(
     generated_reasoning_policy = role_outputs["reasoning_policy"]
     generated_domain_adapter = role_outputs["domain_adapter"]
     frontend_ui_config = role_outputs["ui_config"]
+    frontend_layout_config = role_outputs["frontend_layout"]
     frontend_interaction_config = role_outputs["interaction_config"]
     evaluation_checklist = role_outputs["evaluation_checklist"]
     llm_builder_review = role_outputs["builder_review"]
     frontend_ui_config.setdefault("selected_scaffold_id", selected_scaffold_id)
     frontend_ui_config.setdefault("product_archetype", llm_app_design.get("product_archetype", selected_scaffold_id))
+    frontend_layout_config.setdefault("selected_scaffold_id", selected_scaffold_id)
+    frontend_layout_config.setdefault("interface_type", (llm_app_design.get("frontend_experience") or {}).get("interface_type", "operations_console"))
     frontend_interaction_config.setdefault("selected_scaffold_id", selected_scaffold_id)
     frontend_interaction_config.setdefault("product_archetype", llm_app_design.get("product_archetype", selected_scaffold_id))
     product_spec["generated_reasoning_policy_summary"] = {
@@ -3940,6 +4043,7 @@ def build_prototype(
         "generated_reasoning_policy_file": "backend/generated_reasoning_policy.py",
         "generated_domain_adapter_file": "backend/generated_domain_adapter.py",
         "frontend_ui_config_file": "frontend/generated_ui_config.json",
+        "frontend_layout_config_file": "frontend/generated_layout_config.json",
         "frontend_interaction_config_file": "frontend/generated_interaction_config.json",
         "evaluation_checklist_file": "evaluation_checklist.json",
         "llm_builder_review_file": "llm_builder_review.json",
@@ -3961,6 +4065,7 @@ def build_prototype(
             "code_task_planner",
             "backend_role",
             "frontend_role",
+            "frontend_layout_role",
             "guardrails_role",
             "evaluation_role",
             "reviewer_role",
@@ -4017,6 +4122,7 @@ def build_prototype(
         "component_plan.json": component_plan,
         "generated_reasoning_policy.json": generated_reasoning_policy,
         "generated_domain_logic_validation.json": domain_logic_validation,
+        "generated_layout_config.json": frontend_layout_config,
         "generated_interaction_config.json": frontend_interaction_config,
         "evaluation_checklist.json": evaluation_checklist,
         "llm_builder_review.json": llm_builder_review,
@@ -4063,6 +4169,7 @@ def build_prototype(
         "frontend/styles.css": FRONTEND_CSS,
         "frontend/app.js": FRONTEND_JS,
         "frontend/generated_ui_config.json": json.dumps(frontend_ui_config, ensure_ascii=False, indent=2) + "\n",
+        "frontend/generated_layout_config.json": json.dumps(frontend_layout_config, ensure_ascii=False, indent=2) + "\n",
         "frontend/generated_interaction_config.json": json.dumps(frontend_interaction_config, ensure_ascii=False, indent=2) + "\n",
         "knowledge_base.md": knowledge_base + "\n",
         "generated_product_rules.md": generated_product_rules + "\n",
