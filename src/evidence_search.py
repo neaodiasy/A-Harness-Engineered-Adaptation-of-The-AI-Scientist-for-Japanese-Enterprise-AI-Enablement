@@ -11,6 +11,7 @@ from __future__ import annotations
 import html
 import os
 import re
+import ssl
 import time
 import urllib.parse
 import urllib.request
@@ -18,6 +19,17 @@ from datetime import datetime, timezone
 from urllib.error import URLError
 
 from src.domain_templates import select_domain_template
+
+try:
+    import certifi
+except Exception:  # pragma: no cover
+    certifi = None
+
+
+def _ssl_context() -> ssl.SSLContext:
+    if certifi is not None:
+        return ssl.create_default_context(cafile=certifi.where())
+    return ssl.create_default_context()
 
 
 EVIDENCE_LIBRARY: tuple[dict, ...] = (
@@ -172,7 +184,7 @@ def _duckduckgo_html(query: str, max_results: int = 6) -> list[dict]:
             "Accept": "text/html",
         },
     )
-    with urllib.request.urlopen(request, timeout=20) as response:
+    with urllib.request.urlopen(request, timeout=20, context=_ssl_context()) as response:
         body = response.read().decode("utf-8", errors="replace")
 
     results: list[dict] = []

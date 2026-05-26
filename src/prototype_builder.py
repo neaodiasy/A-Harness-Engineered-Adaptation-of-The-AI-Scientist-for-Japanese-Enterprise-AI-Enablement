@@ -934,10 +934,22 @@ from __future__ import annotations
 import json
 import os
 import re
+import ssl
 import time
 import urllib.error
 import urllib.request
 from typing import Any
+
+try:
+    import certifi
+except Exception:  # pragma: no cover
+    certifi = None
+
+
+def _ssl_context():
+    if certifi is not None:
+        return ssl.create_default_context(cafile=certifi.where())
+    return ssl.create_default_context()
 
 
 def parse_jsonish(text: str) -> dict[str, Any]:
@@ -988,6 +1000,7 @@ def complete_json(system_prompt: str, user_prompt: str, *, retries: int = 2) -> 
     if reasoning_effort:
         payload["reasoning_effort"] = reasoning_effort
     last_error: Exception | None = None
+    ssl_context = _ssl_context()
     for attempt in range(retries + 1):
         request = urllib.request.Request(
             _endpoint(),
@@ -996,7 +1009,7 @@ def complete_json(system_prompt: str, user_prompt: str, *, retries: int = 2) -> 
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, timeout=120) as response:
+            with urllib.request.urlopen(request, timeout=120, context=ssl_context) as response:
                 data = json.loads(response.read().decode("utf-8"))
             raw = data["choices"][0]["message"]["content"]
             try:
@@ -1032,10 +1045,22 @@ from __future__ import annotations
 import html
 import os
 import re
+import ssl
 import time
 import urllib.parse
 import urllib.request
 from typing import Any
+
+try:
+    import certifi
+except Exception:  # pragma: no cover
+    certifi = None
+
+
+def _ssl_context():
+    if certifi is not None:
+        return ssl.create_default_context(cafile=certifi.where())
+    return ssl.create_default_context()
 
 
 TRUSTED_DOMAINS = [
@@ -1096,7 +1121,7 @@ def _fetch(url: str, timeout: int = 12) -> str:
             "Accept": "text/html,application/xhtml+xml",
         },
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:
+    with urllib.request.urlopen(request, timeout=timeout, context=_ssl_context()) as response:
         return response.read().decode("utf-8", errors="replace")
 
 

@@ -551,12 +551,14 @@ def adapt_case(case: dict, domain_data: dict, product_spec: dict) -> dict
 def build_domain_prompt_context(adapted_case: dict, policy: dict, adapter: dict) -> dict
 
 Safety rules:
-- no imports except typing or __future__
+- no imports except: from __future__ import annotations, from typing import Any
+- do not import re, os, sys, pathlib, urllib, requests, socket, subprocess, json, importlib, or shutil
 - no file I/O, no network calls, no subprocess
 - no eval/exec/open/compile/__import__
-- no classes, no global side effects
+- no classes, no lambdas, no global variables, no top-level assignments
 - return dictionaries only
 - short code only
+- use only plain dict/list/string operations and for-loops inside the two required functions
 
 Selected scaffold: {app_design.get('selected_scaffold_id')}
 App design: {json.dumps(app_design, ensure_ascii=False)}
@@ -572,6 +574,38 @@ Selected opportunity: {json.dumps(selected_opportunity, ensure_ascii=False)}
         valid, errors = validate_domain_logic_code(code)
         if valid:
             return code + "\n", {"source": "deepseek_domain_logic_code", "valid": True, "errors": []}
+        repair_prompt = f"""Your previous backend/generated_domain_logic.py was rejected by the safety validator.
+Return corrected Python code only. No Markdown.
+
+Validation errors:
+{json.dumps(errors, ensure_ascii=False)}
+
+Previous code:
+{code}
+
+Rewrite it with only:
+- optional: from __future__ import annotations
+- optional: from typing import Any
+- exactly these two top-level functions:
+  def adapt_case(case: dict, domain_data: dict, product_spec: dict) -> dict
+  def build_domain_prompt_context(adapted_case: dict, policy: dict, adapter: dict) -> dict
+- no classes, no lambdas, no top-level variables, no imports besides typing/__future__
+- no regex, no file/network/subprocess/eval/exec/open/compile/__import__
+- dictionaries only as return values
+"""
+        repaired = llm_client.complete(repair_prompt, system="Repair unsafe Python into a validator-safe tiny domain plugin. Return code only.", json_mode=False).strip()
+        if repaired.startswith("```"):
+            repaired = repaired.strip("`")
+            repaired = repaired.removeprefix("python").strip()
+        repaired_valid, repaired_errors = validate_domain_logic_code(repaired)
+        if repaired_valid:
+            return repaired + "\n", {
+                "source": "deepseek_domain_logic_code_repaired",
+                "valid": True,
+                "errors": [],
+                "initial_errors": errors,
+            }
+        errors = [*errors, *[f"repair: {item}" for item in repaired_errors]]
         return DOMAIN_LOGIC_FALLBACK, {"source": "deterministic_fallback_after_unsafe_domain_logic", "valid": False, "errors": errors}
     except Exception as exc:
         return DOMAIN_LOGIC_FALLBACK, {"source": "deterministic_fallback_after_domain_logic_error", "valid": False, "errors": [f"{type(exc).__name__}: {exc}"]}

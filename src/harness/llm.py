@@ -5,11 +5,23 @@ from __future__ import annotations
 import json
 import os
 import socket
+import ssl
 import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from typing import Any
+
+try:
+    import certifi
+except Exception:  # pragma: no cover - certifi may be absent in minimal installs
+    certifi = None
+
+
+def _ssl_context() -> ssl.SSLContext:
+    if certifi is not None:
+        return ssl.create_default_context(cafile=certifi.where())
+    return ssl.create_default_context()
 
 
 @dataclass
@@ -63,10 +75,11 @@ class LLMClient:
             },
             method="POST",
         )
+        ssl_context = _ssl_context()
         last_error = ""
         for attempt in range(max(1, self.retries + 1)):
             try:
-                with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
+                with urllib.request.urlopen(request, timeout=self.timeout_seconds, context=ssl_context) as response:
                     data = json.loads(response.read().decode("utf-8"))
                 content = data["choices"][0]["message"]["content"]
                 if json_mode:
