@@ -26,6 +26,14 @@ enterprise profile
 
 The generated output is a runnable local product MVP, not a generic demo or JSON dump. It packages a usable web UI, runtime DeepSeek calls, local domain tools, live trusted-domain evidence search, risk controls, human approval, tests, and auditability. It is still not a fully deployed enterprise SaaS until authentication, persistent storage, enterprise connectors, observability, and security review are added.
 
+## Current Version Highlights
+
+- Strict DeepSeek API mode is the default. The main pipeline requires `DEEPSEEK_API_KEY`; there is no mock-mode product path for demos.
+- `AGENT_MODEL=deepseek-v4-pro`, `DEEPSEEK_THINKING=1`, and `DEEPSEEK_REASONING_EFFORT=high` are supported by both the parent pipeline and generated child apps.
+- The Code Agent now uses a Software Builder Loop to produce a multi-file app under `outputs/<run_id>/02_generated_app/`, including backend modules, frontend workbench, local data, tests, evaluation, and visual artifacts.
+- Generated apps include `.env.example`, `.gitignore`, and `run_app.sh`. The app loads `.env.local` from the app folder or nearby run/project folders, while `.env.local` stays untracked.
+- A checked-in manufacturing maintenance example is available at `outputs/20260526_214921_manufacturing_chatbox_test_001/` for inspection.
+
 ## Why This Is Based On The AI Scientist
 
 Sakana AI's AI Scientist repo is organized around a launchable autonomous discovery loop: templates define a research environment, ideas are generated, experiments are planned and executed, results are analyzed, papers are written, and generated papers can be reviewed. The repository also emphasizes visible intermediate artifacts such as `templates/`, `experiment.py`, `plot.py`, `prompt.json`, `seed_ideas.json`, and launch scripts.
@@ -52,29 +60,31 @@ This project mirrors that design philosophy, but changes the domain:
 
 The system does not simply chat with a user and give advice. It writes and preserves a chain of artifacts:
 
-- `outputs/<timestamp>_api_run/00_README.md`
-- `outputs/<timestamp>_api_run/final_summary.json`
-- `outputs/<timestamp>_api_run/01_consulting/evidence_pack.json`
-- `outputs/<timestamp>_api_run/01_consulting/opportunities.json`
-- `outputs/<timestamp>_api_run/01_consulting/feasibility_results.json`
-- `outputs/<timestamp>_api_run/01_consulting/tree_search_trace.json`
-- `outputs/<timestamp>_api_run/01_consulting/selected_opportunity.json`
-- `outputs/<timestamp>_api_run/02_generated_app/app.py`
-- `outputs/<timestamp>_api_run/02_generated_app/backend/`
-- `outputs/<timestamp>_api_run/02_generated_app/frontend/`
-- `outputs/<timestamp>_api_run/02_generated_app/data/`
-- `outputs/<timestamp>_api_run/02_generated_app/tests/`
-- `outputs/<timestamp>_api_run/02_generated_app/tools.py`
-- `outputs/<timestamp>_api_run/02_generated_app/evaluation.py`
-- `outputs/<timestamp>_api_run/02_generated_app/productization_blueprint.json`
-- `outputs/<timestamp>_api_run/02_generated_app/product_requirements.json`
-- `outputs/<timestamp>_api_run/02_generated_app/project_architecture.json`
-- `outputs/<timestamp>_api_run/02_generated_app/file_manifest.json`
-- `outputs/<timestamp>_api_run/02_generated_app/builder_loop_trace.json`
-- `outputs/<timestamp>_api_run/03_sandbox/sandbox_report.json`
-- `outputs/<timestamp>_api_run/03_sandbox/case_outputs.json`
-- `outputs/<timestamp>_api_run/04_review/review.json`
-- `outputs/<timestamp>_api_run/05_visuals/architecture_diagram.svg`
+- `outputs/<run_id>/00_README.md`
+- `outputs/<run_id>/final_summary.json`
+- `outputs/<run_id>/01_consulting/evidence_pack.json`
+- `outputs/<run_id>/01_consulting/opportunities.json`
+- `outputs/<run_id>/01_consulting/feasibility_results.json`
+- `outputs/<run_id>/01_consulting/tree_search_trace.json`
+- `outputs/<run_id>/01_consulting/selected_opportunity.json`
+- `outputs/<run_id>/02_generated_app/app.py`
+- `outputs/<run_id>/02_generated_app/.env.example`
+- `outputs/<run_id>/02_generated_app/run_app.sh`
+- `outputs/<run_id>/02_generated_app/backend/`
+- `outputs/<run_id>/02_generated_app/frontend/`
+- `outputs/<run_id>/02_generated_app/data/`
+- `outputs/<run_id>/02_generated_app/tests/`
+- `outputs/<run_id>/02_generated_app/tools.py`
+- `outputs/<run_id>/02_generated_app/evaluation.py`
+- `outputs/<run_id>/02_generated_app/productization_blueprint.json`
+- `outputs/<run_id>/02_generated_app/product_requirements.json`
+- `outputs/<run_id>/02_generated_app/project_architecture.json`
+- `outputs/<run_id>/02_generated_app/file_manifest.json`
+- `outputs/<run_id>/02_generated_app/builder_loop_trace.json`
+- `outputs/<run_id>/03_sandbox/sandbox_report.json`
+- `outputs/<run_id>/03_sandbox/case_outputs.json`
+- `outputs/<run_id>/04_review/review.json`
+- `outputs/<run_id>/05_visuals/architecture_diagram.svg`
 
 That artifact trail is the core product. The app is a generated experiment, not the whole system.
 
@@ -121,6 +131,10 @@ j-enterprise-agent-scientist/
 │   ├── index.html
 │   ├── styles.css
 │   └── app.js
+├── profiles/
+│   ├── example_real_estate.json
+│   ├── example_manufacturing_maintenance.json
+│   └── example_pet_insurance_support.json
 ├── templates/
 │   └── real_estate_recommendation/
 │       └── domain_pack.json
@@ -144,7 +158,14 @@ j-enterprise-agent-scientist/
 │       ├── json_utils.py
 │       └── llm.py
 └── outputs/
-    └── <timestamp>_api_run/
+    ├── 20260526_214921_manufacturing_chatbox_test_001/
+    │   ├── 01_consulting/
+    │   ├── 02_generated_app/
+    │   ├── 03_sandbox/
+    │   ├── 04_review/
+    │   ├── 05_visuals/
+    │   └── final_summary.json
+    └── <run_id>/
         ├── 00_README.md
         ├── 01_consulting/
         ├── 02_generated_app/
@@ -156,7 +177,7 @@ j-enterprise-agent-scientist/
 
 ## How To Run
 
-Run the full pipeline from the command line:
+Set your API environment. You can export variables directly:
 
 ```bash
 cd path/to/j-enterprise-agent-scientist-v2-live-search
@@ -166,14 +187,36 @@ export AGENT_MODEL="deepseek-v4-pro"
 export DEEPSEEK_THINKING="1"
 export DEEPSEEK_REASONING_EFFORT="high"
 export ENABLE_LIVE_SEARCH="1"
+```
+
+Or keep local secrets in an untracked file:
+
+```bash
+cp .env.example .env.local
+# edit .env.local and fill DEEPSEEK_API_KEY
+set -a
+source .env.local
+set +a
+```
+
+Run the full pipeline from the command line:
+
+```bash
 python3 run.py --profile profiles/example_real_estate.json
+```
+
+Other included example profiles:
+
+```bash
+python3 run.py --profile profiles/example_manufacturing_maintenance.json
+python3 run.py --profile profiles/example_pet_insurance_support.json
 ```
 
 The full pipeline automatically writes the selected or auto-built runtime domain pack to:
 
 ```text
-outputs/<timestamp>_api_run/01_consulting/domain_pack_candidate.json
-outputs/<timestamp>_api_run/01_consulting/domain_pack_validation.json
+outputs/<run_id>/01_consulting/domain_pack_candidate.json
+outputs/<run_id>/01_consulting/domain_pack_validation.json
 ```
 
 You can also draft a reusable domain pack manually:
@@ -186,18 +229,18 @@ python3 -m src.domain_pack_builder \
 
 The auto-builder writes both `domain_pack.json` and `validation_report.json`. By default it creates a draft under `outputs/`; to install a reviewed template into `templates/<template_id>/domain_pack.json`, rerun with `--install-template`.
 
-Each run writes everything into one timestamped folder:
+Each run writes everything into one folder:
 
 ```text
-outputs/<timestamp>_api_run/
+outputs/<run_id>/
 ```
 
-Start with `outputs/<timestamp>_api_run/00_README.md` and `outputs/<timestamp>_api_run/final_summary.json`.
+Start with `outputs/<run_id>/00_README.md` and `outputs/<run_id>/final_summary.json`.
 
 When live search is enabled, inspect:
 
 ```text
-outputs/<timestamp>_api_run/01_consulting/evidence_pack.json
+outputs/<run_id>/01_consulting/evidence_pack.json
 ```
 
 The evidence pack records curated sources, live trusted-domain results, search metadata, and whether live search was enabled for the run.
@@ -226,30 +269,78 @@ If a port is occupied, the debug server and generated app try the next local por
 Run the generated app:
 
 ```bash
-cd "outputs/<timestamp>_api_run/02_generated_app"
-python3 app.py --cli
-python3 app.py
+cd "outputs/<run_id>/02_generated_app"
+cp .env.example .env.local
+# edit .env.local and fill DEEPSEEK_API_KEY
+./run_app.sh --port 8766
 ```
 
 Open `http://127.0.0.1:8766` after starting the generated app server.
 
+Verify the generated app sees your DeepSeek config:
+
+```bash
+curl http://127.0.0.1:8766/api/runtime_status
+```
+
+Expected fields:
+
+```json
+{
+  "deepseek_api_key_present": true,
+  "model": "deepseek-v4-pro",
+  "thinking_enabled": true,
+  "reasoning_effort": "high"
+}
+```
+
 Run only the generated app evaluation:
 
 ```bash
-cd "outputs/<timestamp>_api_run/02_generated_app"
+cd "outputs/<run_id>/02_generated_app"
 python3 -m unittest discover -s tests
-python3 evaluation.py --case-id case_family_quiet_school
+python3 app.py --cli --max-cases 1
+python3 evaluation.py --max-cases 1
 python3 evaluation.py
 ```
 
 The sandbox runs real-API smoke checks on one representative case so high-reasoning model calls do not turn every pipeline run into a long batch job. The generated product still supports full multi-case CLI and evaluation runs.
+
+## Inspect The Checked-In Manufacturing Run
+
+The repository includes one full generated run for review:
+
+```text
+outputs/20260526_214921_manufacturing_chatbox_test_001/
+```
+
+Useful entry points:
+
+- `outputs/20260526_214921_manufacturing_chatbox_test_001/final_summary.json`
+- `outputs/20260526_214921_manufacturing_chatbox_test_001/01_consulting/selected_opportunity.json`
+- `outputs/20260526_214921_manufacturing_chatbox_test_001/02_generated_app/README.md`
+- `outputs/20260526_214921_manufacturing_chatbox_test_001/02_generated_app/frontend/`
+- `outputs/20260526_214921_manufacturing_chatbox_test_001/02_generated_app/backend/`
+- `outputs/20260526_214921_manufacturing_chatbox_test_001/03_sandbox/sandbox_report.json`
+- `outputs/20260526_214921_manufacturing_chatbox_test_001/04_review/review.md`
+
+To run that generated app locally:
+
+```bash
+cd outputs/20260526_214921_manufacturing_chatbox_test_001/02_generated_app
+cp .env.example .env.local
+# edit .env.local and fill DEEPSEEK_API_KEY
+./run_app.sh --port 8766
+```
+
+Do not commit `.env.local`. The generated app `.gitignore` and root `.gitignore` are set up to keep real keys out of git.
 
 ## Current Limitations
 
 - Live evidence search is implemented for trusted domains, but high-stakes enterprise use still needs source review, stronger query planning, caching, and citation QA.
 - The generated app now includes a product UI, runtime DeepSeek usage, runtime live web evidence search, `product_readiness.json`, and `production_readiness.md`; it is a local product MVP rather than a production-hosted SaaS.
 - The repair loop records failures and repair actions; deeper automatic code patching is the next step.
-- Runs now require `DEEPSEEK_API_KEY` and fail fast if the DeepSeek API is unavailable.
+- Runs require `DEEPSEEK_API_KEY`. Generated apps expose runtime diagnostics at `/api/runtime_status` and return a safe approval-required response if the child-app DeepSeek call fails.
 
 ## Future Work
 

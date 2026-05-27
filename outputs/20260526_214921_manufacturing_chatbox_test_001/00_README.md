@@ -42,9 +42,29 @@ This folder contains one complete J-Enterprise Agent Scientist run.
 
 ```bash
 cd "/Users/zhongxin/Documents/New project/j-enterprise-agent-scientist-v2-live-search/outputs/20260526_214921_manufacturing_chatbox_test_001/02_generated_app"
-python3 app.py --cli
+cp .env.example .env.local
+# edit .env.local and fill DEEPSEEK_API_KEY
+./run_app.sh --port 8766
+```
+
+Open:
+
+```text
+http://127.0.0.1:8766
+```
+
+Check runtime configuration:
+
+```bash
+curl http://127.0.0.1:8766/api/runtime_status
+```
+
+Run CLI and evaluation:
+
+```bash
+python3 app.py --cli --max-cases 1
 python3 -m unittest discover -s tests
-python3 evaluation.py
+python3 evaluation.py --max-cases 1
 ```
 
 ## Visuals
