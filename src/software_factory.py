@@ -210,6 +210,9 @@ def build_file_manifest(product_spec: dict) -> dict:
     """Return the authoritative generated file list."""
     files = [
         ("README.md", "Human-readable usage and inspection guide."),
+        (".env.example", "Runtime environment template for API-backed local execution."),
+        (".gitignore", "Generated app ignore rules that keep local API keys out of source artifacts."),
+        ("run_app.sh", "Convenience launcher that loads .env.local before starting the product."),
         ("requirements.txt", "Runtime dependency note; stdlib-first local product MVP."),
         ("app.py", "CLI/server entrypoint."),
         ("tools.py", "Compatibility wrapper for local domain tools."),

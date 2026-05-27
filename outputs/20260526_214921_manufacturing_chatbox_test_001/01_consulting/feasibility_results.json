@@ -1,0 +1,107 @@
+[
+  {
+    "name": "Maintenance Knowledge Chatbox",
+    "business_value": 9.0,
+    "evidence_strength": 10.0,
+    "data_readiness": 6.5,
+    "technical_feasibility": 7.0,
+    "risk_controllability": 7.5,
+    "japan_enterprise_fit": 8.2,
+    "poc_buildability": 7.8,
+    "overall_score": 8.1,
+    "recommendation": "advance",
+    "key_risks": [
+      "Incorrect retrieval due to poor document quality or ambiguous queries",
+      "Human approval and audit logging should be included before any production use."
+    ],
+    "required_next_validation": [
+      "Confirm representative data availability.",
+      "Create 10-20 sample cases for simulation.",
+      "Review human approval boundary with business owner."
+    ]
+  },
+  {
+    "name": "Smart Escalation Decision Support",
+    "business_value": 8.0,
+    "evidence_strength": 10.0,
+    "data_readiness": 6.5,
+    "technical_feasibility": 7.0,
+    "risk_controllability": 7.5,
+    "japan_enterprise_fit": 8.2,
+    "poc_buildability": 7.8,
+    "overall_score": 7.9,
+    "recommendation": "advance",
+    "key_risks": [
+      "System suggests wrong escalation level, leading to critical delay or unnecessary stop",
+      "Human approval and audit logging should be included before any production use."
+    ],
+    "required_next_validation": [
+      "Confirm representative data availability.",
+      "Create 10-20 sample cases for simulation.",
+      "Review human approval boundary with business owner."
+    ]
+  },
+  {
+    "name": "Multilingual Operator Training Assistant",
+    "business_value": 7.0,
+    "evidence_strength": 10.0,
+    "data_readiness": 6.5,
+    "technical_feasibility": 7.0,
+    "risk_controllability": 7.5,
+    "japan_enterprise_fit": 8.2,
+    "poc_buildability": 7.8,
+    "overall_score": 7.6,
+    "recommendation": "advance",
+    "key_risks": [
+      "Simplified instructions may omit critical context; reliance on AI without hands-on practice",
+      "Human approval and audit logging should be included before any production use."
+    ],
+    "required_next_validation": [
+      "Confirm representative data availability.",
+      "Create 10-20 sample cases for simulation.",
+      "Review human approval boundary with business owner."
+    ]
+  },
+  {
+    "name": "Incident Report Analyzer for Recurrence Prevention",
+    "business_value": 7.0,
+    "evidence_strength": 10.0,
+    "data_readiness": 7.5,
+    "technical_feasibility": 7.0,
+    "risk_controllability": 7.5,
+    "japan_enterprise_fit": 8.2,
+    "poc_buildability": 7.8,
+    "overall_score": 7.8,
+    "recommendation": "advance",
+    "key_risks": [
+      "Misinterpreting incident narratives or missing subtle failure modes",
+      "Human approval and audit logging should be included before any production use."
+    ],
+    "required_next_validation": [
+      "Confirm representative data availability.",
+      "Create 10-20 sample cases for simulation.",
+      "Review human approval boundary with business owner."
+    ]
+  },
+  {
+    "name": "Quality Inspection Guide Chatbox",
+    "business_value": 8.0,
+    "evidence_strength": 10.0,
+    "data_readiness": 6.5,
+    "technical_feasibility": 6.0,
+    "risk_controllability": 7.5,
+    "japan_enterprise_fit": 8.2,
+    "poc_buildability": 7.8,
+    "overall_score": 7.7,
+    "recommendation": "advance",
+    "key_risks": [
+      "Misinterpretation of ambiguous spec descriptions leading to incorrect pass/fail decisions",
+      "Human approval and audit logging should be included before any production use."
+    ],
+    "required_next_validation": [
+      "Confirm representative data availability.",
+      "Create 10-20 sample cases for simulation.",
+      "Review human approval boundary with business owner."
+    ]
+  }
+]

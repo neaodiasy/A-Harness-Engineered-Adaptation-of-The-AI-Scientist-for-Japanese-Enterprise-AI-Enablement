@@ -1,0 +1,379 @@
+{
+  "design_source": "deepseek_build_time_app_design",
+  "selected_scaffold_id": "knowledge_assistant",
+  "reason_for_scaffold_selection": "The knowledge_assistant scaffold aligns with the need for a chat-based interface to retrieve, summarize, and cite evidence from technical documents, manuals, and incident reports. It supports Japanese and simplified English for trainees, flags uncertainty, and integrates human-approval requirements for safety-critical actions.",
+  "product_archetype": "knowledge_assistant",
+  "target_workflow": "Troubleshooting equipment alarms and finding maintenance procedures",
+  "primary_user": "factory engineers, line supervisors, maintenance technicians, quality-control staff, new operators",
+  "ui_sections": [
+    {
+      "id": "item_1",
+      "label": "chat_thread",
+      "purpose": "chat_thread",
+      "required": true
+    },
+    {
+      "id": "item_2",
+      "label": "document_evidence_panel",
+      "purpose": "document_evidence_panel",
+      "required": true
+    },
+    {
+      "id": "item_3",
+      "label": "answer_draft",
+      "purpose": "answer_draft",
+      "required": true
+    },
+    {
+      "id": "item_4",
+      "label": "uncertainty_flags",
+      "purpose": "uncertainty_flags",
+      "required": true
+    },
+    {
+      "id": "item_5",
+      "label": "approval_panel",
+      "purpose": "approval_panel",
+      "required": true
+    },
+    {
+      "id": "item_6",
+      "label": "risk_checklist",
+      "purpose": "risk_checklist",
+      "required": true
+    }
+  ],
+  "backend_modules": [
+    {
+      "id": "item_1",
+      "label": "knowledge_lookup",
+      "purpose": "knowledge_lookup",
+      "required": true
+    },
+    {
+      "id": "item_2",
+      "label": "evidence_summarizer",
+      "purpose": "evidence_summarizer",
+      "required": true
+    },
+    {
+      "id": "item_3",
+      "label": "answer_drafter",
+      "purpose": "answer_drafter",
+      "required": true
+    },
+    {
+      "id": "item_4",
+      "label": "guardrails",
+      "purpose": "guardrails",
+      "required": true
+    },
+    {
+      "id": "item_5",
+      "label": "escalation_checker",
+      "purpose": "escalation_checker",
+      "required": true
+    },
+    {
+      "id": "item_6",
+      "label": "audit_logger",
+      "purpose": "audit_logger",
+      "required": true
+    }
+  ],
+  "local_tools": [
+    {
+      "id": "item_1",
+      "label": "doc_lookup",
+      "purpose": "doc_lookup",
+      "required": true
+    },
+    {
+      "id": "item_2",
+      "label": "evidence_matcher",
+      "purpose": "evidence_matcher",
+      "required": true
+    },
+    {
+      "id": "item_3",
+      "label": "alarm_code_resolver",
+      "purpose": "alarm_code_resolver",
+      "required": true
+    },
+    {
+      "id": "item_4",
+      "label": "sop_retriever",
+      "purpose": "sop_retriever",
+      "required": true
+    },
+    {
+      "id": "item_5",
+      "label": "incident_report_searcher",
+      "purpose": "incident_report_searcher",
+      "required": true
+    }
+  ],
+  "runtime_llm_role": "Provide concise, evidence-grounded answers in clear Japanese (with optional simple English) for factory maintenance and SOP questions. Cite sources and flag missing information or safety risks.",
+  "runtime_prompt_requirements": [
+    "Always cite source document IDs and relevant sections.",
+    "If evidence is missing, explicitly state it and recommend supervisor escalation.",
+    "Do not provide final safety decisions or bypass instructions.",
+    "Respond in Japanese by default; optionally append a simplified English version.",
+    "For safety-critical or production-impacting actions, require human approval."
+  ],
+  "guardrails": [
+    "cite evidence in every answer",
+    "flag uncertainty and missing information",
+    "do not approve machine restart after serious alarm",
+    "do not instruct bypass of safety interlocks",
+    "escalate ambiguous or safety-critical queries to supervisor",
+    "never send external communication"
+  ],
+  "human_approval": {
+    "required": true,
+    "send_allowed": false,
+    "approval_triggers": [
+      "safety-critical actions",
+      "quality-critical decisions",
+      "production-impacting recommendations",
+      "machine restart after serious alarm",
+      "bypass of safety interlocks",
+      "missing evidence or low confidence"
+    ],
+    "approval_packet": {
+      "includes_draft": true,
+      "includes_evidence": true,
+      "includes_risk_flags": true,
+      "reviewer_decision_required": true
+    },
+    "approval_reason": "Outputs may be customer-facing or operationally consequential."
+  },
+  "evaluation_requirements": [
+    "{'checks': ['evidence-grounded answer exists', 'uncertainty is flagged when appropriate', 'escalation is triggered for safety-critical cases', 'source citations are present', 'human approval is enforced for defined triggers', 'answers are provided in Japanese with optional English', 'no forbidden instructions are included'], 'evaluation_method': 'synthetic test cases with known evidence, regular audits of logs'}"
+  ],
+  "domain_adaptation_notes": [
+    "{'language': 'Primary Japanese, optional simplified English for trainees', 'terminology': 'Use factory-specific terms like alarm codes (ALM-xxx), CNC, SOP, inspection dimensions', 'document_sources': 'machine maintenance manuals, SOP documents, alarm code tables, past incident reports, quality inspection checklists, replacement parts notes, training FAQs', 'risk_handling': 'Escalate safety-critical, quality-critical, or production-impacting cases to human supervisor; never bypass safety interlocks'}"
+  ],
+  "small_domain_logic_requirements": [
+    "Classify query intent: troubleshooting vs. procedure lookup vs. escalation question",
+    "Check alarm codes against known tables and retrieve corresponding steps",
+    "Validate that suggested parts match the machine model",
+    "Detect when a query implies a safety risk and enforce escalation",
+    "For multi-step procedures, ensure all steps are included from the SOP"
+  ],
+  "product_feature_plan": [
+    {
+      "core_capabilities": [
+        "Natural language question answering over internal technical documents",
+        "Source citation and evidence panel",
+        "Uncertainty and risk flagging",
+        "Supervisor escalation workflow",
+        "Human-approval gate for critical actions",
+        "Audit trail of all queries and answers",
+        "Japanese interface with optional English translation"
+      ],
+      "future_enhancements": [
+        "Multimodal support for photos of alarms or damaged parts",
+        "Integration with equipment sensors for automated alarm lookup",
+        "Training module for new operators with practice scenarios",
+        "Feedback loop to improve retrieval accuracy"
+      ]
+    }
+  ],
+  "frontend_experience": {
+    "interface_type": "chat_console",
+    "workspace_regions": [
+      "chat_thread",
+      "evidence_panel",
+      "answer_draft",
+      "risk_checklist",
+      "approval_panel"
+    ],
+    "visual_quality_contract": {
+      "layout": "enterprise_workbench_with_chat",
+      "must_have": [
+        "sidebar navigation",
+        "chat thread with user/assistant bubbles",
+        "expandable evidence panel with source links",
+        "risk checklist sidebar",
+        "approval panel for supervisor actions",
+        "activity log",
+        "responsive design for tablet use on factory floor"
+      ],
+      "avoid": [
+        "chat-only UI without panels",
+        "single raw JSON output",
+        "marketing landing page"
+      ]
+    },
+    "layout_variant": "question_answer_evidence",
+    "visual_style": "knowledge_workbench",
+    "primary_surface": "Question intake, AI answer workspace, document evidence, uncertainty flags, approval note.",
+    "navigation_model": "query_history",
+    "emphasis_order": [
+      "assistant",
+      "intake",
+      "evidence",
+      "draft",
+      "approval",
+      "activity"
+    ]
+  },
+  "custom_product_blueprint": {
+    "product_name": "Nagoya Precision Components Maintenance Knowledge Assistant",
+    "subtitle": "AI-powered technical support for factory maintenance and troubleshooting",
+    "primary_action": "Ask a question",
+    "role_model": [
+      {
+        "role": "operator",
+        "permissions": [
+          "create_query",
+          "view_answer",
+          "view_evidence",
+          "flag_for_review"
+        ]
+      },
+      {
+        "role": "reviewer",
+        "permissions": [
+          "review_escalated_cases",
+          "approve_critical_actions",
+          "edit_answer_draft",
+          "provide_final_instruction"
+        ]
+      }
+    ],
+    "state_model": [
+      "query_received",
+      "evidence_retrieved",
+      "draft_generated",
+      "risk_assessed",
+      "escalation_required",
+      "human_approved",
+      "answer_delivered"
+    ],
+    "source": "deterministic_fallback",
+    "product_goal": "Troubleshooting equipment alarms and finding maintenance procedures",
+    "primary_entities": [
+      "case",
+      "evidence",
+      "draft",
+      "risk",
+      "approval"
+    ],
+    "unique_workflows": [
+      "Knowledge Q&A",
+      "Document summary",
+      "Follow-up questions"
+    ],
+    "ui_composition_strategy": "Assemble a responsive product from reusable UI primitives."
+  },
+  "ui_primitive_plan": [
+    {
+      "primitive_id": "chat_thread",
+      "purpose": "Primary conversation interface for operators to ask questions and receive answers with citations.",
+      "default_span": "wide"
+    },
+    {
+      "primitive_id": "evidence_panel",
+      "purpose": "Display retrieved documents, manuals, or incident reports with highlighted excerpts.",
+      "default_span": "medium"
+    },
+    {
+      "primitive_id": "risk_checklist",
+      "purpose": "Surface safety risks, missing information, and escalation rules.",
+      "default_span": "medium"
+    },
+    {
+      "primitive_id": "approval_panel",
+      "purpose": "Show approval status and allow reviewer decision for escalated cases.",
+      "default_span": "medium"
+    },
+    {
+      "primitive_id": "metrics_strip",
+      "purpose": "Summarize confidence, evidence count, risk level, and approval status.",
+      "default_span": "wide"
+    }
+  ],
+  "interaction_modes": [
+    {
+      "id": "item_1",
+      "label": "Type a natural language question in Japanese or simple English.",
+      "purpose": "Type a natural language question in Japanese or simple English.",
+      "required": true
+    },
+    {
+      "id": "item_2",
+      "label": "Receive an answer with numbered steps and source citations.",
+      "purpose": "Receive an answer with numbered steps and source citations.",
+      "required": true
+    },
+    {
+      "id": "item_3",
+      "label": "Expand evidence cards to view original document excerpts.",
+      "purpose": "Expand evidence cards to view original document excerpts.",
+      "required": true
+    },
+    {
+      "id": "item_4",
+      "label": "For escalated cases, a reviewer sees a notification and can approve, edit, or reject the draft.",
+      "purpose": "For escalated cases, a reviewer sees a notification and can approve, edit, or reject the draft.",
+      "required": true
+    },
+    {
+      "id": "item_5",
+      "label": "View audit log of all interactions for compliance.",
+      "purpose": "View audit log of all interactions for compliance.",
+      "required": true
+    }
+  ],
+  "user_actions": [
+    {
+      "id": "item_1",
+      "label": "Ask question",
+      "purpose": "Ask question",
+      "required": true
+    },
+    {
+      "id": "item_2",
+      "label": "View evidence sources",
+      "purpose": "View evidence sources",
+      "required": true
+    },
+    {
+      "id": "item_3",
+      "label": "Flag for supervisor review",
+      "purpose": "Flag for supervisor review",
+      "required": true
+    },
+    {
+      "id": "item_4",
+      "label": "Approve or reject escalated response (reviewer only)",
+      "purpose": "Approve or reject escalated response (reviewer only)",
+      "required": true
+    },
+    {
+      "id": "item_5",
+      "label": "Edit answer draft (reviewer only)",
+      "purpose": "Edit answer draft (reviewer only)",
+      "required": true
+    },
+    {
+      "id": "item_6",
+      "label": "Export conversation for record-keeping",
+      "purpose": "Export conversation for record-keeping",
+      "required": true
+    }
+  ],
+  "conversation_starters": [
+    "NC旋盤のALM-204が出た場合、最初に確認すべき手順は何ですか？",
+    "検査寸法が連続して外れた場合、どのSOPを確認すべきですか？",
+    "新人オペレーター向けに、工具交換前の安全確認を簡単に説明してください。",
+    "このアラームはライン停止と上長承認が必要ですか？",
+    "マシニングセンタの工具折れが疑われる場合のトラブルシューティング手順を教えてください。",
+    "品質検査のチェックリストで、寸法公差が外れた場合の記録手順は？",
+    "機械の安全インターロックを無効にしてはならない理由を教えてください。"
+  ],
+  "validated": true,
+  "llm_model": "deepseek-v4-pro"
+}

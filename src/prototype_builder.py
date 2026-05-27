@@ -1143,6 +1143,7 @@ import ssl
 import time
 import urllib.error
 import urllib.request
+from pathlib import Path
 from typing import Any
 
 try:
@@ -1155,6 +1156,44 @@ def _ssl_context():
     if certifi is not None:
         return ssl.create_default_context(cafile=certifi.where())
     return ssl.create_default_context()
+
+
+APP_DIR = Path(__file__).resolve().parents[1]
+LOADED_ENV_FILES: list[str] = []
+
+
+def candidate_env_files() -> list[Path]:
+    candidates = [APP_DIR / ".env.local", Path.cwd() / ".env.local"]
+    candidates.extend(parent / ".env.local" for parent in APP_DIR.parents[:3])
+    unique: list[Path] = []
+    seen: set[Path] = set()
+    for path in candidates:
+        resolved = path.resolve()
+        if resolved not in seen:
+            seen.add(resolved)
+            unique.append(path)
+    return unique
+
+
+def load_env_file(path: Path | None = None) -> None:
+    """Load local runtime settings without requiring shell exports."""
+    paths = [path] if path is not None else candidate_env_files()
+    for current_path in paths:
+        if not current_path.exists():
+            continue
+        LOADED_ENV_FILES.append(str(current_path.resolve()))
+        for raw_line in current_path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and value and not os.environ.get(key):
+                os.environ[key] = value
+
+
+load_env_file()
 
 
 def parse_jsonish(text: str) -> dict[str, Any]:
@@ -1180,6 +1219,27 @@ def _endpoint() -> str:
     if base_url.endswith("/chat/completions"):
         return base_url
     return base_url + "/chat/completions"
+
+
+def connection_status() -> dict[str, Any]:
+    model = os.environ.get("AGENT_MODEL") or os.environ.get("DEEPSEEK_AGENT_MODEL") or "deepseek-v4-pro"
+    thinking_enabled = os.environ.get("DEEPSEEK_THINKING", "1").lower() not in {"0", "false", "disabled", "off", "no"}
+    reasoning_effort = os.environ.get("DEEPSEEK_REASONING_EFFORT", "high").strip()
+    has_key = bool(os.environ.get("DEEPSEEK_API_KEY"))
+    return {
+        "has_api_key": has_key,
+        "deepseek_api_key_present": has_key,
+        "base_url": os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
+        "deepseek_base_url": os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
+        "endpoint": _endpoint(),
+        "model": model,
+        "agent_model": model,
+        "thinking_enabled": thinking_enabled,
+        "thinking": os.environ.get("DEEPSEEK_THINKING", "1"),
+        "reasoning_effort": reasoning_effort,
+        "env_file_loaded": bool(LOADED_ENV_FILES),
+        "env_files_loaded": LOADED_ENV_FILES,
+    }
 
 
 def complete_json(system_prompt: str, user_prompt: str, *, retries: int = 2) -> dict[str, Any]:
@@ -1873,8 +1933,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
-from backend.agent import run_case
+from backend.agent import run_case, run_interaction
 from backend.data_store import load_product_spec, load_sample_cases
+from backend.llm_client import connection_status
 
 
 APP_DIR = Path(__file__).resolve().parents[1]
@@ -1924,14 +1985,8 @@ class ProductHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/product_spec":
             self._send_json(load_product_spec())
             return
-        if parsed.path == "/api/runtime_status":
-            self._send_json({
-                "deepseek_api_key_present": bool(os.environ.get("DEEPSEEK_API_KEY")),
-                "deepseek_base_url": os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
-                "agent_model": os.environ.get("AGENT_MODEL") or os.environ.get("DEEPSEEK_AGENT_MODEL") or "deepseek-v4-pro",
-                "thinking": os.environ.get("DEEPSEEK_THINKING", "1"),
-                "reasoning_effort": os.environ.get("DEEPSEEK_REASONING_EFFORT", "high"),
-            })
+        if parsed.path in {"/api/runtime_status", "/api/status"}:
+            self._send_json(connection_status())
             return
         if parsed.path == "/api/app_design":
             self._send_json(json.loads((APP_DIR / "llm_app_design.json").read_text(encoding="utf-8")))
@@ -3794,6 +3849,36 @@ REQUIREMENTS = '''# Generated product intentionally uses only the Python standar
 '''
 
 
+ENV_EXAMPLE = '''# Copy this file to .env.local and fill in your real key.
+# .env.local is read automatically by the generated app.
+DEEPSEEK_API_KEY=
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+AGENT_MODEL=deepseek-v4-pro
+DEEPSEEK_THINKING=1
+DEEPSEEK_REASONING_EFFORT=high
+GENERATED_APP_LIVE_SEARCH=1
+'''
+
+
+GITIGNORE = '''.env.local
+__pycache__/
+*.pyc
+'''
+
+
+RUN_APP_SH = '''#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")"
+if [ -f ".env.local" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source ".env.local"
+  set +a
+fi
+python3 app.py "$@"
+'''
+
+
 def build_product_brief(agent_design: dict, product_spec: dict) -> dict:
     opportunity = agent_design.get("selected_opportunity", {}) or {}
     return {
@@ -4303,6 +4388,9 @@ def build_prototype(
         _write_json(app_dir, relative_path, payload)
 
     text_files = {
+        ".env.example": ENV_EXAMPLE,
+        ".gitignore": GITIGNORE,
+        "run_app.sh": RUN_APP_SH,
         "requirements.txt": REQUIREMENTS,
         "app.py": APP_ENTRYPOINT,
         "tools.py": ROOT_TOOLS,
@@ -4341,6 +4429,7 @@ def build_prototype(
     }
     for relative_path, content in text_files.items():
         _write(app_dir, relative_path, content)
+    (app_dir / "run_app.sh").chmod(0o755)
 
     write_pipeline_diagram(app_dir, product_spec)
     write_analysis_charts(app_dir, area_profiles, product_spec)
@@ -4365,13 +4454,9 @@ This generated child app is a runnable local product MVP built by the Software B
 ## Run
 
 ```bash
-export DEEPSEEK_API_KEY="..."
-export DEEPSEEK_BASE_URL="https://api.deepseek.com"
-export AGENT_MODEL="deepseek-v4-pro"
-export DEEPSEEK_THINKING="1"
-export DEEPSEEK_REASONING_EFFORT="high"
-export GENERATED_APP_LIVE_SEARCH="1"
-python3 app.py
+cp .env.example .env.local
+# edit .env.local and fill DEEPSEEK_API_KEY
+./run_app.sh
 ```
 
 Open `http://127.0.0.1:8766`.

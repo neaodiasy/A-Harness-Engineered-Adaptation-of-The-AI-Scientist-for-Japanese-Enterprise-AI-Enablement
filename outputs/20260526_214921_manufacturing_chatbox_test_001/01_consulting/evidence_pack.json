@@ -1,0 +1,201 @@
+{
+  "method": "curated_source_retrieval_v1",
+  "query_context": {
+    "company_name": "Nagoya Precision Components",
+    "country": "Japan",
+    "industry": "manufacturing",
+    "main_business": "The company manufactures precision mechanical components for industrial equipment. Factory engineers and line supervisors maintain CNC machines, inspection devices, and assembly lines. Staff need to quickly search maintenance manuals, SOPs, troubleshooting notes, past incident reports, and quality-control procedures.",
+    "target_users": [
+      "factory engineers",
+      "line supervisors",
+      "maintenance technicians",
+      "quality-control staff",
+      "new operators in training"
+    ],
+    "current_workflow": "When equipment alarms occur or quality issues are detected, staff manually search PDF manuals, SOP folders, past incident notes, and ask senior engineers. New staff often do not know which document to check. Senior engineers answer repetitive questions about alarm codes, inspection procedures, replacement parts, and escalation conditions.",
+    "pain_points": [
+      "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+      "new operators spend too much time finding the right procedure",
+      "senior engineers are interrupted by repetitive troubleshooting questions",
+      "answers can be inconsistent across shifts",
+      "staff need clear escalation guidance for safety-critical or quality-critical cases",
+      "Japanese technical documents are difficult for foreign trainees to understand"
+    ],
+    "available_data": [
+      "machine maintenance manuals",
+      "SOP documents",
+      "alarm code tables",
+      "past incident reports",
+      "quality inspection checklists",
+      "replacement parts notes",
+      "training FAQs"
+    ],
+    "constraints": [
+      "the system must not make final safety decisions",
+      "the system must not instruct staff to bypass safety interlocks",
+      "the system must not approve machine restart after a serious alarm",
+      "human supervisor approval is required for safety-critical, quality-critical, or production-impacting actions",
+      "the system must cite document evidence or say when evidence is missing",
+      "the system should answer in clear Japanese and optionally simple English for trainees"
+    ],
+    "business_goal": "Build an AI-enabled internal technical knowledge chatbox that helps factory staff ask maintenance and SOP questions, retrieve relevant document evidence, summarize troubleshooting steps, and identify when supervisor escalation is required.",
+    "preferred_enablement_direction": "internal manufacturing knowledge chatbox",
+    "desired_product_type": "chatbox",
+    "preferred_interface": "chat_console",
+    "sample_user_questions": [
+      "NC旋盤のALM-204が出た場合、最初に確認すべき手順は何ですか？",
+      "検査寸法が連続して外れた場合、どのSOPを確認すべきですか？",
+      "新人オペレーター向けに、工具交換前の安全確認を簡単に説明してください。",
+      "このアラームはライン停止と上長承認が必要ですか？"
+    ]
+  },
+  "evidence_items": [
+    {
+      "id": "evidence_oecd_ai_labour_japan_2025",
+      "title": "OECD: Artificial Intelligence and the Labour Market in Japan",
+      "url": "https://www.oecd.org/en/publications/artificial-intelligence-and-the-labour-market-in-japan_b825563e-en/full-report.html",
+      "source_type": "policy_report",
+      "themes": [
+        "labor_shortage",
+        "productivity",
+        "skills",
+        "sme",
+        "workplace_ai"
+      ],
+      "industry_terms": [
+        "general",
+        "manufacturing",
+        "finance",
+        "insurance",
+        "services"
+      ],
+      "summary": "Japan faces labour and skills shortages, while AI adoption in workplaces remains comparatively low. The report frames AI as a way to improve productivity, job quality, and access to work when introduced safely.",
+      "supports": [
+        "opportunity_generation",
+        "business_value",
+        "japan_fit"
+      ],
+      "retrieval_method": "curated",
+      "relevance_score": 3.0
+    },
+    {
+      "id": "evidence_meti_genai_dx_skills_2024",
+      "title": "METI: Human Resources and Skills Required for DX Promotion in the Age of Generative AI",
+      "url": "https://www.meti.go.jp/english/press/2024/0628_003.html",
+      "source_type": "government_report",
+      "themes": [
+        "generative_ai",
+        "dx",
+        "skills",
+        "productivity",
+        "transformation"
+      ],
+      "industry_terms": [
+        "general",
+        "manufacturing",
+        "distribution",
+        "services",
+        "retail"
+      ],
+      "summary": "METI positions generative AI as a business opportunity for productivity, added value, and social issue solving, while emphasizing the human skills needed to use AI appropriately and proactively.",
+      "supports": [
+        "ai_literacy",
+        "roadmap",
+        "change_management"
+      ],
+      "retrieval_method": "curated",
+      "relevance_score": 3.0
+    },
+    {
+      "id": "evidence_ipa_dx_all_employee_enablement",
+      "title": "IPA DX SQUARE: Enterprise DX and all-employee digital skill development examples",
+      "url": "https://dx.ipa.go.jp/",
+      "source_type": "dx_case_collection",
+      "themes": [
+        "dx",
+        "data_utilization",
+        "all_employee_enablement",
+        "kaizen",
+        "skills"
+      ],
+      "industry_terms": [
+        "general",
+        "manufacturing",
+        "energy",
+        "consumer_goods",
+        "services"
+      ],
+      "summary": "IPA DX case studies emphasize data utilization, human resource development, digital skill standards, and broad employee enablement.",
+      "supports": [
+        "japan_fit",
+        "kaizen",
+        "adoption"
+      ],
+      "retrieval_method": "curated",
+      "relevance_score": 3.0
+    },
+    {
+      "id": "evidence_meti_geniac_multimodal_insurance_case",
+      "title": "METI GENIAC case: multimodal LMM for insurance contract operations",
+      "url": "https://www.meti.go.jp/policy/mono_info_service/geniac/geniac_magazine/usecase_02.html",
+      "source_type": "industry_case",
+      "themes": [
+        "multimodal",
+        "document_processing",
+        "insurance",
+        "workflow_efficiency"
+      ],
+      "industry_terms": [
+        "insurance",
+        "finance",
+        "document",
+        "contract",
+        "regulated"
+      ],
+      "summary": "A METI GENIAC case highlights multimodal large model development to improve insurance contract operation efficiency.",
+      "supports": [
+        "document_processing",
+        "prototype_scope",
+        "multimodal"
+      ],
+      "retrieval_method": "curated",
+      "relevance_score": 3.0
+    },
+    {
+      "id": "evidence_fsa_ai_discussion_2025",
+      "title": "FSA: AI Discussion Paper for the Financial Sector",
+      "url": "https://www.fsa.go.jp/en/news/2025/20250304/aidp.html",
+      "source_type": "regulatory_discussion",
+      "themes": [
+        "financial_services",
+        "risk_management",
+        "governance",
+        "customer_convenience",
+        "operational_efficiency"
+      ],
+      "industry_terms": [
+        "finance",
+        "bank",
+        "insurance",
+        "securities",
+        "regulated"
+      ],
+      "summary": "Japan's FSA discusses sound AI use in financial institutions, balancing operational efficiency and customer convenience against misuse, misinformation, and emerging risk concerns.",
+      "supports": [
+        "risk_check",
+        "human_approval",
+        "compliance"
+      ],
+      "retrieval_method": "curated",
+      "relevance_score": 0.5
+    }
+  ],
+  "live_search": {
+    "enabled": false,
+    "reason": "Set ENABLE_LIVE_SEARCH=1 to enable live trusted-domain retrieval."
+  },
+  "coverage_notes": [
+    "Evidence prioritizes Japan-specific AI adoption, DX, governance, labour shortage, and regulated workflow themes.",
+    "When ENABLE_LIVE_SEARCH=1, the harness adds live trusted-domain search while preserving the same evidence_pack schema."
+  ]
+}

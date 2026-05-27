@@ -1,0 +1,217 @@
+{
+  "selected_scaffold_id": "knowledge_assistant",
+  "interface_type": "chat_console",
+  "layout_variant": "question_answer_evidence",
+  "visual_style": "knowledge_workbench",
+  "primary_surface": "Question intake, AI answer workspace, document evidence, uncertainty flags, approval note.",
+  "navigation_model": "query_history",
+  "emphasis_order": [
+    "assistant",
+    "intake",
+    "evidence",
+    "draft",
+    "approval",
+    "activity"
+  ],
+  "feature_cards": [
+    {
+      "title": "Natural Language Question Answering",
+      "description": "Ask maintenance and SOP questions in Japanese or simple English and receive evidence-grounded answers."
+    },
+    {
+      "title": "Source Citation & Evidence Panel",
+      "description": "Every answer includes clickable source citations with highlighted excerpts from manuals, SOPs, and incident reports."
+    },
+    {
+      "title": "Uncertainty & Risk Flagging",
+      "description": "Automatically detects missing information or safety risks and surfaces warnings before final answer."
+    },
+    {
+      "title": "Supervisor Escalation",
+      "description": "Safety-critical or ambiguous queries trigger a review workflow, requiring expert approval before release."
+    },
+    {
+      "title": "Human Approval Gate",
+      "description": "Built-in approval panel for reviewer to accept, edit, or reject AI-drafted answers for regulated actions."
+    },
+    {
+      "title": "Audit Trail",
+      "description": "Complete log of all queries, evidence, drafts, and approvals for compliance and continuous improvement."
+    },
+    {
+      "title": "Japanese-First Interface",
+      "description": "Primary UI in Japanese with optional simplified English translations for trainee operators."
+    }
+  ],
+  "ui_primitives": [
+    {
+      "id": "chat_thread",
+      "type": "chat_thread",
+      "label": "Chat Thread",
+      "purpose": "Primary conversation interface for operators to ask questions and receive answers with citations.",
+      "span": "wide",
+      "priority": 1,
+      "bound_action": "",
+      "source": "deepseek_frontend_layout_role"
+    },
+    {
+      "id": "evidence_panel",
+      "type": "evidence_panel",
+      "label": "Evidence Panel",
+      "purpose": "Display retrieved documents, manuals, or incident reports with highlighted excerpts.",
+      "span": "medium",
+      "priority": 2,
+      "bound_action": "",
+      "source": "deepseek_frontend_layout_role"
+    },
+    {
+      "id": "risk_checklist",
+      "type": "risk_checklist",
+      "label": "Risk Checklist",
+      "purpose": "Surface safety risks, missing information, and escalation rules.",
+      "span": "medium",
+      "priority": 3,
+      "bound_action": "",
+      "source": "deepseek_frontend_layout_role"
+    },
+    {
+      "id": "approval_panel",
+      "type": "approval_panel",
+      "label": "Approval Panel",
+      "purpose": "Show approval status and allow reviewer decision for escalated cases.",
+      "span": "medium",
+      "priority": 4,
+      "bound_action": "",
+      "source": "deepseek_frontend_layout_role"
+    },
+    {
+      "id": "metrics_strip",
+      "type": "metrics_strip",
+      "label": "Metrics Strip",
+      "purpose": "Summarize confidence, evidence count, risk level, and approval status.",
+      "span": "wide",
+      "priority": 5,
+      "bound_action": "",
+      "source": "deepseek_frontend_layout_role"
+    }
+  ],
+  "page_regions": {
+    "sidebar": {
+      "components": [
+        "query_history",
+        "metrics_strip"
+      ],
+      "collapsible": true,
+      "default_visible": true
+    },
+    "main": {
+      "components": [
+        "chat_thread",
+        "answer_draft"
+      ],
+      "layout": "stacked"
+    },
+    "context_panel": {
+      "components": [
+        "evidence_panel",
+        "risk_checklist",
+        "approval_panel"
+      ],
+      "layout": "tabbed",
+      "default_tab": "evidence_panel"
+    },
+    "footer": {
+      "components": [
+        "activity_log"
+      ],
+      "always_visible": false
+    }
+  },
+  "custom_product_blueprint": {
+    "product_name": "Nagoya Precision Components Maintenance Knowledge Assistant",
+    "subtitle": "AI-powered technical support for factory maintenance and troubleshooting",
+    "primary_action": "Ask a question",
+    "role_model": [
+      {
+        "role": "operator",
+        "permissions": [
+          "create_query",
+          "view_answer",
+          "view_evidence",
+          "flag_for_review"
+        ]
+      },
+      {
+        "role": "reviewer",
+        "permissions": [
+          "review_escalated_cases",
+          "approve_critical_actions",
+          "edit_answer_draft",
+          "provide_final_instruction"
+        ]
+      }
+    ],
+    "state_model": [
+      "query_received",
+      "evidence_retrieved",
+      "draft_generated",
+      "risk_assessed",
+      "escalation_required",
+      "human_approved",
+      "answer_delivered"
+    ],
+    "source": "deterministic_fallback",
+    "product_goal": "Troubleshooting equipment alarms and finding maintenance procedures",
+    "primary_entities": [
+      "case",
+      "evidence",
+      "draft",
+      "risk",
+      "approval"
+    ],
+    "unique_workflows": [
+      "Knowledge Q&A",
+      "Document summary",
+      "Follow-up questions"
+    ],
+    "ui_composition_strategy": "Assemble a responsive product from reusable UI primitives."
+  },
+  "responsive_policy": {
+    "breakpoints": {
+      "desktop": "min-width: 1200px",
+      "tablet": "min-width: 768px and max-width: 1199px",
+      "mobile": "max-width: 767px"
+    },
+    "layout_strategy": {
+      "desktop": "three-column: sidebar (left) + main chat (center) + context panel (right)",
+      "tablet": "two-column: sidebar (collapsible) + main chat; context panel as bottom sheet",
+      "mobile": "single-column stacked: chat thread full width, panels as expandable cards below"
+    },
+    "touch_optimized": true,
+    "factory_floor_ready": true
+  },
+  "theme_tokens": {
+    "accent": "#7c3aed",
+    "surface": "#faf7ff",
+    "sidebar": "#17102a",
+    "color_scheme": "industrial_light",
+    "primary_color": "#1E40AF",
+    "secondary_color": "#1E293B",
+    "background_color": "#F8FAFC",
+    "surface_color": "#FFFFFF",
+    "text_primary": "#0F172A",
+    "text_secondary": "#475569",
+    "danger_color": "#DC2626",
+    "warning_color": "#F59E0B",
+    "success_color": "#10B981",
+    "font_family_base": "'Noto Sans JP', 'Inter', sans-serif",
+    "font_size_base": "16px",
+    "spacing_unit": "8px",
+    "border_radius": "8px",
+    "shadow": "0 1px 3px rgba(0,0,0,0.1)"
+  },
+  "human_approval_required": true,
+  "send_allowed": false,
+  "source": "deepseek_frontend_layout_role",
+  "primitive_library_version": "ui_primitive_library_v1"
+}

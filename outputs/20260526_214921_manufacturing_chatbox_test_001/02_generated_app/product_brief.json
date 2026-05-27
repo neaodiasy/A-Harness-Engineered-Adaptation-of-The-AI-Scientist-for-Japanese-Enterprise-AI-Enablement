@@ -1,0 +1,8 @@
+{
+  "product_name": "Nagoya Precision Components AI Workbench",
+  "selected_opportunity": "Maintenance Knowledge Chatbox",
+  "problem": "Troubleshooting equipment alarms and finding maintenance procedures",
+  "solution": "Build an AI-enabled internal technical knowledge chatbox that helps factory staff ask maintenance and SOP questions, retrieve relevant document evidence, summarize troubleshooting steps, and identify when supervisor escalation is required.",
+  "demo_value": "Shows consulting-agent to software-builder workflow through a runnable multi-file generated app.",
+  "human_approval": true
+}

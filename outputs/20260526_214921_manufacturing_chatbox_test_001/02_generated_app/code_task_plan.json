@@ -1,0 +1,129 @@
+{
+  "source": "deterministic_fallback",
+  "tasks": [
+    {
+      "role": "backend_role",
+      "task": "Generate runtime reasoning policy and domain adapter specification",
+      "target_files": [
+        "backend/generated_reasoning_policy.py",
+        "backend/generated_domain_adapter.py"
+      ],
+      "inputs": [
+        "product_spec",
+        "runtime_domain_pack",
+        "llm_app_design"
+      ],
+      "acceptance_checks": [
+        "imports",
+        "human_approval_required",
+        "send_allowed_false"
+      ]
+    },
+    {
+      "role": "frontend_role",
+      "task": "Generate UI configuration from app design",
+      "target_files": [
+        "frontend/generated_ui_config.json"
+      ],
+      "inputs": [
+        "llm_app_design"
+      ],
+      "acceptance_checks": [
+        "contains_ui_sections"
+      ]
+    },
+    {
+      "role": "guardrails_role",
+      "task": "Generate forbidden claims and escalation rules",
+      "target_files": [
+        "backend/generated_reasoning_policy.py"
+      ],
+      "inputs": [
+        "llm_app_design",
+        "runtime_domain_pack"
+      ],
+      "acceptance_checks": [
+        "approval_required_true",
+        "send_allowed_false"
+      ]
+    },
+    {
+      "role": "evaluation_role",
+      "task": "Generate domain-specific evaluation checklist",
+      "target_files": [
+        "evaluation_checklist.json"
+      ],
+      "inputs": [
+        "llm_app_design"
+      ],
+      "acceptance_checks": [
+        "checklist_non_empty"
+      ]
+    },
+    {
+      "role": "reviewer_role",
+      "task": "Review generated LLM design artifacts for missing safety fields",
+      "target_files": [
+        "llm_builder_review.json"
+      ],
+      "inputs": [
+        "all_llm_design_artifacts"
+      ],
+      "acceptance_checks": [
+        "review_passed_or_fallback"
+      ]
+    },
+    {
+      "role": "domain_logic_role",
+      "task": "Generate safe domain-specific code plugin",
+      "target_files": [
+        "backend/generated_domain_logic.py"
+      ],
+      "inputs": [
+        "selected_scaffold_id",
+        "runtime_domain_pack",
+        "llm_app_design"
+      ],
+      "acceptance_checks": [
+        "ast_safe",
+        "adapt_case_returns_dict",
+        "prompt_context_returns_dict"
+      ]
+    },
+    {
+      "role": "interaction_role",
+      "task": "Generate business-specific AI copilot interaction modes and user actions",
+      "target_files": [
+        "frontend/generated_interaction_config.json"
+      ],
+      "inputs": [
+        "llm_app_design",
+        "product_spec",
+        "runtime_domain_pack"
+      ],
+      "acceptance_checks": [
+        "user_actions_non_empty",
+        "human_approval_required",
+        "send_allowed_false"
+      ]
+    },
+    {
+      "role": "frontend_layout_role",
+      "task": "Generate product-specific frontend layout and visual experience configuration",
+      "target_files": [
+        "frontend/generated_layout_config.json"
+      ],
+      "inputs": [
+        "llm_app_design",
+        "product_feature_plan",
+        "frontend_experience"
+      ],
+      "acceptance_checks": [
+        "interface_type_valid",
+        "feature_cards_present",
+        "approval_required_true"
+      ]
+    }
+  ],
+  "app_design_archetype": "knowledge_assistant"
+}

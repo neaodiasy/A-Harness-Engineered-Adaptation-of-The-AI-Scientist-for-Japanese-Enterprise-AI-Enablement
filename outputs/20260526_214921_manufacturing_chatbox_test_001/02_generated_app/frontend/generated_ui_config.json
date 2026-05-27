@@ -1,0 +1,71 @@
+{
+  "product_archetype": "knowledge_assistant",
+  "ui_sections": [
+    {
+      "id": "chat_thread",
+      "label": "chat_thread",
+      "purpose": "chat_thread"
+    },
+    {
+      "id": "document_evidence_panel",
+      "label": "document_evidence_panel",
+      "purpose": "document_evidence_panel"
+    },
+    {
+      "id": "answer_draft",
+      "label": "answer_draft",
+      "purpose": "answer_draft"
+    },
+    {
+      "id": "uncertainty_flags",
+      "label": "uncertainty_flags",
+      "purpose": "uncertainty_flags"
+    },
+    {
+      "id": "approval_panel",
+      "label": "approval_panel",
+      "purpose": "approval_panel"
+    },
+    {
+      "id": "risk_checklist",
+      "label": "risk_checklist",
+      "purpose": "risk_checklist"
+    }
+  ],
+  "panel_labels": {
+    "chat_thread": "Chat Thread",
+    "document_evidence_panel": "Document Evidence",
+    "answer_draft": "Answer Draft",
+    "uncertainty_flags": "Uncertainty Flags",
+    "approval_panel": "Approval Panel",
+    "risk_checklist": "Risk Checklist"
+  },
+  "button_labels": {
+    "ask_question": "Ask Question",
+    "view_evidence_sources": "View Evidence Sources",
+    "flag_for_review": "Flag for Supervisor Review",
+    "approve": "Approve",
+    "reject": "Reject",
+    "edit_answer_draft": "Edit Answer Draft",
+    "export_conversation": "Export Conversation"
+  },
+  "empty_state_text": {
+    "default": "No data available.",
+    "chat_thread": "Ask a question to start troubleshooting.",
+    "document_evidence_panel": "No evidence loaded. Ask a question to retrieve documents.",
+    "answer_draft": "No draft generated yet.",
+    "uncertainty_flags": "No uncertainties flagged.",
+    "approval_panel": "No approvals pending.",
+    "risk_checklist": "No risk checks performed."
+  },
+  "approval_labels": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "request_edits": "Request Edits",
+    "escalation_required": "Supervisor Approval Required",
+    "send_allowed": false,
+    "human_approval_required": true
+  },
+  "source": "deepseek_ui_config_role",
+  "selected_scaffold_id": "knowledge_assistant"
+}

@@ -1,0 +1,17 @@
+{
+  "status": "complete",
+  "mode": "real_deepseek_api",
+  "selected_opportunity": "Maintenance Knowledge Chatbox",
+  "generated_app": "/Users/zhongxin/Documents/New project/j-enterprise-agent-scientist-v2-live-search/outputs/20260526_214921_manufacturing_chatbox_test_001/02_generated_app",
+  "evaluation_success": false,
+  "sandbox_success": false,
+  "review_score": 8.56,
+  "outputs": "/Users/zhongxin/Documents/New project/j-enterprise-agent-scientist-v2-live-search/outputs/20260526_214921_manufacturing_chatbox_test_001",
+  "output_sections": {
+    "consulting": "/Users/zhongxin/Documents/New project/j-enterprise-agent-scientist-v2-live-search/outputs/20260526_214921_manufacturing_chatbox_test_001/01_consulting",
+    "generated_app": "/Users/zhongxin/Documents/New project/j-enterprise-agent-scientist-v2-live-search/outputs/20260526_214921_manufacturing_chatbox_test_001/02_generated_app",
+    "sandbox": "/Users/zhongxin/Documents/New project/j-enterprise-agent-scientist-v2-live-search/outputs/20260526_214921_manufacturing_chatbox_test_001/03_sandbox",
+    "review": "/Users/zhongxin/Documents/New project/j-enterprise-agent-scientist-v2-live-search/outputs/20260526_214921_manufacturing_chatbox_test_001/04_review",
+    "visuals": "/Users/zhongxin/Documents/New project/j-enterprise-agent-scientist-v2-live-search/outputs/20260526_214921_manufacturing_chatbox_test_001/05_visuals"
+  }
+}

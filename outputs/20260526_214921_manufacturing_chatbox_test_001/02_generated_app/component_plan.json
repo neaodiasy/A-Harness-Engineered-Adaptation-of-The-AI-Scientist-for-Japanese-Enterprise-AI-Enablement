@@ -1,0 +1,770 @@
+{
+  "component_plan_version": "plan_driven_builder_v1",
+  "builder_mode": "deepseek_selected_scaffold_customization",
+  "selected_scaffold_id": "knowledge_assistant",
+  "scaffold_selection_reason": "The knowledge_assistant scaffold aligns with the need for a chat-based interface to retrieve, summarize, and cite evidence from technical documents, manuals, and incident reports. It supports Japanese and simplified English for trainees, flags uncertainty, and integrates human-approval requirements for safety-critical actions.",
+  "selected_archetype": {
+    "id": "approval_review_console",
+    "name": "Approval Review Console",
+    "primary_job": "Review a request against policy, collect evidence, and produce a controlled approval packet.",
+    "workspace_regions": [
+      "case_queue",
+      "policy_checklist",
+      "risk_panel",
+      "evidence_panel",
+      "decision_options",
+      "audit_log"
+    ],
+    "selection_score": 9,
+    "llm_app_design_product_archetype": "knowledge_assistant"
+  },
+  "source_artifacts": [
+    "selected_opportunity.json",
+    "agent_design.json",
+    "recommended_architecture",
+    "productization_blueprint.json",
+    "runtime_domain_pack",
+    "llm_app_design.json",
+    "code_task_plan.json",
+    "generated_product_rules.md"
+  ],
+  "inputs_consumed": {
+    "selected_primitives": [
+      "intake",
+      "retrieval",
+      "classification",
+      "extraction",
+      "checklist",
+      "drafting",
+      "risk_check",
+      "human_approval",
+      "audit_log",
+      "evaluation"
+    ],
+    "enterprise_capabilities": [
+      "case_queue",
+      "structured_intake_form",
+      "runtime_live_web_evidence_search",
+      "domain_tool_panel",
+      "candidate_or_result_comparison",
+      "editable_business_draft",
+      "human_approval_packet",
+      "activity_log",
+      "audit_trace",
+      "error_and_loading_states"
+    ],
+    "workspace_regions": [
+      "case_queue",
+      "policy_checklist",
+      "risk_panel",
+      "evidence_panel",
+      "decision_options",
+      "audit_log"
+    ],
+    "domain_template_id": "manufacturing",
+    "domain_pack_mode": "auto_built_runtime_domain_pack",
+    "llm_app_design_source": "deepseek_build_time_app_design",
+    "llm_ui_section_count": 6,
+    "llm_backend_module_count": 6,
+    "llm_local_tool_count": 5,
+    "code_task_plan_source": "deterministic_fallback",
+    "specialized_roles": [
+      "backend_role",
+      "frontend_role",
+      "guardrails_role",
+      "evaluation_role",
+      "reviewer_role",
+      "domain_logic_role",
+      "interaction_role",
+      "frontend_layout_role"
+    ],
+    "selected_scaffold_id": "knowledge_assistant"
+  },
+  "planned_ui_sections": [
+    {
+      "id": "item_1",
+      "label": "chat_thread",
+      "purpose": "chat_thread",
+      "required": true
+    },
+    {
+      "id": "item_2",
+      "label": "document_evidence_panel",
+      "purpose": "document_evidence_panel",
+      "required": true
+    },
+    {
+      "id": "item_3",
+      "label": "answer_draft",
+      "purpose": "answer_draft",
+      "required": true
+    },
+    {
+      "id": "item_4",
+      "label": "uncertainty_flags",
+      "purpose": "uncertainty_flags",
+      "required": true
+    },
+    {
+      "id": "item_5",
+      "label": "approval_panel",
+      "purpose": "approval_panel",
+      "required": true
+    },
+    {
+      "id": "item_6",
+      "label": "risk_checklist",
+      "purpose": "risk_checklist",
+      "required": true
+    }
+  ],
+  "planned_backend_modules": [
+    {
+      "id": "item_1",
+      "label": "knowledge_lookup",
+      "purpose": "knowledge_lookup",
+      "required": true
+    },
+    {
+      "id": "item_2",
+      "label": "evidence_summarizer",
+      "purpose": "evidence_summarizer",
+      "required": true
+    },
+    {
+      "id": "item_3",
+      "label": "answer_drafter",
+      "purpose": "answer_drafter",
+      "required": true
+    },
+    {
+      "id": "item_4",
+      "label": "guardrails",
+      "purpose": "guardrails",
+      "required": true
+    },
+    {
+      "id": "item_5",
+      "label": "escalation_checker",
+      "purpose": "escalation_checker",
+      "required": true
+    },
+    {
+      "id": "item_6",
+      "label": "audit_logger",
+      "purpose": "audit_logger",
+      "required": true
+    }
+  ],
+  "planned_local_tools": [
+    {
+      "id": "item_1",
+      "label": "doc_lookup",
+      "purpose": "doc_lookup",
+      "required": true
+    },
+    {
+      "id": "item_2",
+      "label": "evidence_matcher",
+      "purpose": "evidence_matcher",
+      "required": true
+    },
+    {
+      "id": "item_3",
+      "label": "alarm_code_resolver",
+      "purpose": "alarm_code_resolver",
+      "required": true
+    },
+    {
+      "id": "item_4",
+      "label": "sop_retriever",
+      "purpose": "sop_retriever",
+      "required": true
+    },
+    {
+      "id": "item_5",
+      "label": "incident_report_searcher",
+      "purpose": "incident_report_searcher",
+      "required": true
+    }
+  ],
+  "planned_guardrails": [
+    "cite evidence in every answer",
+    "flag uncertainty and missing information",
+    "do not approve machine restart after serious alarm",
+    "do not instruct bypass of safety interlocks",
+    "escalate ambiguous or safety-critical queries to supervisor",
+    "never send external communication"
+  ],
+  "planned_evaluation_checks": [
+    "{'checks': ['evidence-grounded answer exists', 'uncertainty is flagged when appropriate', 'escalation is triggered for safety-critical cases', 'source citations are present', 'human approval is enforced for defined triggers', 'answers are provided in Japanese with optional English', 'no forbidden instructions are included'], 'evaluation_method': 'synthetic test cases with known evidence, regular audits of logs'}"
+  ],
+  "llm_app_design_requirements": {
+    "product_archetype": "knowledge_assistant",
+    "target_workflow": "Troubleshooting equipment alarms and finding maintenance procedures",
+    "primary_user": "factory engineers, line supervisors, maintenance technicians, quality-control staff, new operators",
+    "ui_sections": [
+      {
+        "id": "item_1",
+        "label": "chat_thread",
+        "purpose": "chat_thread",
+        "required": true
+      },
+      {
+        "id": "item_2",
+        "label": "document_evidence_panel",
+        "purpose": "document_evidence_panel",
+        "required": true
+      },
+      {
+        "id": "item_3",
+        "label": "answer_draft",
+        "purpose": "answer_draft",
+        "required": true
+      },
+      {
+        "id": "item_4",
+        "label": "uncertainty_flags",
+        "purpose": "uncertainty_flags",
+        "required": true
+      },
+      {
+        "id": "item_5",
+        "label": "approval_panel",
+        "purpose": "approval_panel",
+        "required": true
+      },
+      {
+        "id": "item_6",
+        "label": "risk_checklist",
+        "purpose": "risk_checklist",
+        "required": true
+      }
+    ],
+    "backend_modules": [
+      {
+        "id": "item_1",
+        "label": "knowledge_lookup",
+        "purpose": "knowledge_lookup",
+        "required": true
+      },
+      {
+        "id": "item_2",
+        "label": "evidence_summarizer",
+        "purpose": "evidence_summarizer",
+        "required": true
+      },
+      {
+        "id": "item_3",
+        "label": "answer_drafter",
+        "purpose": "answer_drafter",
+        "required": true
+      },
+      {
+        "id": "item_4",
+        "label": "guardrails",
+        "purpose": "guardrails",
+        "required": true
+      },
+      {
+        "id": "item_5",
+        "label": "escalation_checker",
+        "purpose": "escalation_checker",
+        "required": true
+      },
+      {
+        "id": "item_6",
+        "label": "audit_logger",
+        "purpose": "audit_logger",
+        "required": true
+      }
+    ],
+    "local_tools": [
+      {
+        "id": "item_1",
+        "label": "doc_lookup",
+        "purpose": "doc_lookup",
+        "required": true
+      },
+      {
+        "id": "item_2",
+        "label": "evidence_matcher",
+        "purpose": "evidence_matcher",
+        "required": true
+      },
+      {
+        "id": "item_3",
+        "label": "alarm_code_resolver",
+        "purpose": "alarm_code_resolver",
+        "required": true
+      },
+      {
+        "id": "item_4",
+        "label": "sop_retriever",
+        "purpose": "sop_retriever",
+        "required": true
+      },
+      {
+        "id": "item_5",
+        "label": "incident_report_searcher",
+        "purpose": "incident_report_searcher",
+        "required": true
+      }
+    ],
+    "guardrails": [
+      "cite evidence in every answer",
+      "flag uncertainty and missing information",
+      "do not approve machine restart after serious alarm",
+      "do not instruct bypass of safety interlocks",
+      "escalate ambiguous or safety-critical queries to supervisor",
+      "never send external communication"
+    ],
+    "evaluation_requirements": [
+      "{'checks': ['evidence-grounded answer exists', 'uncertainty is flagged when appropriate', 'escalation is triggered for safety-critical cases', 'source citations are present', 'human approval is enforced for defined triggers', 'answers are provided in Japanese with optional English', 'no forbidden instructions are included'], 'evaluation_method': 'synthetic test cases with known evidence, regular audits of logs'}"
+    ],
+    "domain_adaptation_notes": [
+      "{'language': 'Primary Japanese, optional simplified English for trainees', 'terminology': 'Use factory-specific terms like alarm codes (ALM-xxx), CNC, SOP, inspection dimensions', 'document_sources': 'machine maintenance manuals, SOP documents, alarm code tables, past incident reports, quality inspection checklists, replacement parts notes, training FAQs', 'risk_handling': 'Escalate safety-critical, quality-critical, or production-impacting cases to human supervisor; never bypass safety interlocks'}"
+    ],
+    "small_domain_logic_requirements": [
+      "Classify query intent: troubleshooting vs. procedure lookup vs. escalation question",
+      "Check alarm codes against known tables and retrieve corresponding steps",
+      "Validate that suggested parts match the machine model",
+      "Detect when a query implies a safety risk and enforce escalation",
+      "For multi-step procedures, ensure all steps are included from the SOP"
+    ],
+    "product_feature_plan": [
+      {
+        "core_capabilities": [
+          "Natural language question answering over internal technical documents",
+          "Source citation and evidence panel",
+          "Uncertainty and risk flagging",
+          "Supervisor escalation workflow",
+          "Human-approval gate for critical actions",
+          "Audit trail of all queries and answers",
+          "Japanese interface with optional English translation"
+        ],
+        "future_enhancements": [
+          "Multimodal support for photos of alarms or damaged parts",
+          "Integration with equipment sensors for automated alarm lookup",
+          "Training module for new operators with practice scenarios",
+          "Feedback loop to improve retrieval accuracy"
+        ]
+      }
+    ],
+    "frontend_experience": {
+      "interface_type": "chat_console",
+      "workspace_regions": [
+        "chat_thread",
+        "evidence_panel",
+        "answer_draft",
+        "risk_checklist",
+        "approval_panel"
+      ],
+      "visual_quality_contract": {
+        "layout": "enterprise_workbench_with_chat",
+        "must_have": [
+          "sidebar navigation",
+          "chat thread with user/assistant bubbles",
+          "expandable evidence panel with source links",
+          "risk checklist sidebar",
+          "approval panel for supervisor actions",
+          "activity log",
+          "responsive design for tablet use on factory floor"
+        ],
+        "avoid": [
+          "chat-only UI without panels",
+          "single raw JSON output",
+          "marketing landing page"
+        ]
+      },
+      "layout_variant": "question_answer_evidence",
+      "visual_style": "knowledge_workbench",
+      "primary_surface": "Question intake, AI answer workspace, document evidence, uncertainty flags, approval note.",
+      "navigation_model": "query_history",
+      "emphasis_order": [
+        "assistant",
+        "intake",
+        "evidence",
+        "draft",
+        "approval",
+        "activity"
+      ]
+    }
+  },
+  "code_task_plan_source": "deterministic_fallback",
+  "specialized_roles": [
+    "backend_role",
+    "frontend_role",
+    "guardrails_role",
+    "evaluation_role",
+    "reviewer_role",
+    "domain_logic_role",
+    "interaction_role",
+    "frontend_layout_role"
+  ],
+  "generated_artifacts": [
+    "llm_app_design.json",
+    "generated_product_rules.md",
+    "code_task_plan.json",
+    "backend/generated_reasoning_policy.py",
+    "backend/generated_domain_adapter.py",
+    "backend/generated_domain_logic.py",
+    "frontend/generated_ui_config.json",
+    "frontend/generated_layout_config.json",
+    "frontend/generated_interaction_config.json",
+    "evaluation_checklist.json",
+    "llm_builder_review.json"
+  ],
+  "deepseek_controls": [
+    "selected_scaffold_id",
+    "reason_for_scaffold_selection",
+    "product_archetype",
+    "target_workflow",
+    "ui_sections",
+    "backend_modules",
+    "local_tools",
+    "runtime_llm_role",
+    "runtime_prompt_requirements",
+    "guardrails",
+    "evaluation_requirements",
+    "domain-specific policy/config/adapter artifacts",
+    "interactive AI copilot modes and user actions",
+    "frontend experience type, layout variant, and product feature cards",
+    "responsive UI primitive composition",
+    "small generated domain logic plugin"
+  ],
+  "scaffold_provided_components": {
+    "scaffold_id": "knowledge_assistant",
+    "purpose": "Retrieve knowledge, summarize evidence, draft grounded answers, and flag uncertainty.",
+    "default_ui_sections": [
+      "query_intake",
+      "document_evidence",
+      "answer_draft",
+      "uncertainty_flags",
+      "approval"
+    ],
+    "default_backend_modules": [
+      "knowledge_lookup",
+      "evidence_summarizer",
+      "answer_drafter",
+      "guardrails"
+    ],
+    "default_local_tools": [
+      "doc_lookup",
+      "evidence_matcher"
+    ],
+    "required_guardrails": [
+      "cite evidence",
+      "flag uncertainty",
+      "approval when needed"
+    ],
+    "default_evaluation_checks": [
+      "evidence-grounded answer",
+      "uncertainty flags",
+      "approval when needed"
+    ]
+  },
+  "deepseek_customized_components": {
+    "ui_sections": [
+      {
+        "id": "item_1",
+        "label": "chat_thread",
+        "purpose": "chat_thread",
+        "required": true
+      },
+      {
+        "id": "item_2",
+        "label": "document_evidence_panel",
+        "purpose": "document_evidence_panel",
+        "required": true
+      },
+      {
+        "id": "item_3",
+        "label": "answer_draft",
+        "purpose": "answer_draft",
+        "required": true
+      },
+      {
+        "id": "item_4",
+        "label": "uncertainty_flags",
+        "purpose": "uncertainty_flags",
+        "required": true
+      },
+      {
+        "id": "item_5",
+        "label": "approval_panel",
+        "purpose": "approval_panel",
+        "required": true
+      },
+      {
+        "id": "item_6",
+        "label": "risk_checklist",
+        "purpose": "risk_checklist",
+        "required": true
+      }
+    ],
+    "backend_modules": [
+      {
+        "id": "item_1",
+        "label": "knowledge_lookup",
+        "purpose": "knowledge_lookup",
+        "required": true
+      },
+      {
+        "id": "item_2",
+        "label": "evidence_summarizer",
+        "purpose": "evidence_summarizer",
+        "required": true
+      },
+      {
+        "id": "item_3",
+        "label": "answer_drafter",
+        "purpose": "answer_drafter",
+        "required": true
+      },
+      {
+        "id": "item_4",
+        "label": "guardrails",
+        "purpose": "guardrails",
+        "required": true
+      },
+      {
+        "id": "item_5",
+        "label": "escalation_checker",
+        "purpose": "escalation_checker",
+        "required": true
+      },
+      {
+        "id": "item_6",
+        "label": "audit_logger",
+        "purpose": "audit_logger",
+        "required": true
+      }
+    ],
+    "local_tools": [
+      {
+        "id": "item_1",
+        "label": "doc_lookup",
+        "purpose": "doc_lookup",
+        "required": true
+      },
+      {
+        "id": "item_2",
+        "label": "evidence_matcher",
+        "purpose": "evidence_matcher",
+        "required": true
+      },
+      {
+        "id": "item_3",
+        "label": "alarm_code_resolver",
+        "purpose": "alarm_code_resolver",
+        "required": true
+      },
+      {
+        "id": "item_4",
+        "label": "sop_retriever",
+        "purpose": "sop_retriever",
+        "required": true
+      },
+      {
+        "id": "item_5",
+        "label": "incident_report_searcher",
+        "purpose": "incident_report_searcher",
+        "required": true
+      }
+    ],
+    "guardrails": [
+      "cite evidence in every answer",
+      "flag uncertainty and missing information",
+      "do not approve machine restart after serious alarm",
+      "do not instruct bypass of safety interlocks",
+      "escalate ambiguous or safety-critical queries to supervisor",
+      "never send external communication"
+    ],
+    "evaluation_requirements": [
+      "{'checks': ['evidence-grounded answer exists', 'uncertainty is flagged when appropriate', 'escalation is triggered for safety-critical cases', 'source citations are present', 'human approval is enforced for defined triggers', 'answers are provided in Japanese with optional English', 'no forbidden instructions are included'], 'evaluation_method': 'synthetic test cases with known evidence, regular audits of logs'}"
+    ],
+    "product_feature_plan": [
+      {
+        "core_capabilities": [
+          "Natural language question answering over internal technical documents",
+          "Source citation and evidence panel",
+          "Uncertainty and risk flagging",
+          "Supervisor escalation workflow",
+          "Human-approval gate for critical actions",
+          "Audit trail of all queries and answers",
+          "Japanese interface with optional English translation"
+        ],
+        "future_enhancements": [
+          "Multimodal support for photos of alarms or damaged parts",
+          "Integration with equipment sensors for automated alarm lookup",
+          "Training module for new operators with practice scenarios",
+          "Feedback loop to improve retrieval accuracy"
+        ]
+      }
+    ],
+    "frontend_experience": {
+      "interface_type": "chat_console",
+      "workspace_regions": [
+        "chat_thread",
+        "evidence_panel",
+        "answer_draft",
+        "risk_checklist",
+        "approval_panel"
+      ],
+      "visual_quality_contract": {
+        "layout": "enterprise_workbench_with_chat",
+        "must_have": [
+          "sidebar navigation",
+          "chat thread with user/assistant bubbles",
+          "expandable evidence panel with source links",
+          "risk checklist sidebar",
+          "approval panel for supervisor actions",
+          "activity log",
+          "responsive design for tablet use on factory floor"
+        ],
+        "avoid": [
+          "chat-only UI without panels",
+          "single raw JSON output",
+          "marketing landing page"
+        ]
+      },
+      "layout_variant": "question_answer_evidence",
+      "visual_style": "knowledge_workbench",
+      "primary_surface": "Question intake, AI answer workspace, document evidence, uncertainty flags, approval note.",
+      "navigation_model": "query_history",
+      "emphasis_order": [
+        "assistant",
+        "intake",
+        "evidence",
+        "draft",
+        "approval",
+        "activity"
+      ]
+    },
+    "role_outputs": [
+      "builder_review",
+      "domain_adapter",
+      "evaluation_checklist",
+      "frontend_layout",
+      "interaction_config",
+      "reasoning_policy",
+      "ui_config"
+    ]
+  },
+  "scaffolded_components": [
+    "app.py entrypoint",
+    "backend/api.py local server",
+    "frontend shell",
+    "guardrail framework",
+    "evaluation framework",
+    "sandbox compatibility"
+  ],
+  "modules": [
+    {
+      "component": "local_api_server",
+      "reason": "Every generated product needs a runnable API and web entrypoint.",
+      "files": [
+        "app.py",
+        "backend/api.py"
+      ],
+      "source": "deterministic scaffold"
+    },
+    {
+      "component": "agent_orchestrator",
+      "reason": "Coordinates case input, local tools, evidence, build-time policy, domain logic plugin, runtime LLM reasoning, and guardrails.",
+      "files": [
+        "backend/agent.py",
+        "backend/llm_client.py",
+        "backend/generated_reasoning_policy.py",
+        "backend/generated_domain_logic.py"
+      ],
+      "source": "selected scaffold plus validated build-time policy/config/code plugin and runtime DeepSeek usage"
+    },
+    {
+      "component": "domain_data_adapter",
+      "reason": "Loads runtime domain pack data selected or auto-built for the submitted enterprise profile.",
+      "files": [
+        "domain_data.json",
+        "data/areas.json",
+        "data/properties.json",
+        "data/sample_customers.json"
+      ],
+      "source": "domain pack injection"
+    },
+    {
+      "component": "approval_guardrails",
+      "reason": "The planning layer requires human review for customer-facing or consequential outputs.",
+      "files": [
+        "backend/guardrails.py",
+        "agent_spec.json"
+      ],
+      "source": "deterministic scaffold plus domain risk rules"
+    },
+    {
+      "component": "evaluation_harness",
+      "reason": "The generated product must be testable through unit tests, CLI smoke tests, and API-backed evaluation.",
+      "files": [
+        "evaluation.py",
+        "tests/test_recommendations.py"
+      ],
+      "source": "deterministic scaffold"
+    },
+    {
+      "component": "runtime_evidence_search",
+      "reason": "The selected workflow needs external supporting context and source freshness checks.",
+      "files": [
+        "backend/web_search.py"
+      ],
+      "source": "deterministic scaffold with runtime web requests"
+    },
+    {
+      "component": "candidate_ranking_tool",
+      "reason": "The productization plan asks for candidate comparison or ranked recommendations.",
+      "files": [
+        "backend/recommendation_engine.py",
+        "backend/tools.py"
+      ],
+      "source": "deterministic scaffold using domain pack records"
+    },
+    {
+      "component": "structured_intake_ui",
+      "reason": "The domain pack defines fields that should appear as a usable product form.",
+      "files": [
+        "frontend/index.html",
+        "frontend/app.js",
+        "frontend/styles.css"
+      ],
+      "source": "deterministic scaffold with product_spec field injection at runtime"
+    },
+    {
+      "component": "approval_packet_workflow",
+      "reason": "The generated app must prepare review packets instead of sending outputs automatically.",
+      "files": [
+        "backend/guardrails.py",
+        "frontend/app.js"
+      ],
+      "source": "deterministic scaffold plus runtime LLM draft"
+    },
+    {
+      "component": "llm_app_design_adapter",
+      "reason": "Translates DeepSeek build-time application design into generated workbench requirements.",
+      "files": [
+        "llm_app_design.json",
+        "app_design.json",
+        "component_plan.json",
+        "product_spec.json"
+      ],
+      "source": "validated build-time DeepSeek JSON design"
+    }
+  ],
+  "generation_contract": {
+    "source_code_generation": "selected_deterministic_scaffold_with_validated_build_time_design_and_small_domain_logic_plugin",
+    "build_time_llm_scope": "scaffold selection, app design, task planning, JSON policy/config artifacts, and one validated small domain logic module; no full-source app generation",
+    "domain_behavior": "configured_by_runtime_domain_pack",
+    "runtime_llm_usage": "backend/agent.py calls DeepSeek after the app is generated",
+    "automatic_code_repair": false,
+    "human_approval_required": true
+  },
+  "interview_note": "The planning agents are used to choose product archetype, domain pack, capabilities, UI regions, risk controls, and generated artifacts. The current implementation assembles a planned product scaffold rather than asking one LLM conversation to write arbitrary source code."
+}

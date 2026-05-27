@@ -1,0 +1,126 @@
+{
+  "trace_version": "software_builder_loop_v1",
+  "loop": [
+    {
+      "stage": "productization_blueprint",
+      "purpose": "Translate the selected opportunity into an enterprise software product archetype, role model, workbench layout, state model, and UI quality contract.",
+      "outputs": [
+        "productization_blueprint.json",
+        "productization_blueprint.md"
+      ],
+      "ai_scientist_analogy": "experiment environment design / template shaping"
+    },
+    {
+      "stage": "product_requirements",
+      "purpose": "Turn the selected enterprise opportunity into users, jobs-to-be-done, workflows, acceptance criteria, and safety boundaries.",
+      "outputs": [
+        "product_requirements.json",
+        "product_brief.json"
+      ],
+      "ai_scientist_analogy": "idea refinement / experiment objective"
+    },
+    {
+      "stage": "project_architecture",
+      "purpose": "Design a runnable product with backend modules, local tools, data files, frontend surface, tests, evaluation, and review artifacts.",
+      "outputs": [
+        "project_architecture.json",
+        "architecture.md"
+      ],
+      "ai_scientist_analogy": "experiment design / method architecture"
+    },
+    {
+      "stage": "file_manifest",
+      "purpose": "Define every generated source, data, test, evaluation, and documentation file before writing code.",
+      "outputs": [
+        "file_manifest.json",
+        "file_plan.json"
+      ],
+      "ai_scientist_analogy": "code generation plan"
+    },
+    {
+      "stage": "code_generation",
+      "purpose": "Generate the full project package, not a single demo script: API server, agent runtime, deterministic tools, data, UI, tests, and docs.",
+      "outputs": [
+        "app.py",
+        "backend/",
+        "frontend/",
+        "data/",
+        "tests/",
+        "evaluation.py"
+      ],
+      "ai_scientist_analogy": "LLM-written experiment code"
+    },
+    {
+      "stage": "sandbox_execution",
+      "purpose": "Compile, import, run CLI, run deterministic tests, run API-backed evaluation, and collect generated case outputs.",
+      "outputs": [
+        "sandbox_report.json",
+        "evaluation_results.json",
+        "case_outputs.json"
+      ],
+      "ai_scientist_analogy": "experiment execution"
+    },
+    {
+      "stage": "repair_loop",
+      "purpose": "Inspect failures and record the next patch/regeneration action until the generated project is runnable.",
+      "outputs": [
+        "repair_log.json",
+        "builder_loop_trace.json"
+      ],
+      "ai_scientist_analogy": "debug, refine, and iterate"
+    },
+    {
+      "stage": "product_review",
+      "purpose": "Score the generated product for business alignment, technical completeness, tool use, API behavior, Japan fit, and governance.",
+      "outputs": [
+        "review.json",
+        "review.md"
+      ],
+      "ai_scientist_analogy": "automated review"
+    }
+  ],
+  "product_requirements": {
+    "product_name": "Nagoya Precision Components AI Workbench",
+    "acceptance_criteria": [
+      "The app exposes a real CLI and local web UI.",
+      "The backend includes separate agent, tool, data, guardrail, and API modules.",
+      "Outputs include local_tool_results and ranked_area_candidates.",
+      "Recommendations use concrete candidate names from the selected domain template.",
+      "The system never returns send_allowed=true in the local product runtime.",
+      "Candidate examples are loaded from template data, e.g. 業務候補 1, 業務候補 2, 業務候補 3."
+    ]
+  },
+  "project_architecture": {
+    "runtime": "Python standard library HTTP API + static frontend + DeepSeek chat completions",
+    "entrypoints": {
+      "cli": "python3 app.py --cli",
+      "server": "python3 app.py",
+      "evaluation": "python3 evaluation.py",
+      "deterministic_tests": "python3 -m unittest discover -s tests"
+    },
+    "backend_modules": [
+      "backend/agent.py",
+      "backend/api.py",
+      "backend/data_store.py",
+      "backend/llm_client.py",
+      "backend/web_search.py",
+      "backend/recommendation_engine.py",
+      "backend/tools.py",
+      "backend/guardrails.py"
+    ],
+    "frontend_modules": [
+      "frontend/index.html",
+      "frontend/styles.css",
+      "frontend/app.js"
+    ]
+  },
+  "file_count": 60,
+  "quality_gates": [
+    "Generated app must be a project package, not a single demo script.",
+    "Generated app must have backend, frontend, data, tests, evaluation, and documentation.",
+    "Generated app must use deterministic local tools before DeepSeek drafting.",
+    "Generated app must call DeepSeek in real API mode.",
+    "Generated app must enforce human approval and send_allowed=false.",
+    "Sandbox evaluation must pass before the generated product is considered usable."
+  ]
+}

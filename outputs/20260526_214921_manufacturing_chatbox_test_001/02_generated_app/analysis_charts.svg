@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="320" viewBox="0 0 920 320">
+<rect width="920" height="320" fill="#ffffff"/>
+<text x="24" y="36" font-size="22" font-weight="800" fill="#172026">Nagoya Precision Components AI Workbench Candidate Data</text>
+<text x="24" y="60" font-size="12" fill="#52606d">Selected opportunity: Maintenance Knowledge Chatbox</text>
+<rect x="56" y="80" width="92" height="170" fill="#166358"/>
+<text x="56" y="272" font-size="13" fill="#172026">業務候補 1</text>
+<text x="56" y="72" font-size="12" fill="#52606d">55</text>
+<rect x="246" y="96" width="92" height="154" fill="#166358"/>
+<text x="246" y="272" font-size="13" fill="#172026">業務候補 2</text>
+<text x="246" y="88" font-size="12" fill="#52606d">50</text>
+<rect x="436" y="111" width="92" height="139" fill="#166358"/>
+<text x="436" y="272" font-size="13" fill="#172026">業務候補 3</text>
+<text x="436" y="103" font-size="12" fill="#52606d">45</text>
+<text x="24" y="304" font-size="13" fill="#52606d">Bars show local candidate reference values; ranking also uses profile constraints, evidence, risk, and approval requirements.</text>
+</svg>

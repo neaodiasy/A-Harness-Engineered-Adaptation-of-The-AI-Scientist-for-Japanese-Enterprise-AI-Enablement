@@ -1,0 +1,18 @@
+{
+  "name": "Maintenance Knowledge Chatbox",
+  "score": 9,
+  "target_workflow": "Troubleshooting equipment alarms and finding maintenance procedures",
+  "proposed_ai_capability": "RAG-powered QA over maintenance manuals, alarm codes, and incident reports, with source citations",
+  "expected_business_value": "Reduce downtime and repetitive senior engineer interruptions; speed up new operator onboarding",
+  "key_risk": "Incorrect retrieval due to poor document quality or ambiguous queries",
+  "human_approval_requirement": "System must flag safety-critical actions for supervisor review; never bypass interlocks",
+  "required_data": "Machine maintenance manuals, alarm code tables, SOPs, past incident reports",
+  "japan_enterprise_fit": "Directly addresses labour shortage and knowledge silos; aligns with METI's DX productivity push",
+  "evidence_support": "evidence_oecd_ai_labour_japan_2025, evidence_meti_genai_dx_skills_2024, evidence_ipa_dx_all_employee_enablement",
+  "why_now": "Japan’s urgent need to counter workforce decline in manufacturing; mature RAG technology enables quick implementation",
+  "refinement_action": "strengthen_human_approval",
+  "refinement_notes": [
+    "Make approval packet mandatory for all external, regulated, or irreversible outputs."
+  ],
+  "search_selection_reason": "Selected after LATS-lite expansion because it has the strongest combination of feasibility, risk controllability, evidence grounding, and PoC buildability."
+}

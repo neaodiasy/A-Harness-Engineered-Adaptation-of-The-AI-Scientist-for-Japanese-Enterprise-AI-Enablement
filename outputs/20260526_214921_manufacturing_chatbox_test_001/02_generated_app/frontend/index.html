@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Generated Agent Product</title>
+    <link rel="stylesheet" href="/frontend/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-block">
+          <div class="brand-mark">JA</div>
+          <div>
+            <div id="productName" class="brand-name">Generated Agent Product</div>
+            <div id="workspaceLabel" class="brand-subtitle">Operations Workspace</div>
+          </div>
+        </div>
+        <nav class="nav-list" aria-label="Workspace navigation">
+          <a id="navIntake" href="#intake" class="nav-item active">Intake</a>
+          <a id="navDecision" href="#recommendations" class="nav-item">Recommendations</a>
+          <a id="navApproval" href="#approval" class="nav-item">Approval</a>
+          <a id="navEvidence" href="#evidence" class="nav-item">Evidence</a>
+          <a id="navArchitecture" href="#architecture" class="nav-item">Architecture</a>
+        </nav>
+        <section class="side-section">
+          <div class="side-title">Case Queue</div>
+          <div id="caseQueue" class="case-queue"></div>
+        </section>
+        <section class="side-section">
+          <div class="side-title">Runtime</div>
+          <div class="runtime-row"><span>LLM</span><strong>DeepSeek</strong></div>
+          <div class="runtime-row"><span>Search</span><strong id="searchMode">Live</strong></div>
+          <div class="runtime-row"><span>Approval</span><strong>Required</strong></div>
+        </section>
+        <section class="side-section">
+          <div class="side-title">LLM Design</div>
+          <div id="designSections" class="design-sections"></div>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <div id="subtitle" class="page-subtitle">Loading product spec...</div>
+            <h1 id="pageTitle">Case Workspace</h1>
+          </div>
+          <div class="topbar-actions">
+            <span id="status" class="status-chip">Ready</span>
+            <button id="run" class="primary-action">Generate Packet</button>
+          </div>
+        </header>
+
+        <section class="kpi-strip" id="summaryCards"></section>
+
+        <section id="primitiveWorkspace" class="primitive-workspace" aria-label="Generated UI primitive workspace"></section>
+
+        <section class="work-grid">
+          <article id="intake" class="panel intake-panel">
+            <div class="panel-header">
+              <h2 id="intakeTitle">Case Intake</h2>
+              <button id="loadSample" class="secondary-action">Load Sample</button>
+            </div>
+            <div id="fields" class="field-grid"></div>
+          </article>
+
+          <article id="recommendations" class="panel decision-panel">
+            <div class="panel-header">
+              <h2 id="decisionTitle">Candidate Comparison</h2>
+              <span id="candidateCount" class="small-chip">0 candidates</span>
+            </div>
+            <div id="rankings" class="candidate-list empty-state">No candidates yet.</div>
+          </article>
+
+          <article id="approval" class="panel approval-panel">
+            <div class="panel-header">
+              <h2>Approval Packet</h2>
+              <span id="approvalStatus" class="small-chip warning">Pending</span>
+            </div>
+            <div id="approvalContent" class="muted">No packet yet.</div>
+            <div class="approval-actions">
+              <button id="approveDraft" class="secondary-action" disabled>Approve Draft</button>
+              <button id="requestEdit" class="secondary-action" disabled>Request Edits</button>
+              <button id="escalate" class="secondary-action" disabled>Escalate</button>
+            </div>
+          </article>
+
+          <article class="panel draft-panel">
+            <div class="panel-header">
+              <h2>Draft</h2>
+              <span class="small-chip">Editable</span>
+            </div>
+            <textarea id="draftEditor" class="draft-editor" spellcheck="false">No draft yet.</textarea>
+          </article>
+
+          <article id="assistant" class="panel assistant-panel">
+            <div class="panel-header">
+              <h2 id="assistantTitle">AI Copilot</h2>
+              <span class="small-chip">DeepSeek</span>
+            </div>
+            <p id="assistantNotice" class="muted">AI output is draft-only and requires human approval.</p>
+            <div id="assistantActions" class="assistant-actions"></div>
+            <textarea id="assistantMessage" class="assistant-message" spellcheck="false"></textarea>
+            <div class="assistant-toolbar">
+              <button id="askAssistant" class="primary-action">Ask AI</button>
+              <button id="useStarter" class="secondary-action">Use Starter</button>
+            </div>
+            <div id="assistantOutput" class="assistant-output empty-state">Ask the copilot to analyze the case, retrieve evidence, or draft safely.</div>
+          </article>
+
+          <article id="evidence" class="panel evidence-panel">
+            <div class="panel-header">
+              <h2>Evidence Sources</h2>
+              <span id="evidenceCount" class="small-chip">0 sources</span>
+            </div>
+            <div id="evidenceSources" class="evidence-list empty-state">No evidence yet.</div>
+          </article>
+
+          <article class="panel log-panel">
+            <div class="panel-header">
+              <h2>Activity</h2>
+              <span class="small-chip">Audit</span>
+            </div>
+            <ol id="activityLog" class="activity-log">
+              <li>Workspace ready.</li>
+            </ol>
+          </article>
+        </section>
+
+        <section id="designedProduct" class="panel dynamic-design-panel">
+          <div class="panel-header">
+            <div>
+              <h2>Generated Product Surface</h2>
+              <p class="muted">This area is rendered from the build-time DeepSeek app design, not hard-coded product text.</p>
+            </div>
+            <span id="designSource" class="small-chip">Design</span>
+          </div>
+          <div id="dynamicDesignPanels" class="dynamic-design-grid"></div>
+        </section>
+
+        <section id="architecture" class="panel visual-panel">
+          <div class="panel-header">
+            <h2>Product System</h2>
+            <span class="small-chip">Builder Loop</span>
+          </div>
+          <div class="visual-grid">
+            <article>
+              <h3>Agent Workflow</h3>
+              <img src="/pipeline_diagram.svg" alt="Generated agent workflow diagram">
+            </article>
+            <article>
+              <h3>Analysis View</h3>
+              <img src="/analysis_charts.svg" alt="Generated analysis chart">
+            </article>
+            <article>
+              <h3>Readiness</h3>
+              <div id="readiness" class="readiness-list muted">Loading...</div>
+            </article>
+            <article>
+              <h3>Debug Output</h3>
+              <details open>
+                <summary>Structured response</summary>
+                <pre id="output">{}</pre>
+              </details>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="/frontend/app.js"></script>
+  </body>
+</html>

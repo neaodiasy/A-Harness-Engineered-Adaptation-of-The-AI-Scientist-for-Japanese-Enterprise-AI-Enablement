@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="320" viewBox="0 0 1040 320">
+<rect width="1040" height="320" fill="#f8fafc"/>
+<text x="28" y="38" font-size="22" font-weight="800" fill="#172026">Opportunity Scores for Nagoya Precision Components</text>
+<text x="28" y="64" font-size="12" fill="#53606b">Selected: Maintenance Knowledge Chatbox | Business value, feasibility, Japan fit, and product buildability.</text>
+<text x="28" y="110" font-size="12" font-weight="700" fill="#172026">Maintenance Knowledge Chatbox</text>
+<rect x="430" y="94" width="500" height="18" rx="5" fill="#e5eaf0"/>
+<rect x="430" y="94" width="664" height="18" rx="5" fill="#b45309"/>
+<text x="948" y="109" font-size="12" font-weight="700" fill="#172026">8.1</text>
+<text x="28" y="152" font-size="12" font-weight="700" fill="#172026">Smart Escalation Decision Support</text>
+<rect x="430" y="136" width="500" height="18" rx="5" fill="#e5eaf0"/>
+<rect x="430" y="136" width="647" height="18" rx="5" fill="#136f63"/>
+<text x="948" y="151" font-size="12" font-weight="700" fill="#172026">7.9</text>
+<text x="28" y="194" font-size="12" font-weight="700" fill="#172026">Multilingual Operator Training Assistant</text>
+<rect x="430" y="178" width="500" height="18" rx="5" fill="#e5eaf0"/>
+<rect x="430" y="178" width="623" height="18" rx="5" fill="#136f63"/>
+<text x="948" y="193" font-size="12" font-weight="700" fill="#172026">7.6</text>
+<text x="28" y="236" font-size="12" font-weight="700" fill="#172026">Incident Report Analyzer for Recurrence Prevention</text>
+<rect x="430" y="220" width="500" height="18" rx="5" fill="#e5eaf0"/>
+<rect x="430" y="220" width="639" height="18" rx="5" fill="#136f63"/>
+<text x="948" y="235" font-size="12" font-weight="700" fill="#172026">7.8</text>
+<text x="28" y="278" font-size="12" font-weight="700" fill="#172026">Quality Inspection Guide Chatbox</text>
+<rect x="430" y="262" width="500" height="18" rx="5" fill="#e5eaf0"/>
+<rect x="430" y="262" width="631" height="18" rx="5" fill="#136f63"/>
+<text x="948" y="277" font-size="12" font-weight="700" fill="#172026">7.7</text>
+</svg>

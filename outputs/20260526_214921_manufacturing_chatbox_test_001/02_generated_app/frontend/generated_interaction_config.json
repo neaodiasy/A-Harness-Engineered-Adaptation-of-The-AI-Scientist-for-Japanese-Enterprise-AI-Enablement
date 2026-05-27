@@ -1,0 +1,53 @@
+{
+  "selected_scaffold_id": "knowledge_assistant",
+  "product_archetype": "knowledge_assistant",
+  "assistant_title": "Nagoya Precision Components Maintenance Knowledge Assistant",
+  "input_placeholder": "故障・メンテナンス・SOPに関する質問を日本語または英語で入力してください... (例: ALM-204が発生した場合の手順は？)",
+  "interaction_modes": [
+    "Type a natural language question in Japanese or simple English.",
+    "Receive an answer with numbered steps and source citations.",
+    "Expand evidence cards to view original document excerpts.",
+    "For escalated cases, a reviewer sees a notification and can approve, edit, or reject the draft.",
+    "View audit log of all interactions for compliance."
+  ],
+  "user_actions": [
+    {
+      "label": "Ask question",
+      "description": "Submit a maintenance or SOP query to retrieve evidence-based answers."
+    },
+    {
+      "label": "View evidence sources",
+      "description": "Open and read the original documents that support the answer."
+    },
+    {
+      "label": "Flag for supervisor review",
+      "description": "Escalate the current response for human review if unsure or safety-critical."
+    },
+    {
+      "label": "Approve or reject escalated response (reviewer only)",
+      "description": "As a reviewer, approve the draft or request changes before it is finalized."
+    },
+    {
+      "label": "Edit answer draft (reviewer only)",
+      "description": "Modify the assistant's draft to add context or correct information."
+    },
+    {
+      "label": "Export conversation for record-keeping",
+      "description": "Save the full chat thread and evidence for compliance and audit purposes."
+    }
+  ],
+  "conversation_starters": [
+    "NC旋盤のALM-204が出た場合、最初に確認すべき手順は何ですか？",
+    "検査寸法が連続して外れた場合、どのSOPを確認すべきですか？",
+    "新人オペレーター向けに、工具交換前の安全確認を簡単に説明してください。",
+    "このアラームはライン停止と上長承認が必要ですか？",
+    "マシニングセンタの工具折れが疑われる場合のトラブルシューティング手順を教えてください。",
+    "品質検査のチェックリストで、寸法公差が外れた場合の記録手順は？",
+    "機械の安全インターロックを無効にしてはならない理由を教えてください。"
+  ],
+  "safety_notice": "This AI assistant provides technical support based on approved documents. It does not replace professional judgment. Safety-critical actions, machine restarts, and bypass of interlocks require human supervisor approval. Always verify steps and escalate when unsure.",
+  "response_contract": "Every response will provide cited evidence, flag missing information, and indicate if human approval is required. No answer will authorize unsafe actions.",
+  "human_approval_required": true,
+  "send_allowed": false,
+  "source": "deepseek_interaction_config_role"
+}

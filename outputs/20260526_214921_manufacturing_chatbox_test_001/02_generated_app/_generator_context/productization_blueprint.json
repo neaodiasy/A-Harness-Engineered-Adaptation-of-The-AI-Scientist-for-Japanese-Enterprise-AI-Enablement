@@ -1,0 +1,553 @@
+{
+  "blueprint_version": "enterprise_productization_v1",
+  "maturity_target": "enterprise_software_mvp",
+  "selected_archetype": {
+    "id": "approval_review_console",
+    "name": "Approval Review Console",
+    "primary_job": "Review a request against policy, collect evidence, and produce a controlled approval packet.",
+    "workspace_regions": [
+      "case_queue",
+      "policy_checklist",
+      "risk_panel",
+      "evidence_panel",
+      "decision_options",
+      "audit_log"
+    ],
+    "selection_score": 9
+  },
+  "source_opportunity": "Maintenance Knowledge Chatbox",
+  "product_positioning": {
+    "not_a_chatbot": true,
+    "not_a_json_console": true,
+    "primary_user_value": "Review a request against policy, collect evidence, and produce a controlled approval packet.",
+    "enterprise_context": {
+      "company_name": "Nagoya Precision Components",
+      "industry": "manufacturing",
+      "main_business": "The company manufactures precision mechanical components for industrial equipment. Factory engineers and line supervisors maintain CNC machines, inspection devices, and assembly lines. Staff need to quickly search maintenance manuals, SOPs, troubleshooting notes, past incident reports, and quality-control procedures.",
+      "ai_objective": "Build an AI-enabled internal technical knowledge chatbox that helps factory staff ask maintenance and SOP questions, retrieve relevant document evidence, summarize troubleshooting steps, and identify when supervisor escalation is required."
+    }
+  },
+  "role_model": [
+    {
+      "role": "operator",
+      "permissions": [
+        "create_case",
+        "run_agent",
+        "edit_draft"
+      ]
+    },
+    {
+      "role": "reviewer",
+      "permissions": [
+        "review_evidence",
+        "approve",
+        "request_edits",
+        "escalate"
+      ]
+    },
+    {
+      "role": "manager",
+      "permissions": [
+        "view_queue",
+        "inspect_audit",
+        "manage_policy"
+      ]
+    }
+  ],
+  "navigation_sections": [
+    "Work queue",
+    "Case intake",
+    "AI analysis",
+    "Evidence",
+    "Approval",
+    "Audit",
+    "System readiness"
+  ],
+  "workspace_regions": [
+    "case_queue",
+    "policy_checklist",
+    "risk_panel",
+    "evidence_panel",
+    "decision_options",
+    "audit_log"
+  ],
+  "enterprise_capabilities": [
+    "case_queue",
+    "structured_intake_form",
+    "runtime_live_web_evidence_search",
+    "domain_tool_panel",
+    "candidate_or_result_comparison",
+    "editable_business_draft",
+    "human_approval_packet",
+    "activity_log",
+    "audit_trace",
+    "error_and_loading_states"
+  ],
+  "data_model": [
+    {
+      "object": "Case",
+      "fields": [
+        "case_id",
+        "requester",
+        "workflow_type",
+        "status",
+        "created_at"
+      ]
+    },
+    {
+      "object": "EvidenceItem",
+      "fields": [
+        "id",
+        "title",
+        "url",
+        "retrieval_method",
+        "summary"
+      ]
+    },
+    {
+      "object": "AgentRun",
+      "fields": [
+        "run_id",
+        "case_id",
+        "model",
+        "tool_names",
+        "risk_level"
+      ]
+    },
+    {
+      "object": "ApprovalPacket",
+      "fields": [
+        "approval_owner",
+        "decision_options",
+        "risk_reasons",
+        "send_allowed"
+      ]
+    }
+  ],
+  "state_model": [
+    "new",
+    "ready_for_agent",
+    "running",
+    "draft_ready",
+    "review_required",
+    "approved_locally",
+    "edit_requested",
+    "escalated"
+  ],
+  "interaction_model": [
+    "Select a case from the work queue.",
+    "Edit structured input fields.",
+    "Run local tools, live web search, and LLM reasoning.",
+    "Compare ranked candidates or extracted findings.",
+    "Inspect evidence sources and risk reasons.",
+    "Edit the generated draft.",
+    "Record approve, edit, or escalate decision in the local review state."
+  ],
+  "visual_quality_contract": {
+    "layout": "enterprise_workbench",
+    "must_have": [
+      "sidebar navigation",
+      "case queue",
+      "workbench panels",
+      "candidate or result table",
+      "evidence source list with live-search markers",
+      "approval actions",
+      "activity log",
+      "debug JSON secondary only",
+      "responsive KPI cards using auto-fit minmax grid",
+      "tablet and mobile breakpoints",
+      "safe wrapping for long labels and model outputs",
+      "no horizontal page overflow"
+    ],
+    "avoid": [
+      "landing page",
+      "chat-only UI",
+      "single raw JSON output",
+      "marketing hero",
+      "decorative-only visuals",
+      "fixed six-column KPI layout",
+      "desktop-only three-column workbench without tablet fallback"
+    ]
+  },
+  "quality_gates": [
+    "Generated app has a local server and browser UI.",
+    "Generated app uses DeepSeek at runtime.",
+    "Generated app performs runtime trusted-domain evidence search.",
+    "Primary UI is an enterprise workbench; raw JSON is secondary.",
+    "Frontend passes the responsiveness harness.",
+    "Sandbox real-API smoke tests pass without requiring a full long-running batch.",
+    "Human approval is visible and enforced.",
+    "No API key or secret is written into generated files."
+  ],
+  "evidence_basis": [
+    "evidence_oecd_ai_labour_japan_2025",
+    "evidence_meti_genai_dx_skills_2024",
+    "evidence_ipa_dx_all_employee_enablement",
+    "evidence_meti_geniac_multimodal_insurance_case",
+    "evidence_fsa_ai_discussion_2025"
+  ],
+  "selected_primitives": [
+    "intake",
+    "retrieval",
+    "classification",
+    "extraction",
+    "checklist",
+    "drafting",
+    "risk_check",
+    "human_approval",
+    "audit_log",
+    "evaluation"
+  ],
+  "domain_pack_mode": "auto_built_runtime_domain_pack",
+  "runtime_domain_pack": {
+    "template_id": "manufacturing",
+    "description": "Candidate domain pack generated by Domain Pack Auto-Builder. Human review required before production use.",
+    "autobuilder": {
+      "status": "draft",
+      "human_review_required": true,
+      "source_count": 5,
+      "generation_method": "keyword_and_profile_extraction"
+    },
+    "match_terms": [
+      "meti",
+      "engineers",
+      "maintenance",
+      "https",
+      "manuals",
+      "past",
+      "incident",
+      "when",
+      "sop",
+      "not",
+      "must",
+      "human",
+      "www",
+      "html",
+      "factory",
+      "inspection",
+      "troubleshooting",
+      "notes"
+    ],
+    "product_name": "Nagoya Precision Components AI Workbench",
+    "subtitle": "Build an AI-enabled internal technical knowledge chatbox that helps factory staff ask maintenance and SOP questions, retrieve relevant document evidence, summarize troubleshooting steps, and identify when supervisor escalation is required.",
+    "primary_action": "Generate Approval Packet",
+    "tool_name": "manufacturing_toolkit",
+    "candidate_collection_label": "workflow candidates",
+    "item_collection_label": "implementation options",
+    "default_classification_label": "manufacturing_workflow_case",
+    "prompt_context": "AI-driven Japanese enterprise enablement product for manufacturing",
+    "candidate_examples": [
+      "業務候補 1",
+      "業務候補 2",
+      "業務候補 3"
+    ],
+    "fields": [
+      {
+        "key": "request",
+        "label": "Business request",
+        "type": "textarea",
+        "required": true,
+        "default": "Describe the case, user need, or workflow request."
+      },
+      {
+        "key": "evidence_summary",
+        "label": "Evidence summary",
+        "type": "textarea",
+        "required": true,
+        "default": "Paste trusted internal notes, public guidance, or approved examples."
+      },
+      {
+        "key": "target_user",
+        "label": "Target user",
+        "type": "text",
+        "required": false,
+        "default": "factory engineers"
+      },
+      {
+        "key": "approval_owner",
+        "label": "Approval owner",
+        "type": "text",
+        "required": true,
+        "default": "Business owner"
+      }
+    ],
+    "specific_rules": [
+      "Use concrete local tool candidate names from the loaded domain data when relevant.",
+      "Use source evidence as supporting context, not as final authority.",
+      "Do not make final legal, financial, safety, employment, medical, or regulated decisions.",
+      "Escalate ambiguous, irreversible, customer-facing, or regulated outputs to a human owner."
+    ],
+    "missing_information_rules": [
+      {
+        "terms": [
+          "customer",
+          "external",
+          "send",
+          "顧客",
+          "送信"
+        ],
+        "message": "Customer-facing use requires approved source evidence and human review."
+      },
+      {
+        "terms": [
+          "risk",
+          "approval",
+          "legal",
+          "financial",
+          "safety",
+          "リスク",
+          "承認"
+        ],
+        "message": "Approval boundary, risk owner, and current policy evidence must be verified."
+      },
+      {
+        "terms": [
+          "financial"
+        ],
+        "message": "Financial, investment, pricing, or payment advice requires human approval."
+      },
+      {
+        "terms": [
+          "safety"
+        ],
+        "message": "Safety-critical or irreversible operational actions require an accountable human owner."
+      }
+    ],
+    "always_missing_information": [
+      "Current internal policy evidence",
+      "Business owner approval",
+      "Final human review result"
+    ],
+    "scoring_summary_ja": "業務候補、証拠、リスク、人間承認条件をローカルデータでスコアリングしました。",
+    "live_search_queries": [
+      "manufacturing AI governance Japan enterprise",
+      "manufacturing DX AI use case Japan"
+    ],
+    "reviewer_guidance": [
+      "Check that the domain pack was reviewed by a human owner before installation.",
+      "Verify that risk boundaries and approval rules match the actual enterprise context.",
+      "Confirm that sample cases do not include confidential or personal data.",
+      "Run schema validation and generated-app smoke tests before accepting the pack."
+    ],
+    "domain_candidates": [
+      {
+        "area_id": "candidate_1",
+        "name_ja": "業務候補 1",
+        "summary_ja": "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+        "typical_budget_jpy_m": 55,
+        "time_or_effort_index": 25,
+        "access_score": 6,
+        "relevance_score": 6,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+        "source_terms": [
+          "meti",
+          "engineers",
+          "maintenance",
+          "https",
+          "manuals",
+          "past"
+        ]
+      },
+      {
+        "area_id": "candidate_2",
+        "name_ja": "業務候補 2",
+        "summary_ja": "new operators spend too much time finding the right procedure",
+        "typical_budget_jpy_m": 50,
+        "time_or_effort_index": 30,
+        "access_score": 7,
+        "relevance_score": 7,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+        "source_terms": [
+          "meti",
+          "engineers",
+          "maintenance",
+          "https",
+          "manuals",
+          "past"
+        ]
+      },
+      {
+        "area_id": "candidate_3",
+        "name_ja": "業務候補 3",
+        "summary_ja": "senior engineers are interrupted by repetitive troubleshooting questions",
+        "typical_budget_jpy_m": 45,
+        "time_or_effort_index": 35,
+        "access_score": 8,
+        "relevance_score": 8,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+        "source_terms": [
+          "meti",
+          "engineers",
+          "maintenance",
+          "https",
+          "manuals",
+          "past"
+        ]
+      }
+    ],
+    "item_records": [
+      {
+        "property_id": "workflow_option_1",
+        "area_id": "candidate_1",
+        "title_ja": "実装オプション 1",
+        "price_jpy_m": 51,
+        "access_minutes": 6,
+        "relevance_score": 6,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+      },
+      {
+        "property_id": "workflow_option_2",
+        "area_id": "candidate_2",
+        "title_ja": "実装オプション 2",
+        "price_jpy_m": 47,
+        "access_minutes": 7,
+        "relevance_score": 7,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+      },
+      {
+        "property_id": "workflow_option_3",
+        "area_id": "candidate_3",
+        "title_ja": "実装オプション 3",
+        "price_jpy_m": 43,
+        "access_minutes": 8,
+        "relevance_score": 8,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+      }
+    ],
+    "area_profiles": [
+      {
+        "area_id": "candidate_1",
+        "name_ja": "業務候補 1",
+        "summary_ja": "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+        "typical_budget_jpy_m": 55,
+        "time_or_effort_index": 25,
+        "access_score": 6,
+        "relevance_score": 6,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+        "source_terms": [
+          "meti",
+          "engineers",
+          "maintenance",
+          "https",
+          "manuals",
+          "past"
+        ]
+      },
+      {
+        "area_id": "candidate_2",
+        "name_ja": "業務候補 2",
+        "summary_ja": "new operators spend too much time finding the right procedure",
+        "typical_budget_jpy_m": 50,
+        "time_or_effort_index": 30,
+        "access_score": 7,
+        "relevance_score": 7,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+        "source_terms": [
+          "meti",
+          "engineers",
+          "maintenance",
+          "https",
+          "manuals",
+          "past"
+        ]
+      },
+      {
+        "area_id": "candidate_3",
+        "name_ja": "業務候補 3",
+        "summary_ja": "senior engineers are interrupted by repetitive troubleshooting questions",
+        "typical_budget_jpy_m": 45,
+        "time_or_effort_index": 35,
+        "access_score": 8,
+        "relevance_score": 8,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+        "source_terms": [
+          "meti",
+          "engineers",
+          "maintenance",
+          "https",
+          "manuals",
+          "past"
+        ]
+      }
+    ],
+    "property_listings": [
+      {
+        "property_id": "workflow_option_1",
+        "area_id": "candidate_1",
+        "title_ja": "実装オプション 1",
+        "price_jpy_m": 51,
+        "access_minutes": 6,
+        "relevance_score": 6,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+      },
+      {
+        "property_id": "workflow_option_2",
+        "area_id": "candidate_2",
+        "title_ja": "実装オプション 2",
+        "price_jpy_m": 47,
+        "access_minutes": 7,
+        "relevance_score": 7,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+      },
+      {
+        "property_id": "workflow_option_3",
+        "area_id": "candidate_3",
+        "title_ja": "実装オプション 3",
+        "price_jpy_m": 43,
+        "access_minutes": 8,
+        "relevance_score": 8,
+        "user_fit_score": 6,
+        "stability_score": 6,
+        "risk_readiness_score": 5,
+        "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+      }
+    ],
+    "sample_customers": [
+      {
+        "case_id": "manufacturing_case_001",
+        "request": "Build an AI-enabled internal technical knowledge chatbox that helps factory staff ask maintenance and SOP questions, retrieve relevant document evidence, summarize troubleshooting steps, and identify when supervisor escalation is required.",
+        "evidence_summary": "machine maintenance manuals; SOP documents; alarm code tables; past incident reports",
+        "approval_owner": "Business owner"
+      }
+    ]
+  },
+  "domain_pack_validation": {
+    "valid": true,
+    "errors": [],
+    "warnings": [],
+    "human_review_required": true
+  }
+}

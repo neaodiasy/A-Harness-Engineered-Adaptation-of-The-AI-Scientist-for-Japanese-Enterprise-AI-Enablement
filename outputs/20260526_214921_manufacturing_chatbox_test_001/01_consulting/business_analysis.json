@@ -1,0 +1,36 @@
+{
+  "company_name": "Nagoya Precision Components",
+  "industry": "manufacturing",
+  "main_business": "The company manufactures precision mechanical components for industrial equipment. Factory engineers and line supervisors maintain CNC machines, inspection devices, and assembly lines. Staff need to quickly search maintenance manuals, SOPs, troubleshooting notes, past incident reports, and quality-control procedures.",
+  "workflows": [
+    "When equipment alarms occur or quality issues are detected, staff manually search PDF manuals, SOP folders, past incident notes, and ask senior engineers. New staff often do not know which document to check. Senior engineers answer repetitive questions about alarm codes, inspection procedures, replacement parts, and escalation conditions.",
+    "The company manufactures precision mechanical components for industrial equipment. Factory engineers and line supervisors maintain CNC machines, inspection devices, and assembly lines. Staff need to quickly search maintenance manuals, SOPs, troubleshooting notes, past incident reports, and quality-control procedures."
+  ],
+  "pain_points": [
+    "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+    "new operators spend too much time finding the right procedure",
+    "senior engineers are interrupted by repetitive troubleshooting questions",
+    "answers can be inconsistent across shifts",
+    "staff need clear escalation guidance for safety-critical or quality-critical cases",
+    "Japanese technical documents are difficult for foreign trainees to understand"
+  ],
+  "available_data": [
+    "machine maintenance manuals",
+    "SOP documents",
+    "alarm code tables",
+    "past incident reports",
+    "quality inspection checklists",
+    "replacement parts notes",
+    "training FAQs"
+  ],
+  "constraints": [
+    "the system must not make final safety decisions",
+    "the system must not instruct staff to bypass safety interlocks",
+    "the system must not approve machine restart after a serious alarm",
+    "human supervisor approval is required for safety-critical, quality-critical, or production-impacting actions",
+    "the system must cite document evidence or say when evidence is missing",
+    "the system should answer in clear Japanese and optionally simple English for trainees"
+  ],
+  "ai_objective": "Build an AI-enabled internal technical knowledge chatbox that helps factory staff ask maintenance and SOP questions, retrieve relevant document evidence, summarize troubleshooting steps, and identify when supervisor escalation is required.",
+  "consulting_agent_summary": "The consulting agent looks for bounded AI enablement opportunities where local evidence, deterministic tools, LLM drafting, and human approval can improve a real workflow without full automation."
+}

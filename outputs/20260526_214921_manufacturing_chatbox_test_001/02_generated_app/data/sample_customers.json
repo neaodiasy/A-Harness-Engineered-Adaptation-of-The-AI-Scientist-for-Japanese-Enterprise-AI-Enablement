@@ -1,0 +1,8 @@
+[
+  {
+    "case_id": "manufacturing_case_001",
+    "request": "Build an AI-enabled internal technical knowledge chatbox that helps factory staff ask maintenance and SOP questions, retrieve relevant document evidence, summarize troubleshooting steps, and identify when supervisor escalation is required.",
+    "evidence_summary": "machine maintenance manuals; SOP documents; alarm code tables; past incident reports",
+    "approval_owner": "Business owner"
+  }
+]

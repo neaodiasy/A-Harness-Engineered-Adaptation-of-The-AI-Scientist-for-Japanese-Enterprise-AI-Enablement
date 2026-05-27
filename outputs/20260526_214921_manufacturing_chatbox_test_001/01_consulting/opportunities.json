@@ -1,0 +1,67 @@
+[
+  {
+    "name": "Maintenance Knowledge Chatbox",
+    "score": 9,
+    "target_workflow": "Troubleshooting equipment alarms and finding maintenance procedures",
+    "proposed_ai_capability": "RAG-powered QA over maintenance manuals, alarm codes, and incident reports, with source citations",
+    "expected_business_value": "Reduce downtime and repetitive senior engineer interruptions; speed up new operator onboarding",
+    "key_risk": "Incorrect retrieval due to poor document quality or ambiguous queries",
+    "human_approval_requirement": "System must flag safety-critical actions for supervisor review; never bypass interlocks",
+    "required_data": "Machine maintenance manuals, alarm code tables, SOPs, past incident reports",
+    "japan_enterprise_fit": "Directly addresses labour shortage and knowledge silos; aligns with METI's DX productivity push",
+    "evidence_support": "evidence_oecd_ai_labour_japan_2025, evidence_meti_genai_dx_skills_2024, evidence_ipa_dx_all_employee_enablement",
+    "why_now": "Japan’s urgent need to counter workforce decline in manufacturing; mature RAG technology enables quick implementation"
+  },
+  {
+    "name": "Smart Escalation Decision Support",
+    "score": 8,
+    "target_workflow": "Deciding when to escalate an alarm or quality issue to supervisor",
+    "proposed_ai_capability": "Rule-based engine combined with LLM reasoning over alarm severity and quality thresholds, providing recommendation with justification",
+    "expected_business_value": "Reduce inconsistent escalation decisions and prevent safety/quality oversights",
+    "key_risk": "System suggests wrong escalation level, leading to critical delay or unnecessary stop",
+    "human_approval_requirement": "Final decision always by human; system only advises; must not override supervisor",
+    "required_data": "Alarm code tables, quality inspection checklists, historical incident reports with escalation outcomes",
+    "japan_enterprise_fit": "Reinforces kaizen and safety culture; aligns with governance principles applied in manufacturing",
+    "evidence_support": "evidence_fsa_ai_discussion_2025, evidence_ipa_dx_all_employee_enablement",
+    "why_now": "Scattered knowledge causes ad-hoc escalation; AI can codify best practices and ensure consistency"
+  },
+  {
+    "name": "Multilingual Operator Training Assistant",
+    "score": 7,
+    "target_workflow": "On-the-job training for new operators, especially foreign trainees, on SOPs and safety checks",
+    "proposed_ai_capability": "Dual-language (Japanese + simple English) explanation of standard procedures and safety steps, generated from SOPs and FAQs",
+    "expected_business_value": "Fast and safe onboarding of diverse workforce; reduce trainer burden",
+    "key_risk": "Simplified instructions may omit critical context; reliance on AI without hands-on practice",
+    "human_approval_requirement": "Training must be supervised by experienced operator until competency confirmed; system must not replace hands-on training",
+    "required_data": "Training FAQs, SOPs, safety manuals, visual aids if available",
+    "japan_enterprise_fit": "Addresses language barrier in factories; supports ‘all-employee enablement’ in DX strategy",
+    "evidence_support": "evidence_ipa_dx_all_employee_enablement, evidence_oecd_ai_labour_japan_2025",
+    "why_now": "Growing foreign worker employment in Japanese manufacturing; need for accessible, consistent training tools"
+  },
+  {
+    "name": "Incident Report Analyzer for Recurrence Prevention",
+    "score": 7,
+    "target_workflow": "Reviewing past incident reports to identify root causes and suggest preventive measures",
+    "proposed_ai_capability": "Unstructured text analysis to cluster similar incidents, extract common causes, and generate summaries with recommended countermeasures",
+    "expected_business_value": "Proactive quality and safety improvement; knowledge retention from tacit senior engineer insights",
+    "key_risk": "Misinterpreting incident narratives or missing subtle failure modes",
+    "human_approval_requirement": "Suggested preventive measures must be reviewed by engineering team before implementation",
+    "required_data": "Past incident reports, quality inspection notes, maintenance logs",
+    "japan_enterprise_fit": "Embodies kaizen continuous improvement; supports data-driven decision making",
+    "evidence_support": "evidence_ipa_dx_all_employee_enablement, evidence_meti_genai_dx_skills_2024",
+    "why_now": "Many factories have underutilized incident records; NLP can unlock prevention insights"
+  },
+  {
+    "name": "Quality Inspection Guide Chatbox",
+    "score": 8,
+    "target_workflow": "Quality-control staff performing inspections and interpreting specification limits",
+    "proposed_ai_capability": "RAG-based chatbox delivering relevant inspection steps, tolerance limits, and troubleshooting for out-of-spec conditions, with links to SOPs",
+    "expected_business_value": "Faster correct interpretation of specs, reduced misjudgments, consistent quality checks",
+    "key_risk": "Misinterpretation of ambiguous spec descriptions leading to incorrect pass/fail decisions",
+    "human_approval_requirement": "Quality-critical decisions (e.g., waiving a defect) must be approved by supervisor; system only gives reference",
+    "required_data": "Quality inspection checklists, product specification documents, past inspection results",
+    "japan_enterprise_fit": "Meets Japanese manufacturing’s high-quality standards; fits DX-driven process standardization",
+    "evidence_support": "evidence_oecd_ai_labour_japan_2025, evidence_meti_geniac_multimodal_insurance_case",
+    "why_now": "Rising quality demands and workforce variability make consistent guidance essential"
+  }
+]

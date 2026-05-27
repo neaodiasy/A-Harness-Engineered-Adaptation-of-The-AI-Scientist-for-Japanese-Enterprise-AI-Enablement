@@ -1,0 +1,112 @@
+{
+  "agent_name": "Nagoya Precision Components AI Workbench",
+  "model": "deepseek-v4-pro",
+  "selected_opportunity": {
+    "name": "Maintenance Knowledge Chatbox",
+    "score": 9,
+    "target_workflow": "Troubleshooting equipment alarms and finding maintenance procedures",
+    "proposed_ai_capability": "RAG-powered QA over maintenance manuals, alarm codes, and incident reports, with source citations",
+    "expected_business_value": "Reduce downtime and repetitive senior engineer interruptions; speed up new operator onboarding",
+    "key_risk": "Incorrect retrieval due to poor document quality or ambiguous queries",
+    "human_approval_requirement": "System must flag safety-critical actions for supervisor review; never bypass interlocks",
+    "required_data": "Machine maintenance manuals, alarm code tables, SOPs, past incident reports",
+    "japan_enterprise_fit": "Directly addresses labour shortage and knowledge silos; aligns with METI's DX productivity push",
+    "evidence_support": "evidence_oecd_ai_labour_japan_2025, evidence_meti_genai_dx_skills_2024, evidence_ipa_dx_all_employee_enablement",
+    "why_now": "Japan’s urgent need to counter workforce decline in manufacturing; mature RAG technology enables quick implementation",
+    "refinement_action": "strengthen_human_approval",
+    "refinement_notes": [
+      "Make approval packet mandatory for all external, regulated, or irreversible outputs."
+    ],
+    "search_selection_reason": "Selected after LATS-lite expansion because it has the strongest combination of feasibility, risk controllability, evidence grounding, and PoC buildability."
+  },
+  "business_goal": "RAG-powered QA over maintenance manuals, alarm codes, and incident reports, with source citations",
+  "target_workflow": "Troubleshooting equipment alarms and finding maintenance procedures",
+  "app_kind": "manufacturing",
+  "selected_primitives": [
+    "intake",
+    "retrieval",
+    "classification",
+    "extraction",
+    "checklist",
+    "drafting",
+    "risk_check",
+    "human_approval",
+    "audit_log",
+    "evaluation"
+  ],
+  "system_prompt": "You are the AI reasoning layer inside a generated enterprise software product. You receive deterministic local tool results and evidence. Return valid JSON only. Do not invent candidate names, source facts, legal claims, financial guarantees, investment advice, or safety guarantees. Keep customer-facing or business-facing language in Japanese when appropriate. Human approval is mandatory and send_allowed must be false.",
+  "output_contract": {
+    "case_id": "string",
+    "classification": {
+      "label": "string",
+      "confidence": "number",
+      "rationale": "string"
+    },
+    "ranked_area_candidates": [
+      {
+        "area_id": "string",
+        "name_ja": "string",
+        "score": "number"
+      }
+    ],
+    "ranked_property_candidates": [
+      {
+        "property_id": "string",
+        "title_ja": "string",
+        "score": "number"
+      }
+    ],
+    "local_tool_results": {
+      "tool_name": "string",
+      "top_candidates": [
+        "object"
+      ]
+    },
+    "evidence": [
+      {
+        "id": "string",
+        "title": "string",
+        "summary": "string"
+      }
+    ],
+    "missing_information": [
+      "string"
+    ],
+    "recommendation_ja": "string",
+    "customer_or_business_draft_ja": "string",
+    "internal_review_note": "string",
+    "risk": {
+      "risk_flag": "boolean",
+      "risk_level": "low|medium|high",
+      "risk_reasons": [
+        "string"
+      ]
+    },
+    "human_approval_required": "boolean",
+    "send_allowed": "boolean",
+    "approval_packet": {
+      "approval_required": "boolean",
+      "decision_options": [
+        "approve",
+        "edit",
+        "reject",
+        "escalate"
+      ]
+    },
+    "audit_trace": {
+      "evidence_ids": [
+        "string"
+      ],
+      "tool_names": [
+        "string"
+      ],
+      "model": "string"
+    }
+  },
+  "reviewer_guidance": [
+    "Confirm recommended candidates exist in local tool results.",
+    "Verify source freshness, risk boundaries, and missing evidence before customer-facing or operational use.",
+    "Edit customer-facing or business-facing Japanese before use.",
+    "Keep the system as decision support; never treat it as legal, financial, safety, or regulated-domain advice."
+  ]
+}

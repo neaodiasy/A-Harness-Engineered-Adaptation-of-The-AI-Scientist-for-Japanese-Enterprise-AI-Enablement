@@ -1,0 +1,600 @@
+{
+  "success": false,
+  "summary": {
+    "success": false,
+    "passed": 0,
+    "total": 1,
+    "pass_rate": 0.0
+  },
+  "cases": [
+    {
+      "case_id": "manufacturing_case_001",
+      "passed": false,
+      "checks": {
+        "has_case_id": true,
+        "classification_label": true,
+        "confidence_not_fixed_half": true,
+        "classification_rationale": true,
+        "local_tool_results_exists": true,
+        "ranked_area_candidates_exists": true,
+        "ranked_property_candidates_exists": true,
+        "uses_actual_candidate_names": false,
+        "no_placeholder_candidate_names": true,
+        "has_evidence": true,
+        "has_missing_information": true,
+        "human_approval_required": true,
+        "send_allowed_false": true,
+        "customer_draft_is_japanese": true,
+        "approval_packet": true,
+        "audit_trace": true,
+        "no_final_guarantee": true
+      },
+      "output": {
+        "case_id": "manufacturing_case_001",
+        "classification": {
+          "label": "preference_based_recommendation",
+          "confidence": 0.78,
+          "rationale": "業務要件、候補スコア、証拠、人間承認条件に基づく推奨ケースです。"
+        },
+        "ranked_area_candidates": [
+          {
+            "area_id": "candidate_1",
+            "name_ja": "業務候補 1",
+            "summary_ja": "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+            "typical_budget_jpy_m": 55,
+            "time_or_effort_index": 25,
+            "access_score": 6,
+            "relevance_score": 6,
+            "user_fit_score": 6,
+            "stability_score": 6,
+            "risk_readiness_score": 5,
+            "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+            "source_terms": [
+              "meti",
+              "engineers",
+              "maintenance",
+              "https",
+              "manuals",
+              "past"
+            ],
+            "score": 36.0,
+            "reason_ja": "予算・コスト目安 55 に対して適合度を評価。時間・工数・アクセス指標 25 を条件と比較。"
+          },
+          {
+            "area_id": "candidate_2",
+            "name_ja": "業務候補 2",
+            "summary_ja": "new operators spend too much time finding the right procedure",
+            "typical_budget_jpy_m": 50,
+            "time_or_effort_index": 30,
+            "access_score": 7,
+            "relevance_score": 7,
+            "user_fit_score": 6,
+            "stability_score": 6,
+            "risk_readiness_score": 5,
+            "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+            "source_terms": [
+              "meti",
+              "engineers",
+              "maintenance",
+              "https",
+              "manuals",
+              "past"
+            ],
+            "score": 30.5,
+            "reason_ja": "予算・コスト目安 50 に対して適合度を評価。時間・工数・アクセス指標 30 を条件と比較。"
+          },
+          {
+            "area_id": "candidate_3",
+            "name_ja": "業務候補 3",
+            "summary_ja": "senior engineers are interrupted by repetitive troubleshooting questions",
+            "typical_budget_jpy_m": 45,
+            "time_or_effort_index": 35,
+            "access_score": 8,
+            "relevance_score": 8,
+            "user_fit_score": 6,
+            "stability_score": 6,
+            "risk_readiness_score": 5,
+            "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+            "source_terms": [
+              "meti",
+              "engineers",
+              "maintenance",
+              "https",
+              "manuals",
+              "past"
+            ],
+            "score": 25.0,
+            "reason_ja": "予算・コスト目安 45 に対して適合度を評価。時間・工数・アクセス指標 35 を条件と比較。"
+          }
+        ],
+        "ranked_property_candidates": [
+          {
+            "property_id": "workflow_option_1",
+            "area_id": "candidate_1",
+            "title_ja": "実装オプション 1",
+            "price_jpy_m": 51,
+            "access_minutes": 6,
+            "relevance_score": 6,
+            "user_fit_score": 6,
+            "stability_score": 6,
+            "risk_readiness_score": 5,
+            "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。",
+            "area_name_ja": "業務候補 1",
+            "score": 38.2,
+            "reason_ja": "上位候補評価を反映: 業務候補 1。コスト・価格指標 51。"
+          },
+          {
+            "property_id": "workflow_option_2",
+            "area_id": "candidate_2",
+            "title_ja": "実装オプション 2",
+            "price_jpy_m": 47,
+            "access_minutes": 7,
+            "relevance_score": 7,
+            "user_fit_score": 6,
+            "stability_score": 6,
+            "risk_readiness_score": 5,
+            "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。",
+            "area_name_ja": "業務候補 2",
+            "score": 35.73,
+            "reason_ja": "上位候補評価を反映: 業務候補 2。コスト・価格指標 47。"
+          },
+          {
+            "property_id": "workflow_option_3",
+            "area_id": "candidate_3",
+            "title_ja": "実装オプション 3",
+            "price_jpy_m": 43,
+            "access_minutes": 8,
+            "relevance_score": 8,
+            "user_fit_score": 6,
+            "stability_score": 6,
+            "risk_readiness_score": 5,
+            "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。",
+            "area_name_ja": "業務候補 3",
+            "score": 33.25,
+            "reason_ja": "上位候補評価を反映: 業務候補 3。コスト・価格指標 43。"
+          }
+        ],
+        "local_tool_results": {
+          "tool_name": "manufacturing_toolkit",
+          "app_kind": "manufacturing",
+          "ranked_area_candidates": [
+            {
+              "area_id": "candidate_1",
+              "name_ja": "業務候補 1",
+              "summary_ja": "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+              "typical_budget_jpy_m": 55,
+              "time_or_effort_index": 25,
+              "access_score": 6,
+              "relevance_score": 6,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+              "source_terms": [
+                "meti",
+                "engineers",
+                "maintenance",
+                "https",
+                "manuals",
+                "past"
+              ],
+              "score": 36.0,
+              "reason_ja": "予算・コスト目安 55 に対して適合度を評価。時間・工数・アクセス指標 25 を条件と比較。"
+            },
+            {
+              "area_id": "candidate_2",
+              "name_ja": "業務候補 2",
+              "summary_ja": "new operators spend too much time finding the right procedure",
+              "typical_budget_jpy_m": 50,
+              "time_or_effort_index": 30,
+              "access_score": 7,
+              "relevance_score": 7,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+              "source_terms": [
+                "meti",
+                "engineers",
+                "maintenance",
+                "https",
+                "manuals",
+                "past"
+              ],
+              "score": 30.5,
+              "reason_ja": "予算・コスト目安 50 に対して適合度を評価。時間・工数・アクセス指標 30 を条件と比較。"
+            },
+            {
+              "area_id": "candidate_3",
+              "name_ja": "業務候補 3",
+              "summary_ja": "senior engineers are interrupted by repetitive troubleshooting questions",
+              "typical_budget_jpy_m": 45,
+              "time_or_effort_index": 35,
+              "access_score": 8,
+              "relevance_score": 8,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+              "source_terms": [
+                "meti",
+                "engineers",
+                "maintenance",
+                "https",
+                "manuals",
+                "past"
+              ],
+              "score": 25.0,
+              "reason_ja": "予算・コスト目安 45 に対して適合度を評価。時間・工数・アクセス指標 35 を条件と比較。"
+            }
+          ],
+          "ranked_property_candidates": [
+            {
+              "property_id": "workflow_option_1",
+              "area_id": "candidate_1",
+              "title_ja": "実装オプション 1",
+              "price_jpy_m": 51,
+              "access_minutes": 6,
+              "relevance_score": 6,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。",
+              "area_name_ja": "業務候補 1",
+              "score": 38.2,
+              "reason_ja": "上位候補評価を反映: 業務候補 1。コスト・価格指標 51。"
+            },
+            {
+              "property_id": "workflow_option_2",
+              "area_id": "candidate_2",
+              "title_ja": "実装オプション 2",
+              "price_jpy_m": 47,
+              "access_minutes": 7,
+              "relevance_score": 7,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。",
+              "area_name_ja": "業務候補 2",
+              "score": 35.73,
+              "reason_ja": "上位候補評価を反映: 業務候補 2。コスト・価格指標 47。"
+            },
+            {
+              "property_id": "workflow_option_3",
+              "area_id": "candidate_3",
+              "title_ja": "実装オプション 3",
+              "price_jpy_m": 43,
+              "access_minutes": 8,
+              "relevance_score": 8,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。",
+              "area_name_ja": "業務候補 3",
+              "score": 33.25,
+              "reason_ja": "上位候補評価を反映: 業務候補 3。コスト・価格指標 43。"
+            }
+          ],
+          "ranked_candidates": [
+            {
+              "area_id": "candidate_1",
+              "name_ja": "業務候補 1",
+              "summary_ja": "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+              "typical_budget_jpy_m": 55,
+              "time_or_effort_index": 25,
+              "access_score": 6,
+              "relevance_score": 6,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+              "source_terms": [
+                "meti",
+                "engineers",
+                "maintenance",
+                "https",
+                "manuals",
+                "past"
+              ],
+              "score": 36.0,
+              "reason_ja": "予算・コスト目安 55 に対して適合度を評価。時間・工数・アクセス指標 25 を条件と比較。"
+            },
+            {
+              "area_id": "candidate_2",
+              "name_ja": "業務候補 2",
+              "summary_ja": "new operators spend too much time finding the right procedure",
+              "typical_budget_jpy_m": 50,
+              "time_or_effort_index": 30,
+              "access_score": 7,
+              "relevance_score": 7,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+              "source_terms": [
+                "meti",
+                "engineers",
+                "maintenance",
+                "https",
+                "manuals",
+                "past"
+              ],
+              "score": 30.5,
+              "reason_ja": "予算・コスト目安 50 に対して適合度を評価。時間・工数・アクセス指標 30 を条件と比較。"
+            },
+            {
+              "area_id": "candidate_3",
+              "name_ja": "業務候補 3",
+              "summary_ja": "senior engineers are interrupted by repetitive troubleshooting questions",
+              "typical_budget_jpy_m": 45,
+              "time_or_effort_index": 35,
+              "access_score": 8,
+              "relevance_score": 8,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+              "source_terms": [
+                "meti",
+                "engineers",
+                "maintenance",
+                "https",
+                "manuals",
+                "past"
+              ],
+              "score": 25.0,
+              "reason_ja": "予算・コスト目安 45 に対して適合度を評価。時間・工数・アクセス指標 35 を条件と比較。"
+            }
+          ],
+          "ranked_items": [
+            {
+              "property_id": "workflow_option_1",
+              "area_id": "candidate_1",
+              "title_ja": "実装オプション 1",
+              "price_jpy_m": 51,
+              "access_minutes": 6,
+              "relevance_score": 6,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。",
+              "area_name_ja": "業務候補 1",
+              "score": 38.2,
+              "reason_ja": "上位候補評価を反映: 業務候補 1。コスト・価格指標 51。"
+            },
+            {
+              "property_id": "workflow_option_2",
+              "area_id": "candidate_2",
+              "title_ja": "実装オプション 2",
+              "price_jpy_m": 47,
+              "access_minutes": 7,
+              "relevance_score": 7,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。",
+              "area_name_ja": "業務候補 2",
+              "score": 35.73,
+              "reason_ja": "上位候補評価を反映: 業務候補 2。コスト・価格指標 47。"
+            },
+            {
+              "property_id": "workflow_option_3",
+              "area_id": "candidate_3",
+              "title_ja": "実装オプション 3",
+              "price_jpy_m": 43,
+              "access_minutes": 8,
+              "relevance_score": 8,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。",
+              "area_name_ja": "業務候補 3",
+              "score": 33.25,
+              "reason_ja": "上位候補評価を反映: 業務候補 3。コスト・価格指標 43。"
+            }
+          ],
+          "top_candidates": [
+            {
+              "area_id": "candidate_1",
+              "name_ja": "業務候補 1",
+              "summary_ja": "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+              "typical_budget_jpy_m": 55,
+              "time_or_effort_index": 25,
+              "access_score": 6,
+              "relevance_score": 6,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+              "source_terms": [
+                "meti",
+                "engineers",
+                "maintenance",
+                "https",
+                "manuals",
+                "past"
+              ],
+              "score": 36.0,
+              "reason_ja": "予算・コスト目安 55 に対して適合度を評価。時間・工数・アクセス指標 25 を条件と比較。"
+            },
+            {
+              "area_id": "candidate_2",
+              "name_ja": "業務候補 2",
+              "summary_ja": "new operators spend too much time finding the right procedure",
+              "typical_budget_jpy_m": 50,
+              "time_or_effort_index": 30,
+              "access_score": 7,
+              "relevance_score": 7,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+              "source_terms": [
+                "meti",
+                "engineers",
+                "maintenance",
+                "https",
+                "manuals",
+                "past"
+              ],
+              "score": 30.5,
+              "reason_ja": "予算・コスト目安 50 に対して適合度を評価。時間・工数・アクセス指標 30 を条件と比較。"
+            },
+            {
+              "area_id": "candidate_3",
+              "name_ja": "業務候補 3",
+              "summary_ja": "senior engineers are interrupted by repetitive troubleshooting questions",
+              "typical_budget_jpy_m": 45,
+              "time_or_effort_index": 35,
+              "access_score": 8,
+              "relevance_score": 8,
+              "user_fit_score": 6,
+              "stability_score": 6,
+              "risk_readiness_score": 5,
+              "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+              "source_terms": [
+                "meti",
+                "engineers",
+                "maintenance",
+                "https",
+                "manuals",
+                "past"
+              ],
+              "score": 25.0,
+              "reason_ja": "予算・コスト目安 45 に対して適合度を評価。時間・工数・アクセス指標 35 を条件と比較。"
+            }
+          ],
+          "missing_information": [
+            "Business owner approval",
+            "Current internal policy evidence",
+            "Final human review result"
+          ],
+          "scoring_summary_ja": "業務候補、証拠、リスク、人間承認条件をローカルデータでスコアリングしました。"
+        },
+        "evidence": [
+          {
+            "id": "local_candidate_profiles",
+            "title": "Generated local candidate profiles",
+            "summary": "Domain candidates and scoring inputs loaded from data/areas.json."
+          },
+          {
+            "id": "local_item_records",
+            "title": "Generated local item records",
+            "summary": "Related item candidates and scoring inputs loaded from data/properties.json."
+          },
+          {
+            "id": "knowledge_base",
+            "title": "Generated knowledge base",
+            "summary": "# Nagoya Precision Components AI Workbench Knowledge Base\n\n## Enterprise Context\n\n- Industry: manufacturing\n- Main business: The company manufactures precision mechanical components for industrial equipment. Factory engineers and line supervisors maintain CNC machines, inspection devices, and assembly lines. Staff need to quickly search maintenance manuals, SOPs, troubleshooting notes, past incident reports, and quality-control procedures.\n- AI objective: \n- Constraints: ['the system must not make final safety decisions', 'the system must not instruct staff to bypass safety interlocks', 'the system must not approve machine restart after a serious alarm', 'human supervisor approval is require"
+          },
+          {
+            "id": "candidate_candidate_1",
+            "title": "業務候補 1",
+            "summary": "maintenance knowledge is scattered across manuals, SOPs, and past incident reports 根拠資料、承認境界、例外処理を人間が確認してください。"
+          },
+          {
+            "id": "candidate_candidate_2",
+            "title": "業務候補 2",
+            "summary": "new operators spend too much time finding the right procedure 根拠資料、承認境界、例外処理を人間が確認してください。"
+          },
+          {
+            "id": "candidate_candidate_3",
+            "title": "業務候補 3",
+            "summary": "senior engineers are interrupted by repetitive troubleshooting questions 根拠資料、承認境界、例外処理を人間が確認してください。"
+          },
+          {
+            "id": "live_web_1",
+            "title": "PDF AI Guidelines for Business Ver1",
+            "url": "https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/pdf/20240419_9.pdf",
+            "summary": "Runtime live trusted-domain search result. Open the URL for full source verification.",
+            "retrieval_method": "runtime_live_web_search"
+          },
+          {
+            "id": "runtime_live_search_metadata",
+            "title": "Runtime live web search metadata",
+            "summary": "{\"enabled\": true, \"provider\": \"duckduckgo_html_with_bing_rss_fallback\", \"trusted_domains\": [\"digital.go.jp\", \"meti.go.jp\", \"ipa.go.jp\", \"fsa.go.jp\", \"mlit.go.jp\", \"gsi.go.jp\", \"mhlw.go.jp\", \"cao.go.jp\", \"boj.or.jp\", \"jpc-net.jp\", \"oecd.org\"], \"queries\": [\"manufacturing AI governance Japan enterprise\"], \"errors\": [], \"result_count\": 1, \"providers_used\": [\"duckduckgo_html\"]}",
+            "retrieval_method": "runtime_live_web_search_metadata"
+          }
+        ],
+        "missing_information": [
+          "Business owner approval",
+          "Current internal policy evidence",
+          "Final human review result"
+        ],
+        "recommendation_ja": "業務候補1「maintenance knowledge is scattered across manuals, SOPs, and past incident reports」を最も適合度の高い候補として推奨します。理由：スコアリング結果で総合スコア36.0点と最も高く、特に予算指標55百万円・工数指標25が本プロジェクトの要求と合致しています。ただし、この候補はリスク対応準備スコアが5/10と低く、根拠資料・承認境界・例外処理について人間による確認と承認が必要です。実装オプションとしては、同候補に紐づく「実装オプション1」（価格51百万円）が最適です。いずれの候補も、自動実行ではなく承認パケットとして提示し、人間の承認を必須とします。",
+        "customer_or_business_draft_ja": "この度は「AI-enabled internal technical knowledge chatbox」の導入検討についてご依頼いただきありがとうございます。弊社内の分析ツールにより、以下の実装案を推奨いたします。\n\n推奨案: 業務候補1「maintenance knowledge is scattered across manuals, SOPs, and past incident reports」\n根拠: 社内の過去のメンテナンスナレッジが文書化されているものの分散しており、本チャットボックスにより統合的な検索と手順書の提示が可能になります。適合度スコアリング（総合36.0点）で最も高い評価を得ました。また、具体的な実装オプションとして「実装オプション1」（概算51百万円）が紐付きます。\n\n注意点: リスク対応準備スコアが5/10とやや低く、安全境界・承認フローについては導入前に人間による詳細な検証と承認が必要です。最終的な判断は貴社の責任者にご確認いただき、必要な内部ポリシー証拠をご提出ください。\n\n添付資料にてスコアリングの詳細とエビデンスをご確認いただけます。ご不明点があればご連絡ください。",
+        "internal_review_note": "内部レビュアー向け注記：本推奨はローカルツール（manufacturing_toolkit）による候補のスコアリングと、ライブWeb検索による参考情報に基づいています。スコアリングに使用したエビデンスは「local_candidate_profiles」「local_item_records」等であり、最終判断には不足している情報（ビジネスオーナー承認、社内ポリシー証拠、最終レビュー結果）があります。特にリスク対応準備スコアが低い点に留意し、承認前に必ず安全境界と例外処理の内容を確認してください。この回答は意思決定支援であり、自動実行は許可されません。",
+        "risk": {
+          "risk_flag": true,
+          "risk_level": "medium",
+          "risk_reasons": [
+            "Business owner approval",
+            "Current internal policy evidence",
+            "Final human review result"
+          ]
+        },
+        "human_approval_required": true,
+        "send_allowed": false,
+        "approval_packet": {
+          "includes_draft": true,
+          "includes_evidence": true,
+          "includes_risk_flags": true,
+          "reviewer_decision_required": true,
+          "status": "pending_human_approval",
+          "approval_triggers": [
+            "safety-critical actions",
+            "missing evidence",
+            "low risk readiness score"
+          ],
+          "approval_required": true,
+          "approval_owner": "Business owner",
+          "decision_options": [
+            "approve",
+            "edit",
+            "reject",
+            "request_more_information"
+          ],
+          "reviewer_guidance": [
+            "Confirm recommended candidates exist in local tool results.",
+            "Verify source freshness, risk boundaries, and missing evidence before customer-facing or operational use.",
+            "Edit customer-facing or business-facing Japanese before use.",
+            "Keep the system as decision support; never treat it as legal, financial, safety, or regulated-domain advice."
+          ],
+          "items_to_verify": [
+            "Business owner approval",
+            "Current internal policy evidence",
+            "Final human review result"
+          ],
+          "top_area_names": [
+            "業務候補 1",
+            "業務候補 2",
+            "業務候補 3"
+          ],
+          "top_property_titles": [
+            "実装オプション 1",
+            "実装オプション 2",
+            "実装オプション 3"
+          ]
+        },
+        "audit_trace": {
+          "tool_names": [
+            "manufacturing_toolkit"
+          ],
+          "evidence_ids": [
+            "local_candidate_profiles",
+            "local_item_records",
+            "knowledge_base",
+            "candidate_candidate_1",
+            "candidate_candidate_2",
+            "candidate_candidate_3",
+            "live_web_1",
+            "runtime_live_search_metadata"
+          ],
+          "model": "deepseek-v4-pro",
+          "output_contract_enforced": true,
+          "deterministic_candidates_attached": true
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "prd_version": "software_builder_loop_v1",
+  "product_name": "Nagoya Precision Components AI Workbench",
+  "app_kind": "manufacturing",
+  "source_opportunity": "Maintenance Knowledge Chatbox",
+  "company_context": {
+    "industry": "manufacturing",
+    "main_business": "The company manufactures precision mechanical components for industrial equipment. Factory engineers and line supervisors maintain CNC machines, inspection devices, and assembly lines. Staff need to quickly search maintenance manuals, SOPs, troubleshooting notes, past incident reports, and quality-control procedures.",
+    "ai_objective": "",
+    "constraints": [
+      "the system must not make final safety decisions",
+      "the system must not instruct staff to bypass safety interlocks",
+      "the system must not approve machine restart after a serious alarm",
+      "human supervisor approval is required for safety-critical, quality-critical, or production-impacting actions",
+      "the system must cite document evidence or say when evidence is missing",
+      "the system should answer in clear Japanese and optionally simple English for trainees"
+    ]
+  },
+  "problem_statement": "Troubleshooting equipment alarms and finding maintenance procedures",
+  "proposed_capability": "RAG-powered QA over maintenance manuals, alarm codes, and incident reports, with source citations",
+  "primary_users": [
+    "Business consultant",
+    "Manager / reviewer",
+    "Customer-facing or operational advisor"
+  ],
+  "core_workflows": [
+    "Capture user preferences, constraints, and business context.",
+    "Rank local workflow candidates and implementation options with deterministic tools.",
+    "Ask DeepSeek to draft a Japanese recommendation using only local tool results and evidence.",
+    "Block external sending until a human reviewer approves the packet."
+  ],
+  "acceptance_criteria": [
+    "The app exposes a real CLI and local web UI.",
+    "The backend includes separate agent, tool, data, guardrail, and API modules.",
+    "Outputs include local_tool_results and ranked_area_candidates.",
+    "Recommendations use concrete candidate names from the selected domain template.",
+    "The system never returns send_allowed=true in the local product runtime.",
+    "Candidate examples are loaded from template data, e.g. 業務候補 1, 業務候補 2, 業務候補 3."
+  ],
+  "non_goals": [
+    "No production database or external CRM integration in the local product runtime.",
+    "No automatic customer sending or irreversible action.",
+    "No legal, financial, disaster-safety, or investment guarantee."
+  ],
+  "safety_policy": "Human approval is required before customer-facing, financial, legal, safety, or operationally consequential use."
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "property_id": "workflow_option_1",
+    "area_id": "candidate_1",
+    "title_ja": "実装オプション 1",
+    "price_jpy_m": 51,
+    "access_minutes": 6,
+    "relevance_score": 6,
+    "user_fit_score": 6,
+    "stability_score": 6,
+    "risk_readiness_score": 5,
+    "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+  },
+  {
+    "property_id": "workflow_option_2",
+    "area_id": "candidate_2",
+    "title_ja": "実装オプション 2",
+    "price_jpy_m": 47,
+    "access_minutes": 7,
+    "relevance_score": 7,
+    "user_fit_score": 6,
+    "stability_score": 6,
+    "risk_readiness_score": 5,
+    "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+  },
+  {
+    "property_id": "workflow_option_3",
+    "area_id": "candidate_3",
+    "title_ja": "実装オプション 3",
+    "price_jpy_m": 43,
+    "access_minutes": 8,
+    "relevance_score": 8,
+    "user_fit_score": 6,
+    "stability_score": 6,
+    "risk_readiness_score": 5,
+    "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+  }
+]

@@ -1,0 +1,218 @@
+{
+  "template_id": "manufacturing",
+  "template_source": "",
+  "domain_candidates": [
+    {
+      "area_id": "candidate_1",
+      "name_ja": "業務候補 1",
+      "summary_ja": "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+      "typical_budget_jpy_m": 55,
+      "time_or_effort_index": 25,
+      "access_score": 6,
+      "relevance_score": 6,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+      "source_terms": [
+        "meti",
+        "engineers",
+        "maintenance",
+        "https",
+        "manuals",
+        "past"
+      ]
+    },
+    {
+      "area_id": "candidate_2",
+      "name_ja": "業務候補 2",
+      "summary_ja": "new operators spend too much time finding the right procedure",
+      "typical_budget_jpy_m": 50,
+      "time_or_effort_index": 30,
+      "access_score": 7,
+      "relevance_score": 7,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+      "source_terms": [
+        "meti",
+        "engineers",
+        "maintenance",
+        "https",
+        "manuals",
+        "past"
+      ]
+    },
+    {
+      "area_id": "candidate_3",
+      "name_ja": "業務候補 3",
+      "summary_ja": "senior engineers are interrupted by repetitive troubleshooting questions",
+      "typical_budget_jpy_m": 45,
+      "time_or_effort_index": 35,
+      "access_score": 8,
+      "relevance_score": 8,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+      "source_terms": [
+        "meti",
+        "engineers",
+        "maintenance",
+        "https",
+        "manuals",
+        "past"
+      ]
+    }
+  ],
+  "item_records": [
+    {
+      "property_id": "workflow_option_1",
+      "area_id": "candidate_1",
+      "title_ja": "実装オプション 1",
+      "price_jpy_m": 51,
+      "access_minutes": 6,
+      "relevance_score": 6,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+    },
+    {
+      "property_id": "workflow_option_2",
+      "area_id": "candidate_2",
+      "title_ja": "実装オプション 2",
+      "price_jpy_m": 47,
+      "access_minutes": 7,
+      "relevance_score": 7,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+    },
+    {
+      "property_id": "workflow_option_3",
+      "area_id": "candidate_3",
+      "title_ja": "実装オプション 3",
+      "price_jpy_m": 43,
+      "access_minutes": 8,
+      "relevance_score": 8,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+    }
+  ],
+  "area_profiles": [
+    {
+      "area_id": "candidate_1",
+      "name_ja": "業務候補 1",
+      "summary_ja": "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+      "typical_budget_jpy_m": 55,
+      "time_or_effort_index": 25,
+      "access_score": 6,
+      "relevance_score": 6,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+      "source_terms": [
+        "meti",
+        "engineers",
+        "maintenance",
+        "https",
+        "manuals",
+        "past"
+      ]
+    },
+    {
+      "area_id": "candidate_2",
+      "name_ja": "業務候補 2",
+      "summary_ja": "new operators spend too much time finding the right procedure",
+      "typical_budget_jpy_m": 50,
+      "time_or_effort_index": 30,
+      "access_score": 7,
+      "relevance_score": 7,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+      "source_terms": [
+        "meti",
+        "engineers",
+        "maintenance",
+        "https",
+        "manuals",
+        "past"
+      ]
+    },
+    {
+      "area_id": "candidate_3",
+      "name_ja": "業務候補 3",
+      "summary_ja": "senior engineers are interrupted by repetitive troubleshooting questions",
+      "typical_budget_jpy_m": 45,
+      "time_or_effort_index": 35,
+      "access_score": 8,
+      "relevance_score": 8,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "根拠資料、承認境界、例外処理を人間が確認してください。",
+      "source_terms": [
+        "meti",
+        "engineers",
+        "maintenance",
+        "https",
+        "manuals",
+        "past"
+      ]
+    }
+  ],
+  "property_listings": [
+    {
+      "property_id": "workflow_option_1",
+      "area_id": "candidate_1",
+      "title_ja": "実装オプション 1",
+      "price_jpy_m": 51,
+      "access_minutes": 6,
+      "relevance_score": 6,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+    },
+    {
+      "property_id": "workflow_option_2",
+      "area_id": "candidate_2",
+      "title_ja": "実装オプション 2",
+      "price_jpy_m": 47,
+      "access_minutes": 7,
+      "relevance_score": 7,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+    },
+    {
+      "property_id": "workflow_option_3",
+      "area_id": "candidate_3",
+      "title_ja": "実装オプション 3",
+      "price_jpy_m": 43,
+      "access_minutes": 8,
+      "relevance_score": 8,
+      "user_fit_score": 6,
+      "stability_score": 6,
+      "risk_readiness_score": 5,
+      "risk_note_ja": "自動実行ではなく、承認パケットとして提示してください。"
+    }
+  ],
+  "sample_customers": [
+    {
+      "case_id": "manufacturing_case_001",
+      "request": "Build an AI-enabled internal technical knowledge chatbox that helps factory staff ask maintenance and SOP questions, retrieve relevant document evidence, summarize troubleshooting steps, and identify when supervisor escalation is required.",
+      "evidence_summary": "machine maintenance manuals; SOP documents; alarm code tables; past incident reports",
+      "approval_owner": "Business owner"
+    }
+  ]
+}

@@ -1,0 +1,411 @@
+{
+  "company_profile": {
+    "company_name": "Nagoya Precision Components",
+    "country": "Japan",
+    "industry": "manufacturing",
+    "main_business": "The company manufactures precision mechanical components for industrial equipment. Factory engineers and line supervisors maintain CNC machines, inspection devices, and assembly lines. Staff need to quickly search maintenance manuals, SOPs, troubleshooting notes, past incident reports, and quality-control procedures.",
+    "target_users": [
+      "factory engineers",
+      "line supervisors",
+      "maintenance technicians",
+      "quality-control staff",
+      "new operators in training"
+    ],
+    "current_workflow": "When equipment alarms occur or quality issues are detected, staff manually search PDF manuals, SOP folders, past incident notes, and ask senior engineers. New staff often do not know which document to check. Senior engineers answer repetitive questions about alarm codes, inspection procedures, replacement parts, and escalation conditions.",
+    "pain_points": [
+      "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+      "new operators spend too much time finding the right procedure",
+      "senior engineers are interrupted by repetitive troubleshooting questions",
+      "answers can be inconsistent across shifts",
+      "staff need clear escalation guidance for safety-critical or quality-critical cases",
+      "Japanese technical documents are difficult for foreign trainees to understand"
+    ],
+    "available_data": [
+      "machine maintenance manuals",
+      "SOP documents",
+      "alarm code tables",
+      "past incident reports",
+      "quality inspection checklists",
+      "replacement parts notes",
+      "training FAQs"
+    ],
+    "constraints": [
+      "the system must not make final safety decisions",
+      "the system must not instruct staff to bypass safety interlocks",
+      "the system must not approve machine restart after a serious alarm",
+      "human supervisor approval is required for safety-critical, quality-critical, or production-impacting actions",
+      "the system must cite document evidence or say when evidence is missing",
+      "the system should answer in clear Japanese and optionally simple English for trainees"
+    ],
+    "business_goal": "Build an AI-enabled internal technical knowledge chatbox that helps factory staff ask maintenance and SOP questions, retrieve relevant document evidence, summarize troubleshooting steps, and identify when supervisor escalation is required.",
+    "preferred_enablement_direction": "internal manufacturing knowledge chatbox",
+    "desired_product_type": "chatbox",
+    "preferred_interface": "chat_console",
+    "sample_user_questions": [
+      "NC旋盤のALM-204が出た場合、最初に確認すべき手順は何ですか？",
+      "検査寸法が連続して外れた場合、どのSOPを確認すべきですか？",
+      "新人オペレーター向けに、工具交換前の安全確認を簡単に説明してください。",
+      "このアラームはライン停止と上長承認が必要ですか？"
+    ]
+  },
+  "evidence_pack": {
+    "method": "curated_source_retrieval_v1",
+    "query_context": {
+      "company_name": "Nagoya Precision Components",
+      "country": "Japan",
+      "industry": "manufacturing",
+      "main_business": "The company manufactures precision mechanical components for industrial equipment. Factory engineers and line supervisors maintain CNC machines, inspection devices, and assembly lines. Staff need to quickly search maintenance manuals, SOPs, troubleshooting notes, past incident reports, and quality-control procedures.",
+      "target_users": [
+        "factory engineers",
+        "line supervisors",
+        "maintenance technicians",
+        "quality-control staff",
+        "new operators in training"
+      ],
+      "current_workflow": "When equipment alarms occur or quality issues are detected, staff manually search PDF manuals, SOP folders, past incident notes, and ask senior engineers. New staff often do not know which document to check. Senior engineers answer repetitive questions about alarm codes, inspection procedures, replacement parts, and escalation conditions.",
+      "pain_points": [
+        "maintenance knowledge is scattered across manuals, SOPs, and past incident reports",
+        "new operators spend too much time finding the right procedure",
+        "senior engineers are interrupted by repetitive troubleshooting questions",
+        "answers can be inconsistent across shifts",
+        "staff need clear escalation guidance for safety-critical or quality-critical cases",
+        "Japanese technical documents are difficult for foreign trainees to understand"
+      ],
+      "available_data": [
+        "machine maintenance manuals",
+        "SOP documents",
+        "alarm code tables",
+        "past incident reports",
+        "quality inspection checklists",
+        "replacement parts notes",
+        "training FAQs"
+      ],
+      "constraints": [
+        "the system must not make final safety decisions",
+        "the system must not instruct staff to bypass safety interlocks",
+        "the system must not approve machine restart after a serious alarm",
+        "human supervisor approval is required for safety-critical, quality-critical, or production-impacting actions",
+        "the system must cite document evidence or say when evidence is missing",
+        "the system should answer in clear Japanese and optionally simple English for trainees"
+      ],
+      "business_goal": "Build an AI-enabled internal technical knowledge chatbox that helps factory staff ask maintenance and SOP questions, retrieve relevant document evidence, summarize troubleshooting steps, and identify when supervisor escalation is required.",
+      "preferred_enablement_direction": "internal manufacturing knowledge chatbox",
+      "desired_product_type": "chatbox",
+      "preferred_interface": "chat_console",
+      "sample_user_questions": [
+        "NC旋盤のALM-204が出た場合、最初に確認すべき手順は何ですか？",
+        "検査寸法が連続して外れた場合、どのSOPを確認すべきですか？",
+        "新人オペレーター向けに、工具交換前の安全確認を簡単に説明してください。",
+        "このアラームはライン停止と上長承認が必要ですか？"
+      ]
+    },
+    "evidence_items": [
+      {
+        "id": "evidence_oecd_ai_labour_japan_2025",
+        "title": "OECD: Artificial Intelligence and the Labour Market in Japan",
+        "url": "https://www.oecd.org/en/publications/artificial-intelligence-and-the-labour-market-in-japan_b825563e-en/full-report.html",
+        "source_type": "policy_report",
+        "themes": [
+          "labor_shortage",
+          "productivity",
+          "skills",
+          "sme",
+          "workplace_ai"
+        ],
+        "industry_terms": [
+          "general",
+          "manufacturing",
+          "finance",
+          "insurance",
+          "services"
+        ],
+        "summary": "Japan faces labour and skills shortages, while AI adoption in workplaces remains comparatively low. The report frames AI as a way to improve productivity, job quality, and access to work when introduced safely.",
+        "supports": [
+          "opportunity_generation",
+          "business_value",
+          "japan_fit"
+        ],
+        "retrieval_method": "curated",
+        "relevance_score": 3.0
+      },
+      {
+        "id": "evidence_meti_genai_dx_skills_2024",
+        "title": "METI: Human Resources and Skills Required for DX Promotion in the Age of Generative AI",
+        "url": "https://www.meti.go.jp/english/press/2024/0628_003.html",
+        "source_type": "government_report",
+        "themes": [
+          "generative_ai",
+          "dx",
+          "skills",
+          "productivity",
+          "transformation"
+        ],
+        "industry_terms": [
+          "general",
+          "manufacturing",
+          "distribution",
+          "services",
+          "retail"
+        ],
+        "summary": "METI positions generative AI as a business opportunity for productivity, added value, and social issue solving, while emphasizing the human skills needed to use AI appropriately and proactively.",
+        "supports": [
+          "ai_literacy",
+          "roadmap",
+          "change_management"
+        ],
+        "retrieval_method": "curated",
+        "relevance_score": 3.0
+      },
+      {
+        "id": "evidence_ipa_dx_all_employee_enablement",
+        "title": "IPA DX SQUARE: Enterprise DX and all-employee digital skill development examples",
+        "url": "https://dx.ipa.go.jp/",
+        "source_type": "dx_case_collection",
+        "themes": [
+          "dx",
+          "data_utilization",
+          "all_employee_enablement",
+          "kaizen",
+          "skills"
+        ],
+        "industry_terms": [
+          "general",
+          "manufacturing",
+          "energy",
+          "consumer_goods",
+          "services"
+        ],
+        "summary": "IPA DX case studies emphasize data utilization, human resource development, digital skill standards, and broad employee enablement.",
+        "supports": [
+          "japan_fit",
+          "kaizen",
+          "adoption"
+        ],
+        "retrieval_method": "curated",
+        "relevance_score": 3.0
+      },
+      {
+        "id": "evidence_meti_geniac_multimodal_insurance_case",
+        "title": "METI GENIAC case: multimodal LMM for insurance contract operations",
+        "url": "https://www.meti.go.jp/policy/mono_info_service/geniac/geniac_magazine/usecase_02.html",
+        "source_type": "industry_case",
+        "themes": [
+          "multimodal",
+          "document_processing",
+          "insurance",
+          "workflow_efficiency"
+        ],
+        "industry_terms": [
+          "insurance",
+          "finance",
+          "document",
+          "contract",
+          "regulated"
+        ],
+        "summary": "A METI GENIAC case highlights multimodal large model development to improve insurance contract operation efficiency.",
+        "supports": [
+          "document_processing",
+          "prototype_scope",
+          "multimodal"
+        ],
+        "retrieval_method": "curated",
+        "relevance_score": 3.0
+      },
+      {
+        "id": "evidence_fsa_ai_discussion_2025",
+        "title": "FSA: AI Discussion Paper for the Financial Sector",
+        "url": "https://www.fsa.go.jp/en/news/2025/20250304/aidp.html",
+        "source_type": "regulatory_discussion",
+        "themes": [
+          "financial_services",
+          "risk_management",
+          "governance",
+          "customer_convenience",
+          "operational_efficiency"
+        ],
+        "industry_terms": [
+          "finance",
+          "bank",
+          "insurance",
+          "securities",
+          "regulated"
+        ],
+        "summary": "Japan's FSA discusses sound AI use in financial institutions, balancing operational efficiency and customer convenience against misuse, misinformation, and emerging risk concerns.",
+        "supports": [
+          "risk_check",
+          "human_approval",
+          "compliance"
+        ],
+        "retrieval_method": "curated",
+        "relevance_score": 0.5
+      }
+    ],
+    "live_search": {
+      "enabled": false,
+      "reason": "Set ENABLE_LIVE_SEARCH=1 to enable live trusted-domain retrieval."
+    },
+    "coverage_notes": [
+      "Evidence prioritizes Japan-specific AI adoption, DX, governance, labour shortage, and regulated workflow themes.",
+      "When ENABLE_LIVE_SEARCH=1, the harness adds live trusted-domain search while preserving the same evidence_pack schema."
+    ]
+  },
+  "market_context": {
+    "labor_shortage": "Japan faces acute labor and skills shortage, especially in manufacturing SMEs, driving need for productivity tools.",
+    "dx_readiness": "METI and IPA promote DX and generative AI as strategic tools, with emphasis on human-centered deployment and all-employee enablement.",
+    "governance": "AI in regulated contexts requires clear governance, human approval, and risk management, even outside finance.",
+    "multimodal_processing": "Japanese enterprises are exploring multimodal AI for document and technical content processing, as seen in GENIAC cases.",
+    "kaizen_culture": "Kaizen-style continuous improvement fits iterative AI rollout and feedback-driven refinement in factory settings."
+  },
+  "opportunities": [
+    {
+      "name": "Maintenance Knowledge Chatbox",
+      "score": 9,
+      "target_workflow": "Troubleshooting equipment alarms and finding maintenance procedures",
+      "proposed_ai_capability": "RAG-powered QA over maintenance manuals, alarm codes, and incident reports, with source citations",
+      "expected_business_value": "Reduce downtime and repetitive senior engineer interruptions; speed up new operator onboarding",
+      "key_risk": "Incorrect retrieval due to poor document quality or ambiguous queries",
+      "human_approval_requirement": "System must flag safety-critical actions for supervisor review; never bypass interlocks",
+      "required_data": "Machine maintenance manuals, alarm code tables, SOPs, past incident reports",
+      "japan_enterprise_fit": "Directly addresses labour shortage and knowledge silos; aligns with METI's DX productivity push",
+      "evidence_support": "evidence_oecd_ai_labour_japan_2025, evidence_meti_genai_dx_skills_2024, evidence_ipa_dx_all_employee_enablement",
+      "why_now": "Japan’s urgent need to counter workforce decline in manufacturing; mature RAG technology enables quick implementation"
+    },
+    {
+      "name": "Smart Escalation Decision Support",
+      "score": 8,
+      "target_workflow": "Deciding when to escalate an alarm or quality issue to supervisor",
+      "proposed_ai_capability": "Rule-based engine combined with LLM reasoning over alarm severity and quality thresholds, providing recommendation with justification",
+      "expected_business_value": "Reduce inconsistent escalation decisions and prevent safety/quality oversights",
+      "key_risk": "System suggests wrong escalation level, leading to critical delay or unnecessary stop",
+      "human_approval_requirement": "Final decision always by human; system only advises; must not override supervisor",
+      "required_data": "Alarm code tables, quality inspection checklists, historical incident reports with escalation outcomes",
+      "japan_enterprise_fit": "Reinforces kaizen and safety culture; aligns with governance principles applied in manufacturing",
+      "evidence_support": "evidence_fsa_ai_discussion_2025, evidence_ipa_dx_all_employee_enablement",
+      "why_now": "Scattered knowledge causes ad-hoc escalation; AI can codify best practices and ensure consistency"
+    },
+    {
+      "name": "Multilingual Operator Training Assistant",
+      "score": 7,
+      "target_workflow": "On-the-job training for new operators, especially foreign trainees, on SOPs and safety checks",
+      "proposed_ai_capability": "Dual-language (Japanese + simple English) explanation of standard procedures and safety steps, generated from SOPs and FAQs",
+      "expected_business_value": "Fast and safe onboarding of diverse workforce; reduce trainer burden",
+      "key_risk": "Simplified instructions may omit critical context; reliance on AI without hands-on practice",
+      "human_approval_requirement": "Training must be supervised by experienced operator until competency confirmed; system must not replace hands-on training",
+      "required_data": "Training FAQs, SOPs, safety manuals, visual aids if available",
+      "japan_enterprise_fit": "Addresses language barrier in factories; supports ‘all-employee enablement’ in DX strategy",
+      "evidence_support": "evidence_ipa_dx_all_employee_enablement, evidence_oecd_ai_labour_japan_2025",
+      "why_now": "Growing foreign worker employment in Japanese manufacturing; need for accessible, consistent training tools"
+    },
+    {
+      "name": "Incident Report Analyzer for Recurrence Prevention",
+      "score": 7,
+      "target_workflow": "Reviewing past incident reports to identify root causes and suggest preventive measures",
+      "proposed_ai_capability": "Unstructured text analysis to cluster similar incidents, extract common causes, and generate summaries with recommended countermeasures",
+      "expected_business_value": "Proactive quality and safety improvement; knowledge retention from tacit senior engineer insights",
+      "key_risk": "Misinterpreting incident narratives or missing subtle failure modes",
+      "human_approval_requirement": "Suggested preventive measures must be reviewed by engineering team before implementation",
+      "required_data": "Past incident reports, quality inspection notes, maintenance logs",
+      "japan_enterprise_fit": "Embodies kaizen continuous improvement; supports data-driven decision making",
+      "evidence_support": "evidence_ipa_dx_all_employee_enablement, evidence_meti_genai_dx_skills_2024",
+      "why_now": "Many factories have underutilized incident records; NLP can unlock prevention insights"
+    },
+    {
+      "name": "Quality Inspection Guide Chatbox",
+      "score": 8,
+      "target_workflow": "Quality-control staff performing inspections and interpreting specification limits",
+      "proposed_ai_capability": "RAG-based chatbox delivering relevant inspection steps, tolerance limits, and troubleshooting for out-of-spec conditions, with links to SOPs",
+      "expected_business_value": "Faster correct interpretation of specs, reduced misjudgments, consistent quality checks",
+      "key_risk": "Misinterpretation of ambiguous spec descriptions leading to incorrect pass/fail decisions",
+      "human_approval_requirement": "Quality-critical decisions (e.g., waiving a defect) must be approved by supervisor; system only gives reference",
+      "required_data": "Quality inspection checklists, product specification documents, past inspection results",
+      "japan_enterprise_fit": "Meets Japanese manufacturing’s high-quality standards; fits DX-driven process standardization",
+      "evidence_support": "evidence_oecd_ai_labour_japan_2025, evidence_meti_geniac_multimodal_insurance_case",
+      "why_now": "Rising quality demands and workforce variability make consistent guidance essential"
+    }
+  ],
+  "recommended_agent": {
+    "name": "Nagoya Technical Knowledge Chatbox",
+    "description": "A retrieval-augmented generation (RAG) chatbox providing just-in-time answers from maintenance manuals, SOPs, alarm codes, and incident reports, with escalation logic and multilingual support.",
+    "core_capabilities": [
+      "natural language query over technical documents",
+      "source citation and confidence scoring",
+      "escalation recommendation based on alarm severity and quality impact",
+      "dual-language output (Japanese + simple English)",
+      "feedback loop for answer quality improvement"
+    ],
+    "human_approval_points": [
+      "safety-critical actions (machine restart after serious alarm)",
+      "quality-critical corrective actions",
+      "production-impacting changes",
+      "advice on bypassing safety interlocks (system must refuse)",
+      "when evidence is missing or unclear, recommend supervisor consultation"
+    ]
+  },
+  "feasibility_check": {
+    "data_availability": "Good: maintenance manuals, SOPs, alarm code tables, incident reports, inspection checklists, and FAQs are available, though currently scattered.",
+    "technical_feasibility": "High: RAG over PDFs and structured documents is well-established; Japanese language models are available; can start with a simple prototype.",
+    "operational_feasibility": "Medium: requires curation and indexing of documents; cultural adoption may need kaizen-style engagement with senior engineers and trainers.",
+    "regulatory_risk": "Low: internal tool with no direct safety decision-making; human approval gates align with governance best practices.",
+    "evidence_alignment": "Strong alignment with Japanese government DX and AI productivity narratives (METI, IPA); OECD labour shortage pressure supports ROI."
+  },
+  "agent_workflow": [
+    {
+      "step": 1,
+      "action": "User submits query in natural language (Japanese or English) via chat console."
+    },
+    {
+      "step": 2,
+      "action": "System retrieves relevant document chunks from indexed manuals, SOPs, alarm tables, and incident reports."
+    },
+    {
+      "step": 3,
+      "action": "LLM generates answer with step-by-step guidance, citing sources, and flags if answer is incomplete."
+    },
+    {
+      "step": 4,
+      "action": "System evaluates escalation rules (e.g., if alarm is safety-critical, instruct to stop and call supervisor)."
+    },
+    {
+      "step": 5,
+      "action": "Output answer in Japanese (primary) and optional simple English; include escalation notice if applicable."
+    },
+    {
+      "step": 6,
+      "action": "User rates answer; feedback collected for future fine-tuning and document updates."
+    }
+  ],
+  "roadmap": {
+    "phase_1_foundation": {
+      "timeline": "0-3 months",
+      "activities": [
+        "Digitize and curate core documents (manuals, SOPs, alarm codes).",
+        "Set up RAG pipeline with Japanese LLM and document indexing.",
+        "Build chat console frontend with basic query-answer flow.",
+        "Implement source citation and confidence display."
+      ]
+    },
+    "phase_2_escalation_and_multilingual": {
+      "timeline": "4-6 months",
+      "activities": [
+        "Add escalation rules engine mapped to alarm severity and quality impact.",
+        "Integrate simple English output using translation layer or dual generation.",
+        "Pilot with a small group of engineers and new operators.",
+        "Collect user feedback and refine answers."
+      ]
+    },
+    "phase_3_expansion_and_analytics": {
+      "timeline": "7-12 months",
+      "activities": [
+        "Expand to incident report analysis and trend identification.",
+        "Add proactive maintenance tips based on recurring issues.",
+        "Integrate with training modules for new operators.",
+        "Deploy feedback loop for continuous document improvement."
+      ]
+    }
+  },
+  "ai_scientist_mapping": {
+    "agent_scientist_role": "Design and tune the retrieval-augmented generation system, including knowledge indexing strategy, prompt engineering, escalation logic, and domain-specific fine-tuning of the LLM to understand factory terminology.",
+    "applied_research_engineer_role": "Implement scalable document processing pipeline, optimize retrieval latency, build the chat interface, and ensure reliable human-in-the-loop approval workflows for safety-critical scenarios.",
+    "collaboration_with_domain_experts": "Work closely with senior engineers to validate answer accuracy, curate alarm escalation rules, and refine SOP interpretations; partner with quality control staff to integrate inspection checklists."
+  }
+}
